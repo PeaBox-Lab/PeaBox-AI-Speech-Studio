@@ -1,24 +1,17 @@
-# PeaBox Voice Studio v1.0
+# PeaBox Voice Studio 2
 
-Fully functional local Python app for offline narration and AI transcription.
-
-## Features
-- Offline TTS using system voices
-- TXT, MD, DOCX and text-PDF import
-- WAV generation, playback and download
-- Upload or microphone transcription
-- Faster-Whisper local inference
-- TXT and SRT exports
-- SQLite job history
+Local Kokoro TTS, Faster-Whisper transcription, and optional Azure Speech, Amazon Polly and Google Cloud TTS.
 
 ## Windows
-Extract the ZIP and double-click `start_windows.bat`. Python 3.10-3.12 is required. The launcher creates an isolated environment and installs dependencies.
+Install 64-bit Python 3.11, extract the folder and run `start_windows.bat`. The launcher creates a clean Python 3.11 virtual environment. This avoids current Python 3.13 compatibility problems in audio/ML dependencies.
 
-## macOS/Linux
-Run `chmod +x start_linux_mac.sh && ./start_linux_mac.sh`. On Ubuntu/Debian, install `espeak-ng libespeak1 ffmpeg`.
+## Features
+- Multiple Kokoro local voices and languages
+- Automatic model download on first Kokoro generation
+- Dynamic voice discovery from Azure, Polly and Google
+- Cloud MP3 generation
+- Local transcription to TXT/SRT
+- WinError 32 temporary-file lock fix
+- Cost estimates per script and provider comparison
 
-## Notes
-The first transcription downloads a Whisper model. TTS needs no internet. FFmpeg is recommended for MP3/M4A/video. Data is stored in `data/`; outputs in `outputs/`. This focused release intentionally excludes voice cloning and dubbing to remain reliable on ordinary computers.
-
-## Responsible use
-Only process recordings you are authorized to use. Do not create deceptive or impersonating audio.
+Install FFmpeg and add it to PATH for MP3/video transcription. Credentials are held only in the Streamlit session. Do not commit secrets.

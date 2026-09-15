@@ -1,5 +1,9 @@
 streamlit>=1.40,<2
-pyttsx3>=2.98
+requests>=2.32,<3
 faster-whisper>=1.1,<2
-python-docx>=1.1,<2
-pypdf>=5,<7
+kokoro-onnx>=0.6.1,<1
+soundfile>=0.13,<1
+misaki[en]>=0.9,<1
+boto3>=1.35,<2
+google-cloud-texttospeech>=2.18,<3
+google-auth>=2.35,<3
