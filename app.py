@@ -10,6 +10,7 @@ from peabox_voice_studio.services.batch import build_manifest
 from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
 from peabox_voice_studio.services.bundles import export_timeline_bundle, import_timeline_bundle
 from peabox_voice_studio.services.files import atomic_write_bytes, build_render_zip, safe_filename
+from peabox_voice_studio.services.governance import ALLOWED_TRANSITIONS, APPROVAL_STATES, RISK_LEVELS, WORKFLOW_STATES, add_comment, add_decision, decide_approval, governance, governance_readiness, governance_summary, reopen_comment, request_approval, resolve_comment, supersede_decision, transition_status, update_project_governance
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
@@ -27,6 +28,7 @@ inject_corporate_theme()
 store = ProjectStore()
 profiles = st.session_state.setdefault("provider_profiles", {})
 voice_catalogs = st.session_state.setdefault("voice_catalogs", {})
+governance_actor = st.session_state.setdefault("governance_actor", "Local User")
 
 def configured_providers() -> set[str]:
     return {"Kokoro local", *profiles.keys()}
@@ -115,17 +117,20 @@ if page == "Dashboard":
         jobs = project.settings.get("batch_jobs", [])
         transcript_sessions = project.settings.get("transcript_sessions", [])
         comparison_history = project.settings.get("comparison_history", [])
-        cols = st.columns(4)
-        with cols[0]: kpi_card("Script blocks", str(len(project.blocks)), "Structured production units")
-        with cols[1]: kpi_card("Timeline clips", str(len(clips)), "Durable WAV assets")
-        with cols[2]: kpi_card("Batch jobs", str(len(jobs)), "Saved production runs")
-        with cols[3]: kpi_card("Transcripts", str(len(transcript_sessions)), "Saved editing sessions")
+        gov_summary = governance_summary(project)
+        cols = st.columns(5)
+        with cols[0]: kpi_card("Workflow", gov_summary["status"], f"Risk: {gov_summary['risk_level']}")
+        with cols[1]: kpi_card("Script blocks", str(len(project.blocks)), "Structured production units")
+        with cols[2]: kpi_card("Timeline clips", str(len(clips)), "Durable WAV assets")
+        with cols[3]: kpi_card("Open reviews", str(gov_summary["open_comments"]), f"{gov_summary['blocking_comments']} blocking")
+        with cols[4]: kpi_card("Approvals", str(gov_summary["pending_approvals"]), "Pending local attestations")
         section("Production readiness", "Current project health across script, providers, timeline, and system dependencies.")
         validation = validate_timeline(project) if clips else {"valid": False, "errors": 0, "warnings": 0, "enabled_clips": 0}
         readiness_rows = [
             {"Area": "Project", "Status": "Ready", "Detail": f"{len(project.blocks)} blocks and {len(project.script):,} master-script characters"},
             {"Area": "Providers", "Status": "Ready" if configured_providers() else "Needs setup", "Detail": f"{len(configured_providers())} provider paths available"},
             {"Area": "Timeline", "Status": "Ready" if validation.get("valid") else "Needs review", "Detail": f"{validation.get('enabled_clips', 0)} enabled clips; {validation.get('errors', 0)} errors"},
+            {"Area": "Governance", "Status": "Ready" if governance_readiness(project)["ready"] else "Needs review", "Detail": f"{gov_summary['open_comments']} open comments; {gov_summary['pending_approvals']} pending approvals"},
             {"Area": "System", "Status": f"{ready_checks}/{total_checks} ready", "Detail": "Open System Check for details"},
         ]
         st.dataframe(readiness_rows, use_container_width=True, hide_index=True)
@@ -140,6 +145,7 @@ if page == "Dashboard":
         for item in project.render_history[:5]: activity.append({"Type": "Render", "When": item.get("created_at"), "Item": item.get("output"), "Status": item.get("provider")})
         for item in project.settings.get("timeline_exports", [])[:5]: activity.append({"Type": "Timeline export", "When": item.get("created_at"), "Item": item.get("output"), "Status": "Completed"})
         for item in jobs[:5]: activity.append({"Type": "Batch job", "When": item.get("updated_at", item.get("created_at")), "Item": item.get("id", "")[:8], "Status": item.get("status")})
+        for item in governance(project)["audit_log"][-5:]: activity.append({"Type": "Governance", "When": item.get("timestamp"), "Item": item.get("action"), "Status": item.get("actor")})
         activity = sorted(activity, key=lambda row: row.get("When") or "", reverse=True)[:10]
         if activity: st.dataframe(activity, use_container_width=True, hide_index=True)
         else: callout("No production activity has been recorded yet. Start with Script Editor or Speech Generator.")
@@ -209,6 +215,141 @@ elif page == "Projects":
                 confirm = st.checkbox("I understand this permanently deletes the project")
                 if st.button("Delete permanently", disabled=not confirm): store.delete(project.id); st.session_state.pop("project", None); st.rerun()
 
+
+elif page == "Governance":
+    if not project:
+        st.info("Open a project to manage governance and review records.")
+    else:
+        actor = st.text_input("Current local actor label", value=st.session_state.get("governance_actor", "Local User"), key="governance_actor_input")
+        st.session_state.governance_actor = actor.strip() or "Local User"
+        callout("Actor and reviewer names are local labels, not authenticated identities. Enterprise authentication and permissions remain a future architecture stage.")
+        data = governance(project)
+        summary = governance_summary(project)
+        readiness = governance_readiness(project)
+        cols = st.columns(5)
+        with cols[0]: kpi_card("Workflow", summary["status"], f"Risk: {summary['risk_level']}")
+        with cols[1]: kpi_card("Open comments", str(summary["open_comments"]), f"{summary['blocking_comments']} blocking")
+        with cols[2]: kpi_card("Pending approvals", str(summary["pending_approvals"]), f"{summary['approved_requests']} approved")
+        with cols[3]: kpi_card("Decisions", str(summary["decisions"]), "Recorded project decisions")
+        with cols[4]: kpi_card("Audit entries", str(summary["audit_entries"]), "Append-only action history")
+        if readiness["issues"]:
+            st.dataframe(readiness["issues"], use_container_width=True, hide_index=True)
+        tabs = st.tabs(["Project governance", "Review comments", "Decisions", "Audit log"])
+        with tabs[0]:
+            section("Ownership and review policy", "These values travel with the portable project and timeline bundle.")
+            owner = st.text_input("Project owner", value=data.get("owner", ""))
+            contributors_text = st.text_area("Contributors, one per line", value="\n".join(data.get("contributors", [])), height=110)
+            g1, g2 = st.columns(2)
+            risk = g1.selectbox("Risk level", RISK_LEVELS, index=RISK_LEVELS.index(data.get("risk_level", "Low")))
+            due_date = g2.text_input("Target date", value=data.get("due_date", ""), placeholder="YYYY-MM-DD or local planning date")
+            r1, r2 = st.columns(2)
+            review_required = r1.checkbox("Review required", value=data.get("review_required", True))
+            approval_required = r2.checkbox("Approval required", value=data.get("approval_required", True))
+            if st.button("Save governance settings", type="primary"):
+                update_project_governance(project, st.session_state.governance_actor, owner, contributors_text.splitlines(), risk, due_date, review_required, approval_required); save_project(project); st.success("Governance settings saved")
+            section("Workflow status", "Transitions are controlled and recorded in the audit log.")
+            current = data.get("status", "Draft")
+            allowed = sorted(ALLOWED_TRANSITIONS.get(current, set()), key=WORKFLOW_STATES.index)
+            st.markdown(f"Current status: {status_badge(current, 'good' if current in {'Approved','Published'} else 'warn' if current in {'In Review','Changes Requested'} else 'neutral')}", unsafe_allow_html=True)
+            if allowed:
+                target_status = st.selectbox("Move to", allowed)
+                transition_note = st.text_input("Transition note")
+                if st.button("Apply workflow transition"):
+                    try:
+                        transition_status(project, target_status, st.session_state.governance_actor, transition_note); save_project(project); st.rerun()
+                    except Exception as exc: st.error(f"Transition blocked: {exc}")
+        with tabs[1]:
+            section("Review thread", "Comments are retained; they can be resolved or reopened rather than deleted.")
+            c1, c2 = st.columns(2)
+            comment_author = c1.text_input("Comment author", value=st.session_state.governance_actor, key="comment_author")
+            priority = c2.selectbox("Priority", ["Low", "Normal", "High", "Blocking"], index=1)
+            target_type = st.selectbox("Comment target", ["Project", "Script Block", "Timeline Clip", "Batch Job", "Transcript", "Other"])
+            target_id = st.text_input("Target reference", placeholder="Optional block, clip, job, or transcript ID")
+            comment_body = st.text_area("Review comment", height=100)
+            if st.button("Add review comment", disabled=not (comment_author.strip() and comment_body.strip())):
+                add_comment(project, comment_author, comment_body, target_type, target_id, priority); save_project(project); st.rerun()
+            comments = data.get("comments", [])
+            show_resolved = st.checkbox("Show resolved comments")
+            visible_comments = [item for item in comments if show_resolved or item.get("status") == "Open"]
+            for item in reversed(visible_comments):
+                with st.expander(f"{item.get('priority')} · {item.get('target_type')} · {item.get('author')} · {item.get('status')}"):
+                    st.write(item.get("body"))
+                    st.caption(f"Created {item.get('created_at')} · Reference {item.get('target_id') or 'Project'}")
+                    if item.get("status") == "Open":
+                        resolution = st.text_input("Resolution note", key=f"resolution_{item['id']}")
+                        if st.button("Resolve comment", key=f"resolve_{item['id']}"):
+                            resolve_comment(project, item["id"], st.session_state.governance_actor, resolution); save_project(project); st.rerun()
+                    elif st.button("Reopen comment", key=f"reopen_{item['id']}"):
+                        reopen_comment(project, item["id"], st.session_state.governance_actor); save_project(project); st.rerun()
+        with tabs[2]:
+            section("Decision register", "Capture material choices and rationale; superseded decisions remain visible.")
+            decision_title = st.text_input("Decision title")
+            decision_outcome = st.text_area("Decision or proposed outcome", height=90)
+            decision_rationale = st.text_area("Rationale", height=90)
+            decision_status = st.selectbox("Decision status", ["Proposed", "Decided"])
+            if st.button("Record decision", disabled=not (decision_title.strip() and decision_outcome.strip())):
+                add_decision(project, st.session_state.governance_actor, decision_title, decision_outcome, decision_rationale, decision_status); save_project(project); st.rerun()
+            decisions = data.get("decisions", [])
+            if decisions:
+                st.dataframe(decisions, use_container_width=True, hide_index=True)
+                active_decisions = [item for item in decisions if item.get("status") != "Superseded"]
+                if active_decisions:
+                    selected_decision = st.selectbox("Supersede decision", active_decisions, format_func=lambda item: item["title"])
+                    supersede_reason = st.text_input("Supersede reason")
+                    if st.button("Mark selected decision superseded"):
+                        supersede_decision(project, selected_decision["id"], st.session_state.governance_actor, supersede_reason); save_project(project); st.rerun()
+        with tabs[3]:
+            section("Audit log", "Entries are append-only through the application workflow and included in project exports.")
+            audit = list(reversed(data.get("audit_log", [])))
+            audit_query = st.text_input("Filter audit entries", placeholder="Actor, action, target, or detail")
+            if audit_query:
+                audit = [item for item in audit if audit_query.lower() in json.dumps(item, ensure_ascii=False).lower()]
+            if audit: st.dataframe(audit, use_container_width=True, hide_index=True)
+            else: st.info("No governance actions have been recorded.")
+
+elif page == "Approvals":
+    if not project:
+        st.info("Open a project to manage approval requests.")
+    else:
+        actor = st.text_input("Current local actor label", value=st.session_state.get("governance_actor", "Local User"), key="approval_actor_input")
+        st.session_state.governance_actor = actor.strip() or "Local User"
+        callout("Approval records are local attestations. They are not digital signatures and do not verify the identity or authority of the named reviewer.")
+        data = governance(project)
+        summary = governance_summary(project)
+        cols = st.columns(4)
+        with cols[0]: kpi_card("Pending", str(summary["pending_approvals"]), "Awaiting local decision")
+        with cols[1]: kpi_card("Approved", str(summary["approved_requests"]), "Approved attestations")
+        with cols[2]: kpi_card("Workflow", summary["status"], "Current project state")
+        with cols[3]: kpi_card("Owner", summary["owner"] or "Unassigned", "Project accountability")
+        section("Request approval", "Create a review gate for a defined project scope.")
+        a1, a2 = st.columns(2)
+        requester = a1.text_input("Requester", value=st.session_state.governance_actor)
+        reviewer = a2.text_input("Reviewer label")
+        scope = st.text_input("Approval scope", placeholder="Example: Final narration and timeline master")
+        attestation = st.text_area("Requester attestation", placeholder="Describe what is ready and what evidence was reviewed", height=90)
+        if st.button("Create approval request", type="primary", disabled=not (requester.strip() and reviewer.strip() and scope.strip())):
+            request_approval(project, requester, reviewer, scope, attestation); save_project(project); st.rerun()
+        approvals = data.get("approvals", [])
+        if approvals:
+            section("Approval queue", "Pending requests appear first; completed records remain as project history.")
+            ordered = sorted(approvals, key=lambda item: (item.get("status") != "Pending", item.get("created_at", "")))
+            for item in ordered:
+                with st.expander(f"{item.get('status')} · {item.get('scope')} · reviewer {item.get('reviewer')}", expanded=item.get("status") == "Pending"):
+                    st.caption(f"Requested by {item.get('requester')} at {item.get('created_at')}")
+                    if item.get("attestation"): st.write(item.get("attestation"))
+                    if item.get("status") == "Pending":
+                        decision_note = st.text_area("Decision note", key=f"approval_note_{item['id']}", height=70)
+                        b1, b2, b3 = st.columns(3)
+                        if b1.button("Approve", key=f"approve_{item['id']}"):
+                            decide_approval(project, item["id"], st.session_state.governance_actor, "Approved", decision_note); save_project(project); st.rerun()
+                        if b2.button("Reject", key=f"reject_{item['id']}"):
+                            decide_approval(project, item["id"], st.session_state.governance_actor, "Rejected", decision_note); save_project(project); st.rerun()
+                        if b3.button("Withdraw", key=f"withdraw_{item['id']}"):
+                            decide_approval(project, item["id"], st.session_state.governance_actor, "Withdrawn", decision_note); save_project(project); st.rerun()
+                    else:
+                        st.write(f"Decision by {item.get('decided_by')} at {item.get('decision_at')}: {item.get('decision_note', '')}")
+        else:
+            st.info("No approval requests have been created.")
 
 elif page == "System Check":
     diagnostics = system_diagnostics()
@@ -703,7 +844,7 @@ elif page == "Render History":
         st.info("Open a project to review activity and history.")
     else:
         section("Project activity ledger", "Review outputs and production records without changing the underlying project data.")
-        tabs = st.tabs(["Renders", "Batch jobs", "Timeline exports", "Comparisons", "Transcripts"])
+        tabs = st.tabs(["Renders", "Batch jobs", "Timeline exports", "Comparisons", "Transcripts", "Governance"])
         with tabs[0]:
             if project.render_history: st.dataframe(project.render_history, use_container_width=True, hide_index=True)
             else: st.info("No individual renders have been recorded.")
@@ -729,22 +870,30 @@ elif page == "Render History":
                 rows = [{"Name": item.get("name"), "Source": item.get("source_name"), "Language": item.get("language"), "Created": item.get("created_at"), "Updated": item.get("updated_at"), "Segments": len(item.get("segments", []))} for item in transcripts]
                 st.dataframe(rows, use_container_width=True, hide_index=True)
             else: st.info("No transcript sessions have been saved.")
+        with tabs[5]:
+            gov = governance(project)
+            st.subheader("Review and approval summary")
+            st.json(governance_summary(project))
+            st.subheader("Recent governance audit")
+            if gov.get("audit_log"): st.dataframe(list(reversed(gov["audit_log"][-100:])), use_container_width=True, hide_index=True)
+            else: st.info("No governance actions have been recorded.")
 
 else:
     section("Product roadmap and operating guidance", "Delivered capabilities, planned architecture, and setup notes for this release.")
     st.markdown("""
 ### Current release
-- Portable timeline bundles with project JSON and copied WAV assets
-- Collision-safe bundle import with rewritten local clip paths
-- Missing-asset relinking, metadata refresh, stale-link acknowledgement, and invalid-record cleanup
-- Timeline duplication and safer project migration
-- Non-destructive sequencing, mixing, waveform peaks, merged WAV, and manifest export
+- Governance Center with ownership, contributors, risk, due dates, and controlled workflow status
+- Persistent review comments with priority, targets, resolution, and reopening
+- Decision register with rationale and supersession history
+- Approval Queue with local attestations and workflow gates
+- Append-only application audit entries included in project exports
+- Corporate dashboard governance readiness and consolidated activity history
 
 ### Planned next
-1. Background-music fades and automation controls
-2. Interactive waveform dragging in a React/Web Audio frontend
-3. Optional speaker diarization and speaker alignment
-4. Separate worker process and SQLite repository before hosted multi-user use
+1. Authenticated identity, role-based permissions, and shared projects
+2. SQLite repository and background worker process
+3. Interactive waveform dragging in a React/Web Audio frontend
+4. Optional speaker diarization and speaker alignment
 
 ### Setup
 Run `start_windows.bat`. The launcher accepts installed Python 3.10, 3.11, or 3.12 and creates or reuses `.venv`. Install FFmpeg for compressed media transcription.

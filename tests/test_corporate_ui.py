@@ -26,7 +26,7 @@ class CorporateUiTests(unittest.TestCase):
             self.assertIn(marker, self.app)
 
     def test_activity_screen_consolidates_histories(self):
-        for label in ("Renders", "Batch jobs", "Timeline exports", "Comparisons", "Transcripts"):
+        for label in ("Renders", "Batch jobs", "Timeline exports", "Comparisons", "Transcripts", "Governance"):
             self.assertIn(f'"{label}"', self.app)
 
     def test_streamlit_magic_leak_remains_absent(self):

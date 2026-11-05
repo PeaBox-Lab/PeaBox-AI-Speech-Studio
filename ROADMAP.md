@@ -84,6 +84,14 @@ The durable clip and manifest model is now delivered. A React/Web Audio frontend
 - Reusable corporate visual components and consistent page framing
 - Consolidated activity and history review screens
 
+## Delivered — v0.07.0: Collaboration and governance foundation
+
+- Project ownership, contributors, risk, review policy, and workflow states
+- Review comments, decision register, approval queue, and application audit history
+- Dashboard governance readiness and consolidated review history
+
+Authenticated identities, permissions, and shared storage remain part of the future multi-user architecture.
+
 ## v0.06.00: Scale and collaboration
 
 - SQLite repository migration followed by optional PostgreSQL

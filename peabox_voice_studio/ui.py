@@ -21,6 +21,8 @@ NAVIGATION = {
         ("Transcription Studio", "Transcription", "▤"),
     ],
     "Administration": [
+        ("Governance Center", "Governance", "◆"),
+        ("Approval Queue", "Approvals", "✓"),
         ("Provider Setup", "Provider Setup", "⚙"),
         ("System Check", "System Check", "◇"),
         ("Activity & History", "Render History", "◷"),
@@ -41,6 +43,8 @@ PAGE_META = {
     "Quality Studio": ("Quality Studio", "Manage pronunciation rules, pause controls, and processed-text previews.", "Audio & Quality"),
     "Audio Quality Lab": ("Audio Quality Lab", "Analyze WAV files, create normalized or trimmed copies, and compare voices.", "Audio & Quality"),
     "Transcription": ("Transcription Studio", "Transcribe, edit, validate, save, and export timestamped media text.", "Audio & Quality"),
+    "Governance": ("Governance Center", "Manage ownership, workflow state, review comments, decisions, and project risk.", "Administration"),
+    "Approvals": ("Approval Queue", "Request, decide, and review local approval attestations and workflow gates.", "Administration"),
     "Provider Setup": ("Provider Setup", "Configure session-only cloud credentials and discover provider voices.", "Administration"),
     "System Check": ("System Check", "Review runtime, media, model, and storage readiness.", "Administration"),
     "Render History": ("Activity & History", "Review project renders, timeline exports, jobs, comparisons, and saved transcripts.", "Administration"),

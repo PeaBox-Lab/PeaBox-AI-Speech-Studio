@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.07.0 — 2026-11-05
+
+### Added
+
+- Governance Center with ownership, contributors, risk, target date, and review policy
+- Controlled project workflow states and transition rules
+- Persistent review comments with priority, target, resolution, and reopening
+- Decision register with rationale and supersession history
+- Approval Queue with local attestations and approval-gated workflow
+- Append-only application governance audit entries
+- Governance KPIs and readiness on the Executive Dashboard
+- Governance tab in Activity & History
+- Governance workflow, export, UI, page-smoke, and compatibility tests
+
+### Clarification
+
+- Actor and reviewer names are local labels, not authenticated identities
+- Approval records are local attestations, not digital signatures
+
+### Compatibility
+
+- All v0.06.0 and earlier project and timeline bundle formats remain readable
+
 ## v0.06.0 — 2026-11-05
 
 ### Added
