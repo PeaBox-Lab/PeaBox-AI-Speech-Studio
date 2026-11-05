@@ -1,21 +1,21 @@
 # Troubleshooting
 
+## Confirm the running release
+
+The sidebar must show `PeaBox v0.04.01`. If it shows another version, stop older Streamlit terminals with `Ctrl+C`, close old browser tabs, and use the exact Local URL printed by the new launcher.
+
+## Compressed media cannot be transcribed
+
+Open **System Check**. MP3, M4A, OGG, MP4, MOV, MKV, and WebM require FFmpeg. WAV can be transcribed without it. After installing FFmpeg and adding it to PATH, restart PeaBox.
+
+## Transcript export buttons are unavailable
+
+Review the timing validation table. Subtitle export and project saving are blocked if segments overlap or have zero duration. Use **Repair timing automatically**, review the repaired values, then export.
+
+## Pronunciation output is unexpected
+
+Open **Quality Studio** and review duplicate or overlapping rule diagnostics. Rules are applied in displayed order, so overlapping sources can affect the result.
+
 ## The page shows `DeltaGenerator` documentation
 
-This was caused by a Streamlit expression in releases through v0.03.11. Streamlit interpreted the returned UI object as content and rendered its internal API documentation. v0.03.12 replaces that expression with a normal `if/else` statement.
-
-## The sidebar does not show Provider Setup or Voice Library
-
-An older release is still running. Stop its terminal with `Ctrl+C`, close the browser tab, extract v0.03.12 into a new folder, and run the new folder's `start_windows.bat`. The sidebar should display `PeaBox v0.03.12`.
-
-## Buttons appear not to respond
-
-1. Confirm the sidebar version says `PeaBox v0.03.12`.
-2. Stop every older Streamlit terminal with `Ctrl+C`.
-3. Start only the v0.03.12 launcher.
-4. Open the Local URL printed by that launcher.
-5. If port 8501 belongs to an older process, the new launcher may print a different port. Use the exact URL it prints.
-
-## Clean restart
-
-Deleting `.venv` is normally unnecessary. If dependency installation was interrupted, close the app, delete only the extracted release folder's `.venv`, and run `start_windows.bat` again. Projects under `data/projects` should be backed up before replacing an extracted folder.
+That issue was fixed in v0.03.12 and remains covered by regression tests. If it appears, an older release is still running. Stop all older Streamlit terminals and start this release from its own folder.

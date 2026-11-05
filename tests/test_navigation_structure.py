@@ -12,12 +12,12 @@ class NavigationStructureTests(unittest.TestCase):
         self.tree = ast.parse(self.source)
 
     def test_all_expected_pages_are_registered(self):
-        expected = ["Projects", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
+        expected = ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
         for page in expected:
             self.assertIn(f'"{page}"', self.source)
 
     def test_all_primary_page_branches_exist(self):
-        branches = ["Projects", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History"]
+        branches = ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History"]
         for page in branches:
             self.assertIn(f'page == "{page}"', self.source)
 

@@ -93,3 +93,31 @@ def compile_ssml_text(text: str) -> str:
         cursor = match.end()
     parts.append(html.escape(text[cursor:]))
     return "".join(parts)
+
+
+def pronunciation_conflicts(entries: list[dict]) -> list[dict]:
+    issues = []
+    seen = {}
+    for index, item in enumerate(entries, 1):
+        source = str(item.get("source", "")).strip()
+        key = source if item.get("case_sensitive") else source.lower()
+        if not source:
+            issues.append({"severity": "error", "rule": index, "message": "Pronunciation source is empty"})
+            continue
+        signature = (key, bool(item.get("case_sensitive")), bool(item.get("whole_word", True)))
+        if signature in seen:
+            issues.append({"severity": "warning", "rule": index, "message": f"Duplicates rule {seen[signature]} for '{source}'"})
+        else:
+            seen[signature] = index
+    for first_index, first in enumerate(entries, 1):
+        first_source = str(first.get("source", ""))
+        for second_index, second in enumerate(entries[first_index:], first_index + 1):
+            second_source = str(second.get("source", ""))
+            if first_source and second_source and first_source.lower() != second_source.lower() and (first_source.lower() in second_source.lower() or second_source.lower() in first_source.lower()):
+                issues.append({"severity": "info", "rule": second_index, "message": f"'{second_source}' overlaps rule {first_index} source '{first_source}'; order may affect output"})
+    return issues
+
+
+def pronunciation_preview(text: str, entries: list[dict]) -> dict:
+    prepared = apply_pronunciations(text, entries)
+    return {"original": text, "prepared": prepared, "changed": prepared != text, "conflicts": pronunciation_conflicts(entries)}

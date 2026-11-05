@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.04.01 — 2026-11-05
+
+### Added
+
+- System Check for Python, FFmpeg, storage, and Kokoro model readiness
+- Media-format readiness checks before transcription
+- Transcript overlap, duration, and empty-text validation
+- Automatic sequential timing repair
+- Saved transcript update and schema-v2 session support
+- Pronunciation duplicate and overlap diagnostics
+- Pronunciation match preview status
+- Tests for diagnostics, timing repair, invalid-export blocking, and rule conflicts
+
+### Changed
+
+- Invalid transcript timing now blocks SRT/VTT export and project saving
+- Older invalid transcript sessions are repaired when loaded
+
+### Preserved
+
+- v0.04.00 quality and transcription features
+- v0.03.12 UI rendering regression protection
+
 ## v0.04.00 — 2026-11-05
 
 ### Added

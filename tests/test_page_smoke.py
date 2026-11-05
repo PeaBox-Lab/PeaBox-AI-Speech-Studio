@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGES = ["Projects", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
+PAGES = ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
 
 
 class SessionState(dict):

@@ -1,54 +1,52 @@
-# PeaBox Voice Studio v0.04.00
+# PeaBox Voice Studio v0.04.01
 
-A local-first multi-provider voice production and transcription workspace with project pronunciation rules, safe pause controls, editable transcripts, resumable jobs, reusable voice presets, and session-only cloud credentials.
+A hardened local-first multi-provider voice production and transcription workspace with system diagnostics, transcript timing validation and repair, pronunciation conflict checks, safe pause controls, reusable presets, and resumable jobs.
 
-## v0.04.00 highlights
+## v0.04.01 highlights
 
-### Quality Studio
+### System Check
 
-- Project pronunciation dictionary with case-sensitive and whole-word matching
-- Rule ordering preserved in project JSON and exports
-- Safe `[[pause:seconds]]` markers limited to 0.1–10 seconds
-- Pause markers compile to SSML breaks for Azure, Polly, and Google
-- Kokoro receives a punctuation-based local pause approximation
-- Processed-text previews before generation
-- Resumable jobs snapshot both original and processed text for repeatability
+- Reports the running Python version and supported range
+- Detects whether FFmpeg is available
+- Checks project and output storage write access
+- Shows whether Kokoro model and voice files are ready or will download on first use
+- Explains which compressed media formats require FFmpeg
 
-### Transcription Studio
+### Transcript safety
 
-- Editable timestamped transcript segments
-- Optional speaker labels
-- Search across transcript text and speakers
-- TXT, standards-compatible SRT, and WebVTT export
-- Save, reload, and delete project transcript sessions
-- Up to 20 transcript sessions retained per project
+- Detects overlapping segments
+- Detects zero-duration or reversed timing
+- Warns about empty segment text
+- Blocks SRT/VTT export and project saving while timing errors remain
+- Automatically repairs overlaps and minimum duration
+- Safely repairs older invalid sessions when they are loaded
+- Supports updating an existing saved transcript session
+- Saves new sessions with schema version 2 and an updated timestamp
+
+### Quality-rule diagnostics
+
+- Detects duplicate pronunciation rules
+- Identifies overlapping rule sources where rule order can change output
+- Shows whether pronunciation rules changed preview text
+- Preserves the existing safe pause-marker workflow
 
 ### Preserved
 
-- Corrected v0.03.12 navigation and Streamlit rendering behavior
-- Session-cached provider voice discovery and Voice Library
-- Project voice presets
-- Resumable cloud and local jobs with retry, cancellation, reopen, duplicate, delete, and downloads
-- Portable project JSON import/export
-
-## Pause syntax
-
-Use a marker such as:
-
-```text
-Welcome to PeaBox. [[pause:1.5]] Let us begin.
-```
-
-Malformed or out-of-range pause markers are reported before use.
+- v0.04.00 Quality and Transcription Studio
+- v0.03.12 UI rendering fix and navigation smoke tests
+- Session-cached provider voice catalogs and presets
+- Resumable cloud and local production jobs
+- Portable project import and export
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat` from that folder.
-4. Install FFmpeg and add it to PATH for compressed media transcription.
+4. Open **System Check** after startup.
+5. Install FFmpeg and add it to PATH if compressed audio/video transcription is required.
 
-The sidebar must display `PeaBox v0.04.00`. If it shows an older version, stop older Streamlit terminals and use the Local URL printed by the new launcher.
+The sidebar must display `PeaBox v0.04.01`.
 
 ## Tests
 

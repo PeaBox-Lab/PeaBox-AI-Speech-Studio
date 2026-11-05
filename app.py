@@ -12,8 +12,9 @@ from peabox_voice_studio.services.catalogs import capability_rows, catalog_facet
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
 from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
-from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, validate_pause_markers
-from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, save_transcript_session
+from peabox_voice_studio.services.diagnostics import system_diagnostics, transcription_readiness
+from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, pronunciation_conflicts, pronunciation_preview, validate_pause_markers
+from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
 
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide")
@@ -95,8 +96,8 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Quality and transcription studio")
-page = st.sidebar.radio("Studio", ["Projects", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
+st.caption(f"Version {VERSION} · Hardened quality and transcription studio")
+page = st.sidebar.radio("Studio", ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
 st.sidebar.caption(f"PeaBox v{VERSION}")
 if project:
@@ -148,6 +149,23 @@ if page == "Projects":
                 confirm = st.checkbox("I understand this permanently deletes the project")
                 if st.button("Delete permanently", disabled=not confirm): store.delete(project.id); st.session_state.pop("project", None); st.rerun()
 
+
+elif page == "System Check":
+    st.header("System Check")
+    diagnostics = system_diagnostics()
+    st.dataframe(diagnostics, use_container_width=True, hide_index=True)
+    blocking = [row for row in diagnostics if row["Status"] in {"Unsupported", "Missing", "Not writable"}]
+    if blocking:
+        st.warning("Resolve the listed setup items before using affected features. WAV transcription can work without FFmpeg; compressed media cannot.")
+    else:
+        st.success("Core local requirements are ready.")
+    st.subheader("Quick guidance")
+    st.markdown("""
+- **Python:** Use 64-bit Python 3.10, 3.11, or 3.12.
+- **FFmpeg:** Required for MP3, M4A, OGG, MP4, MOV, MKV, and WebM transcription.
+- **Kokoro files:** Download automatically during the first local generation.
+- **Storage:** Projects and generated audio must remain writable.
+""")
 
 elif page == "Provider Setup":
     st.header("Provider Setup")
@@ -252,6 +270,10 @@ elif page == "Quality Studio":
         entries = list_pronunciations(project)
         if entries:
             st.dataframe(entries, use_container_width=True, hide_index=True)
+            conflicts = pronunciation_conflicts(entries)
+            if conflicts:
+                st.warning("Pronunciation rules contain duplicates or overlaps; review rule order.")
+                st.dataframe(conflicts, use_container_width=True, hide_index=True)
             selected_rule = st.selectbox("Delete pronunciation rule", entries, format_func=lambda item: f"{item['source']} → {item['replacement']}")
             if st.button("Delete selected rule"):
                 delete_pronunciation(project, selected_rule["id"]); save_project(project); st.rerun()
@@ -266,7 +288,11 @@ elif page == "Quality Studio":
         preview_text = st.session_state.get("quality_preview_text", preview_text)
         issues = validate_pause_markers(preview_text)
         if issues: st.error("; ".join(issues))
-        st.code(prepare_text(preview_text, project, preview_provider))
+        preview = pronunciation_preview(preview_text, entries)
+        prepared_preview = prepare_text(preview_text, project, preview_provider)
+        if preview["changed"]: st.success("Pronunciation rules changed the preview text.")
+        else: st.info("No pronunciation rule matched the preview text.")
+        st.code(prepared_preview)
         st.caption("Cloud providers compile valid pause markers to SSML breaks. Kokoro receives punctuation-based pause approximations.")
 
 elif page == "Script Blocks":
@@ -377,8 +403,10 @@ elif page == "Transcription":
     a, b = st.columns(2)
     model_size = a.selectbox("Model", ["tiny", "base", "small", "medium", "large-v3"], index=1)
     language = b.selectbox("Language", ["Auto", "en", "hi", "de", "fr", "es", "it", "pt", "ja", "zh"])
+    media_ready = transcription_readiness(upload.name if upload else "")
     if upload and upload.size > MAX_UPLOAD_BYTES: st.error("File exceeds the 500 MB limit")
-    if st.button("Transcribe locally", type="primary", disabled=not upload or (upload and upload.size > MAX_UPLOAD_BYTES)):
+    if upload and not media_ready["ready"]: st.error(media_ready["message"] + ". Open System Check for setup guidance.")
+    if st.button("Transcribe locally", type="primary", disabled=not upload or (upload and upload.size > MAX_UPLOAD_BYTES) or not media_ready["ready"]):
         try:
             from peabox_voice_studio.services.transcription import transcribe
             with st.spinner("Transcribing locally..."):
@@ -395,24 +423,42 @@ elif page == "Transcription":
         edited = st.data_editor(working["segments"], use_container_width=True, hide_index=True, num_rows="dynamic", disabled=["index"], key="transcript_editor")
         if edited is not None:
             working["segments"] = normalize_segments(edited.to_dict("records") if hasattr(edited, "to_dict") else edited)
-        bundle = export_transcript_bundle(working["segments"])
+        validation = validate_segments(working["segments"])
+        v1, v2, v3 = st.columns(3)
+        v1.metric("Timing errors", validation["errors"])
+        v2.metric("Warnings", validation["warnings"])
+        v3.metric("Segments", len(validation["segments"]))
+        if validation["issues"]:
+            st.dataframe(validation["issues"], use_container_width=True, hide_index=True)
+        if st.button("Repair timing automatically", disabled=validation["valid"]):
+            working["segments"] = repair_segment_timing(working["segments"]); st.rerun()
         stem = safe_filename(Path(working.get("source_name") or "transcript").stem)
-        x, y, z = st.columns(3)
-        x.download_button("Download TXT", bundle["txt"], f"{stem}.txt")
-        y.download_button("Download SRT", bundle["srt"], f"{stem}.srt")
-        z.download_button("Download VTT", bundle["vtt"], f"{stem}.vtt")
+        if validation["valid"]:
+            bundle = export_transcript_bundle(working["segments"])
+            x, y, z = st.columns(3)
+            x.download_button("Download TXT", bundle["txt"], f"{stem}.txt")
+            y.download_button("Download SRT", bundle["srt"], f"{stem}.srt")
+            z.download_button("Download VTT", bundle["vtt"], f"{stem}.vtt")
+        else:
+            st.error("Repair transcript timing before export or saving.")
         if project:
             session_name = st.text_input("Saved transcript name", value=stem)
-            if st.button("Save transcript to project"):
-                save_transcript_session(project, session_name, working["segments"], working.get("source_name", ""), working.get("language", "")); save_project(project); st.success("Transcript saved to project")
+            if st.button("Save transcript to project", disabled=not validation["valid"]):
+                try:
+                    save_transcript_session(project, session_name, working["segments"], working.get("source_name", ""), working.get("language", "")); save_project(project); st.success("Transcript saved to project")
+                except Exception as exc: st.error(f"Could not save transcript: {exc}")
             sessions = project.settings.get("transcript_sessions", [])
             if sessions:
                 st.subheader("Saved transcript sessions")
-                selected_session = st.selectbox("Load saved transcript", sessions, format_func=lambda item: f"{item['name']} · {item['created_at']}")
-                l1, l2 = st.columns(2)
+                selected_session = st.selectbox("Saved transcript", sessions, format_func=lambda item: f"{item['name']} · {item.get('updated_at', item['created_at'])}")
+                l1, l2, l3 = st.columns(3)
                 if l1.button("Load selected transcript"):
-                    st.session_state.transcript_working = {"source_name": selected_session.get("source_name", ""), "language": selected_session.get("language", ""), "segments": selected_session["segments"]}; st.rerun()
-                if l2.button("Delete selected transcript"):
+                    loaded_validation = validate_segments(selected_session.get("segments", []))
+                    loaded_segments = loaded_validation["segments"] if loaded_validation["valid"] else repair_segment_timing(selected_session.get("segments", []))
+                    st.session_state.transcript_working = {"source_name": selected_session.get("source_name", ""), "language": selected_session.get("language", ""), "segments": loaded_segments, "session_id": selected_session["id"]}; st.rerun()
+                if l2.button("Update selected transcript", disabled=not validation["valid"]):
+                    update_transcript_session(project, selected_session["id"], working["segments"]); save_project(project); st.success("Saved transcript updated")
+                if l3.button("Delete selected transcript"):
                     delete_transcript_session(project, selected_session["id"]); save_project(project); st.rerun()
 
 elif page == "Render History":
@@ -425,11 +471,12 @@ else:
     st.header("Roadmap & Help")
     st.markdown("""
 ### Current release
-- Project pronunciation dictionary with case and whole-word controls
-- Safe pause markers compiled to cloud SSML or local pause approximations
-- Quality previews and processed-text snapshots in resumable jobs
-- Editable transcript segments with search and TXT, SRT, and VTT exports
-- Saved project transcript sessions plus all v0.03.12 provider, catalog, preset, and job features
+- Transcript overlap and duration validation with automatic timing repair
+- Safe saved-session loading, updating, and schema-v2 transcript sessions
+- System Check for Python, FFmpeg, storage, and Kokoro model readiness
+- Media-format readiness before transcription
+- Pronunciation duplicate/overlap diagnostics and match previews
+- All v0.04.00 quality, transcript, provider, catalog, preset, and job features
 
 ### Planned next
 1. Optional speaker diarization and speaker alignment

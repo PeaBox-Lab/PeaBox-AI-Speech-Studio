@@ -50,6 +50,12 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 - Optional speaker diarization with explicit model setup remains next
 - Speaker-labelled TXT, SRT, and VTT exports
 
+## Delivered — v0.04.01: Quality and transcript hardening
+
+- System and media-readiness diagnostics
+- Transcript overlap validation, automatic timing repair, and safer session recovery
+- Pronunciation duplicate/overlap diagnostics and match previews
+
 ## v0.05.00: Non-destructive timeline
 
 - AudioClip repository separated from script blocks

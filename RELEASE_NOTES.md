@@ -1,7 +1,9 @@
-# PeaBox Voice Studio v0.04.00 Release Notes
+# PeaBox Voice Studio v0.04.01 Release Notes
 
-This release begins the Quality & Transcription Studio phase described in the supplied development plan. Projects can maintain pronunciation replacements and use controlled pause markers without editing raw SSML. Cloud providers receive compiled SSML breaks, while local Kokoro generation receives a safe punctuation-based approximation. Batch jobs store processed text alongside original text so later retries remain reproducible.
+This maintenance release hardens the Quality and Transcription Studio introduced in v0.04.00.
 
-Transcription results are now editable as timestamped segments. Users can search the working transcript, add speaker labels, export TXT/SRT/VTT, and save transcript sessions inside a project for later editing.
+Transcript edits are now validated before subtitle export or project saving. Overlaps, zero-duration segments, and invalid timing are surfaced directly. An automatic repair action makes segments sequential and applies a minimum duration. Older saved sessions are validated and repaired when loaded, and existing sessions can be updated in place.
 
-The v0.03.12 UI fix remains protected by regression and page-smoke tests.
+A new System Check page reports Python compatibility, FFmpeg availability, writable project/output storage, and Kokoro model readiness. Compressed-media transcription is disabled with a clear explanation when FFmpeg is unavailable, while WAV input remains usable.
+
+Pronunciation rules now display duplicate and overlap diagnostics, and the preview states whether any rule actually changed the text.
