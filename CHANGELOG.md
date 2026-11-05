@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.02.02 — 2026-11-05
+
+### Fixed
+
+- Removed the Windows launcher's hard dependency on Python 3.11.
+- Added compatible Python discovery for 3.12, 3.11, and 3.10 through the Python Launcher, `python`, or `python3`.
+- Reuse a valid existing virtual environment and rebuild an incomplete or incompatible one.
+- Run pip and Streamlit explicitly through the selected virtual-environment interpreter.
+- Show clear installation guidance only when no compatible Python is installed.
+
+### Added
+
+- PowerShell-based launcher logic with deterministic version preference.
+- Automated launcher checks covering supported versions, fallback commands, environment recovery, and Streamlit invocation.
+
 ## v0.02.01 — 2026-11-05
 
 ### Added

@@ -1,4 +1,4 @@
-# PeaBox Voice Studio v0.02.01
+# PeaBox Voice Studio v0.02.02
 
 PeaBox Voice Studio is a local-first Streamlit workspace for text-to-speech, transcription, persistent scripts, and render tracking. This release refactors the attached v0.2 prototype into a modular project structure while retaining Kokoro, Azure Speech, Amazon Polly, Google Cloud TTS, and Faster-Whisper support.
 
@@ -18,7 +18,7 @@ PeaBox Voice Studio is a local-first Streamlit workspace for text-to-speech, tra
 ## Folder structure
 
 ```text
-PeaBox_Voice_Studio_v0.02.01/
+PeaBox_Voice_Studio_v0.02.02/
 ├── app.py
 ├── peabox_voice_studio/
 │   ├── config.py
@@ -46,12 +46,12 @@ PeaBox_Voice_Studio_v0.02.01/
 
 ## Windows setup
 
-1. Install 64-bit Python 3.11.
+1. Install 64-bit Python 3.10, 3.11, or 3.12. The launcher prefers the newest compatible installed version.
 2. Extract the ZIP.
-3. Run `start_windows.bat`.
+3. Run `start_windows.bat`. It checks the Python Launcher, `python`, and `python3`, then creates or reuses `.venv`.
 4. Install FFmpeg and add it to PATH for compressed audio/video transcription.
 
-The launcher creates a local virtual environment, installs the declared dependencies, and starts Streamlit.
+The launcher creates a local virtual environment, installs the declared dependencies, and starts Streamlit. It does not silently require Python 3.11 and does not attempt an unattended Python installation. If no compatible version is found, it shows the supported versions and exits without modifying the system.
 
 ## Security and privacy
 
@@ -70,4 +70,4 @@ python -m unittest discover -s tests -v
 
 ## Release naming
 
-The requested release folder and package are named `PeaBox_Voice_Studio_v0.02.01`. The user-provided `v99.99.99` string is treated as a future naming placeholder rather than the current semantic release number.
+The requested release folder and package are named `PeaBox_Voice_Studio_v0.02.02`. The user-provided `v99.99.99` string is treated as a future naming placeholder rather than the current semantic release number.

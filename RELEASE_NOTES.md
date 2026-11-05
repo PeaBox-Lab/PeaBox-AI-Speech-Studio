@@ -1,5 +1,7 @@
-# PeaBox Voice Studio v0.02.01 Release Notes
+# PeaBox Voice Studio v0.02.02 Release Notes
 
-This release turns the attached provider-focused prototype into a project-based workspace. Users can keep a Master Script, reuse it in speech generation, preserve provider settings, and review render history. The source is reorganized so future script blocks, batch rendering, timeline assembly, and hosted scale can be added without extending one monolithic UI file.
+This maintenance release fixes Windows startup when Python 3.11 is not installed. `start_windows.bat` now delegates to a PowerShell launcher that searches for Python 3.12, 3.11, and 3.10 in that order, then checks the `python` and `python3` commands. It creates the virtual environment with the first compatible interpreter found.
 
-Current provider pricing in the Cost Guide is carried forward from the attached v0.2 code and must be verified independently. No external market or competitor claims are included because this build was completed without web research.
+A valid existing `.venv` is reused. An incomplete environment or one outside the supported 3.10–3.12 range is rebuilt. If no compatible Python is available, the launcher exits with clear instructions rather than silently skipping environment creation or attempting an unattended system installation.
+
+All v0.02.01 project workspace, provider, transcription, render-history, audit, and roadmap capabilities are preserved.

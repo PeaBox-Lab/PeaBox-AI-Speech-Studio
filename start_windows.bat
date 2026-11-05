@@ -1,11 +1,16 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-where py >nul 2>nul || (echo Install 64-bit Python 3.11 from python.org and add it to PATH.& pause & exit /b 1)
-if not exist .venv py -3.11 -m venv .venv
-if not exist .venv\Scripts\python.exe (echo Python 3.11 was not found. Install it and run again.& pause & exit /b 1)
-call .venv\Scripts\activate.bat
-python -m pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
-streamlit run app.py
-pause
+
+where powershell.exe >nul 2>nul
+if errorlevel 1 (
+    echo Windows PowerShell was not found.
+    echo Start PowerShell manually and run: powershell -ExecutionPolicy Bypass -File .\start_windows.ps1
+    pause
+    exit /b 1
+)
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0start_windows.ps1"
+set "EXIT_CODE=%ERRORLEVEL%"
+if not "%EXIT_CODE%"=="0" pause
+exit /b %EXIT_CODE%
