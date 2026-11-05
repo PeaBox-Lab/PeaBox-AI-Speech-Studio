@@ -62,7 +62,7 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 - Non-destructive peak normalization and silence trimming
 - Kokoro A/B voice and speed comparison history
 
-## v0.05.00: Non-destructive timeline
+## Delivered — v0.05.00: Non-destructive timeline
 
 - AudioClip repository separated from script blocks
 - Waveform peak extraction and clip duration metadata
@@ -70,7 +70,7 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 - Background music track and mix preview
 - Merged WAV export and chapter/manifest outputs
 
-A React/Web Audio frontend and FastAPI service become justified at this stage, when low-latency playback and timeline interaction exceed Streamlit's strengths.
+The durable clip and manifest model is now delivered. A React/Web Audio frontend remains justified for direct waveform dragging and low-latency interactive playback.
 
 ## v0.06.00: Scale and collaboration
 

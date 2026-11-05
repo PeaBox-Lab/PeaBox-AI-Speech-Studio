@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.04.10 Release Notes
+# PeaBox Voice Studio v0.05.00 Release Notes
 
-This release adds the Audio Quality Lab planned after the Quality and Transcription Studio. Users can inspect uncompressed 16-bit PCM WAV files, create peak-normalized copies, and remove leading or trailing silence without overwriting the source.
+This release delivers the first non-destructive Timeline Studio phase from the supplied product roadmap. WAV assets become durable project clip records rather than only downloaded files. Each clip stores cached waveform peaks, timing, gain, track, source linkage, and readiness information.
 
-A/B Kokoro comparisons generate the same prepared text using two voice and speed configurations. Both variants include playback, downloads, and audio metrics. Active projects retain comparison settings, output names, metrics, preference, and notes for later review.
+Clips can be arranged sequentially or overlapped at explicit start times. Timeline export validates missing files and incompatible audio formats, mixes enabled clips into a new 16-bit PCM WAV, and creates a portable manifest. Original source audio is never modified.
 
-This release remains intentionally WAV-first and non-destructive. Waveform timeline editing and mixed-track export remain part of the later v0.05.00 phase.
+This is a Streamlit form-based timeline, not yet the later React/Web Audio drag-and-drop interface. The clip and manifest schema provides the migration foundation for that frontend.

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 APP_NAME = "PeaBox Voice Studio"
-VERSION = "0.04.10"
+VERSION = "0.05.00"
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 PROJECTS_DIR = DATA_DIR / "projects"

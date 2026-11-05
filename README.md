@@ -1,58 +1,56 @@
-# PeaBox Voice Studio v0.04.10
+# PeaBox Voice Studio v0.05.00
 
-A local-first voice production, transcription, and WAV quality workspace with non-destructive audio processing, A/B Kokoro comparisons, project pronunciation rules, session-cached cloud voices, and resumable multi-provider jobs.
+A local-first multi-provider voice production studio with durable audio clips, cached waveform peaks, non-destructive timeline arrangement, overlapping PCM mixing, merged WAV export, transcription, pronunciation controls, quality processing, and resumable jobs.
 
-## v0.04.10 Audio Quality Lab
+## v0.05.00 Timeline Studio
 
-### WAV analysis
+### Durable audio clips
 
-For uncompressed 16-bit PCM WAV files, the app reports:
+- Add existing WAV assets from the release output folder
+- Link a clip to an optional script block
+- Store title, track, start time, duration, gain, sample rate, channels, waveform peaks, source block ID, and source hash
+- Keep clip records inside portable project JSON
+- Detect missing audio files
+- Detect stale clips when a linked script block changes after rendering
 
-- Duration
-- Sample rate
-- Channel count
-- Frame count
-- Peak level in dBFS
-- RMS level in dBFS
-- Clipped-sample count
-- File size
+### Non-destructive arrangement
 
-### Non-destructive processing
+- Reorder clip records without changing source files
+- Assign track names
+- Set explicit start offsets
+- Enable or disable clips
+- Apply per-clip gain from -60 to +12 dB
+- Automatically arrange enabled clips sequentially with a configurable gap
+- Preview individual clips and cached waveform peak charts
 
-- Create a normalized copy with a target peak from -30 to 0 dBFS
-- Trim leading and trailing silence using a configurable threshold
-- Preserve configurable padding around detected audio
-- Preview, compare metrics, and download the processed WAV
-- Save processed copies into the release output folder without overwriting the source
+### Mix and export
 
-### A/B Kokoro comparisons
-
-- Generate identical prepared text with two independent language, voice, and speed settings
-- Play and download both WAV files
-- Compare duration, peak, RMS, and clipping metrics
-- Save comparison records in the active project
-- Record A, B, Tie, or no preference with review notes
-- Keep the latest 20 comparison records per project
+- Mix overlapping enabled clips at their explicit start times
+- Validate sample rate and channel compatibility before export
+- Report potential clipped samples before final limiting
+- Export one uncompressed 16-bit PCM WAV
+- Export a timeline manifest containing order, timing, gain, track, source linkage, and readiness state
+- Retain the latest 20 timeline export records per project
 
 ## Scope boundary
 
-The Audio Quality Lab supports uncompressed **16-bit PCM WAV** processing. Cloud MP3 output should be converted to WAV before using normalization or silence trimming. This release is not yet a multitrack editor and does not merge tracks.
+Timeline Studio currently works with uncompressed **16-bit PCM WAV** files that share the same sample rate and channel count. It offers form-based timeline controls in Streamlit; direct waveform dragging and browser-based low-latency playback remain planned for a later React/Web Audio frontend.
 
 ## Preserved capabilities
 
-- v0.04.01 system and media diagnostics
-- Transcript validation, repair, TXT/SRT/VTT export, and saved sessions
-- Pronunciation rules and safe pause markers
-- Cloud provider catalogs, presets, and resumable jobs
-- v0.03.12 UI regression protection
+- v0.04.10 WAV analysis, normalization, silence trimming, and A/B comparison
+- v0.04.01 system and transcript diagnostics
+- Pronunciation dictionaries, safe pause markers, and transcript sessions
+- Cloud voice catalogs, project presets, and resumable multi-provider jobs
+- v0.03.12 interface regression protection
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the sidebar displays `PeaBox v0.04.10`.
-5. Use **System Check** to verify FFmpeg and storage readiness.
+4. Confirm the sidebar displays `PeaBox v0.05.00`.
+5. Generate or process WAV files, then add them in Timeline Studio.
 
 ## Tests
 

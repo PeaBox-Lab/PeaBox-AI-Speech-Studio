@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.05.00 — 2026-11-05
+
+### Added
+
+- Durable project audio-clip records
+- Cached normalized waveform peaks
+- Source-block hashes and stale-render detection
+- Missing-file and audio-format validation
+- Clip track, order, enable, start-time, and gain controls
+- Automatic sequential arrangement with configurable gaps
+- Overlapping multitrack PCM mixing
+- Merged WAV and timeline manifest export
+- Timeline export history
+- Timeline, mixing, stale-state, navigation, and UI regression tests
+
+### Scope
+
+- Timeline controls are form-based in Streamlit; drag-and-drop waveforms remain planned for the React/Web Audio phase
+
 ## v0.04.10 — 2026-11-05
 
 ### Added
