@@ -41,28 +41,15 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 - Job duplicate, reopen, retry, cancellation, deletion, and output recovery controls
 
 
-## Delivered — v0.04.00: Quality and transcription studio
+## v0.04.00: Quality and transcription studio
 
 - Pronunciation dictionary and provider-aware SSML controls
 - Reusable voice/direction presets and searchable voice filters
 - Audio normalization and silence controls
-- Editable transcript sessions with TXT, SRT, and VTT export
-- Optional speaker diarization with explicit model setup remains next
+- Optional speaker diarization with explicit model setup
 - Speaker-labelled TXT, SRT, and VTT exports
 
-## Delivered — v0.04.01: Quality and transcript hardening
-
-- System and media-readiness diagnostics
-- Transcript overlap validation, automatic timing repair, and safer session recovery
-- Pronunciation duplicate/overlap diagnostics and match previews
-
-## Delivered — v0.04.10: Audio Quality Lab
-
-- WAV analysis with peak, RMS, clipping, format, and duration metrics
-- Non-destructive peak normalization and silence trimming
-- Kokoro A/B voice and speed comparison history
-
-## Delivered — v0.05.00: Non-destructive timeline
+## v0.05.00: Non-destructive timeline
 
 - AudioClip repository separated from script blocks
 - Waveform peak extraction and clip duration metadata
@@ -70,7 +57,7 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 - Background music track and mix preview
 - Merged WAV export and chapter/manifest outputs
 
-The durable clip and manifest model is now delivered. A React/Web Audio frontend remains justified for direct waveform dragging and low-latency interactive playback.
+A React/Web Audio frontend and FastAPI service become justified at this stage, when low-latency playback and timeline interaction exceed Streamlit's strengths.
 
 ## Delivered — v0.05.01: Timeline portability and recovery
 

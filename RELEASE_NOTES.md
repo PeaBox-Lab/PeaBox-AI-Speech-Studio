@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.07.0 Release Notes
+# PeaBox Voice Studio v0.07.1 Release Notes
 
-This release adds local collaboration and governance controls to the corporate workspace. Projects can carry ownership labels, contributor lists, risk, target dates, workflow states, review comments, decisions, approval requests, and an append-only application audit history.
+This visual-maintenance release fixes the defects visible in the supplied v0.07.0 screenshot while retaining the complete governance and production feature set.
 
-The new Governance Center manages review policy, comments, decisions, and audit records. Approval Queue manages local approval attestations and controls transition into the Approved state when approval is required. The Executive Dashboard and Activity & History screens now surface governance readiness and recent governance actions.
+The Workspace Area control no longer renders as an unreadable white block. The original global sidebar text-color override has been replaced with targeted styles for the select value, icon, focus state, and dropdown options. Navigation now has clearer area and screen labels plus a much stronger selected-screen state.
 
-PeaBox remains a local application. Names are not authenticated and approvals are not digital signatures. These controls establish portable review discipline while the future shared-project and identity architecture remains pending.
+The page header receives additional top clearance and explicit width, box-sizing, wrapping, and overflow rules. Responsive breakpoints improve spacing and column behavior on medium and small windows. Sidebar status badges, captions, expanders, cards, and buttons also receive contrast and density refinements.

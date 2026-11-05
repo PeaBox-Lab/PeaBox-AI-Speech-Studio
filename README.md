@@ -1,6 +1,17 @@
-# PeaBox Voice Studio v0.07.0
+# PeaBox Voice Studio v0.07.1
 
 A governed corporate voice-production workspace with workflow states, ownership, review comments, decision records, approval gates, audit history, executive readiness, portable projects and timelines, multi-provider generation, transcription, and non-destructive audio assembly.
+
+
+## v0.07.1 Responsive UI polish
+
+- Fixed white-on-white Workspace Area selector text
+- Added accessible dark select, focus, icon, and dropdown-option states
+- Fixed top-banner clipping with greater header clearance and overflow protection
+- Strengthened selected navigation rows and added explicit area/screen labels
+- Improved sidebar caption and project-status contrast
+- Added responsive medium and mobile breakpoints
+- Improved content width, card wrapping, column stacking, and button consistency
 
 ## v0.07.0 Collaboration & Governance
 
@@ -53,7 +64,7 @@ All v0.06.0 corporate screens and all v0.05.01 production, timeline, bundle, aud
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the sidebar shows `Enterprise workspace · v0.07.0`.
+4. Confirm the sidebar shows `Enterprise workspace · v0.07.1`.
 5. Open **Administration → Governance Center** to assign ownership and workflow policy.
 
 ## Tests

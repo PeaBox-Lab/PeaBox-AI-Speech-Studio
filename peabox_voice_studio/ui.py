@@ -56,39 +56,116 @@ def inject_corporate_theme() -> None:
     st.markdown("""
 <style>
 :root {
-  --pb-navy:#13213c; --pb-blue:#235ea8; --pb-cyan:#3aa7c4; --pb-ink:#172033;
-  --pb-muted:#667085; --pb-bg:#f4f7fb; --pb-card:#ffffff; --pb-border:#d9e2ef;
+  --pb-navy:#13213c; --pb-navy-2:#1b3155; --pb-blue:#2f6fbb; --pb-blue-active:#316da8;
+  --pb-cyan:#55bed6; --pb-ink:#172033; --pb-muted:#667085; --pb-bg:#f3f6fa;
+  --pb-card:#ffffff; --pb-border:#d6e0ec; --pb-sidebar-text:#edf5ff;
+  --pb-sidebar-muted:#b9c8dc; --pb-sidebar-control:#203b64; --pb-sidebar-border:#49698f;
   --pb-good:#147d64; --pb-warn:#b54708; --pb-bad:#b42318;
 }
+html, body, [data-testid="stAppViewContainer"] { overflow-x:hidden; }
 .stApp { background:var(--pb-bg); color:var(--pb-ink); }
-[data-testid="stSidebar"] { background:linear-gradient(180deg,#101b31 0%,#172a4d 100%); border-right:1px solid #23395f; }
-[data-testid="stSidebar"] * { color:#eef4ff; }
-[data-testid="stSidebar"] .stRadio label, [data-testid="stSidebar"] .stSelectbox label { font-weight:600; }
-[data-testid="stSidebar"] [data-baseweb="select"] > div { background:#1d3359; border-color:#36517a; }
-[data-testid="stSidebar"] div[role="radiogroup"] label { padding:.35rem .45rem; border-radius:7px; margin:.08rem 0; }
-[data-testid="stSidebar"] div[role="radiogroup"] label:hover { background:#243d67; }
-.block-container { max-width:1500px; padding-top:1.2rem; padding-bottom:3rem; }
-.pb-topbar { background:linear-gradient(120deg,var(--pb-navy),#234a7d); border-radius:14px; padding:1.25rem 1.5rem; color:white; margin-bottom:1rem; box-shadow:0 8px 24px rgba(19,33,60,.12); }
-.pb-eyebrow { color:#9fd8e8; font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; font-weight:700; margin-bottom:.35rem; }
-.pb-title { font-size:1.75rem; line-height:1.15; font-weight:720; margin:0; }
-.pb-subtitle { color:#d9e7f7; margin-top:.45rem; max-width:900px; font-size:.94rem; }
-.pb-card { background:var(--pb-card); border:1px solid var(--pb-border); border-radius:12px; padding:1rem 1.1rem; min-height:110px; box-shadow:0 3px 12px rgba(22,45,78,.05); }
+[data-testid="stHeader"] { background:rgba(243,246,250,.94); backdrop-filter:blur(8px); }
+[data-testid="stToolbar"] { right:.75rem; }
+[data-testid="stSidebar"] {
+  background:linear-gradient(180deg,#101b31 0%,#172a4d 55%,#142441 100%);
+  border-right:1px solid #2c466d;
+  min-width:17rem;
+}
+[data-testid="stSidebarContent"] { padding-top:.75rem; overflow-y:auto; }
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] { color:var(--pb-sidebar-text); }
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color:var(--pb-sidebar-muted)!important; }
+/* Explicit select styling prevents inherited white text on Streamlit's default white control. */
+[data-testid="stSidebar"] div[data-baseweb="select"] > div {
+  background:var(--pb-sidebar-control)!important;
+  border:1px solid var(--pb-sidebar-border)!important;
+  color:#ffffff!important;
+  min-height:2.55rem;
+  box-shadow:none!important;
+}
+[data-testid="stSidebar"] div[data-baseweb="select"] span,
+[data-testid="stSidebar"] div[data-baseweb="select"] input,
+[data-testid="stSidebar"] div[data-baseweb="select"] svg {
+  color:#ffffff!important; fill:#ffffff!important; -webkit-text-fill-color:#ffffff!important;
+}
+[data-testid="stSidebar"] div[data-baseweb="select"]:focus-within > div {
+  border-color:#83c8e3!important; box-shadow:0 0 0 2px rgba(85,190,214,.22)!important;
+}
+/* Popovers render outside the sidebar and need dark text on their light surface. */
+div[data-baseweb="popover"] ul[role="listbox"] { background:#ffffff!important; border:1px solid var(--pb-border); }
+div[data-baseweb="popover"] li[role="option"],
+div[data-baseweb="popover"] li[role="option"] span { color:var(--pb-ink)!important; -webkit-text-fill-color:var(--pb-ink)!important; }
+div[data-baseweb="popover"] li[role="option"]:hover { background:#edf4fc!important; }
+[data-testid="stSidebar"] div[role="radiogroup"] { gap:.2rem; }
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+  min-height:2.35rem; padding:.42rem .62rem; border-radius:8px; margin:0;
+  border:1px solid transparent; transition:background .14s ease,border-color .14s ease,transform .14s ease;
+}
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover { background:#243d67; border-color:#36557e; transform:translateX(1px); }
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+  background:linear-gradient(90deg,#2b659f,#28588f)!important;
+  border-color:#69a7d3!important;
+  box-shadow:inset 3px 0 0 #7fdbeb,0 4px 12px rgba(0,0,0,.14);
+}
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p { color:#ffffff!important; font-weight:720; }
+[data-testid="stSidebar"] div[role="radiogroup"] input { accent-color:#72d4e5; }
+[data-testid="stSidebar"] hr { border-color:#385374; margin:.85rem 0; }
+.block-container {
+  width:100%; max-width:1440px; box-sizing:border-box;
+  padding:3.35rem 2.25rem 4rem!important;
+}
+.pb-topbar {
+  width:100%; max-width:100%; box-sizing:border-box; overflow:hidden;
+  background:linear-gradient(120deg,var(--pb-navy),#234a7d 68%,#26638d);
+  border:1px solid rgba(147,190,226,.22); border-radius:14px;
+  padding:1.35rem 1.55rem; color:white; margin:.2rem 0 1.15rem;
+  box-shadow:0 8px 24px rgba(19,33,60,.13); position:relative;
+}
+.pb-topbar::after {
+  content:""; position:absolute; right:-3rem; top:-5rem; width:15rem; height:15rem;
+  border-radius:50%; background:radial-gradient(circle,rgba(85,190,214,.2),rgba(85,190,214,0) 70%); pointer-events:none;
+}
+.pb-eyebrow { color:#aee3ef; font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; font-weight:750; margin-bottom:.38rem; overflow-wrap:anywhere; }
+.pb-title { font-size:clamp(1.45rem,2.1vw,1.85rem); line-height:1.18; font-weight:750; margin:0; overflow-wrap:anywhere; }
+.pb-subtitle { color:#dceafb; margin-top:.48rem; max-width:920px; font-size:.94rem; line-height:1.45; overflow-wrap:anywhere; }
+.pb-card { background:var(--pb-card); border:1px solid var(--pb-border); border-radius:12px; padding:1rem 1.1rem; min-height:110px; box-shadow:0 3px 12px rgba(22,45,78,.05); box-sizing:border-box; }
 .pb-card-label { color:var(--pb-muted); text-transform:uppercase; letter-spacing:.06em; font-size:.7rem; font-weight:700; }
-.pb-card-value { color:var(--pb-navy); font-size:1.55rem; font-weight:750; margin:.2rem 0; }
-.pb-card-note { color:var(--pb-muted); font-size:.8rem; }
+.pb-card-value { color:var(--pb-navy); font-size:1.55rem; font-weight:750; margin:.2rem 0; overflow-wrap:anywhere; }
+.pb-card-note { color:var(--pb-muted); font-size:.8rem; line-height:1.35; }
 .pb-section { border-left:4px solid var(--pb-blue); padding:.15rem 0 .15rem .75rem; margin:1.3rem 0 .7rem; }
 .pb-section-title { font-weight:720; color:var(--pb-navy); font-size:1.05rem; }
 .pb-section-note { color:var(--pb-muted); font-size:.82rem; margin-top:.15rem; }
 .pb-callout { background:#edf5ff; border:1px solid #c8dcf5; border-radius:10px; padding:.8rem 1rem; color:#25446e; margin:.5rem 0 1rem; }
-.pb-status { display:inline-block; padding:.18rem .55rem; border-radius:999px; font-weight:700; font-size:.72rem; }
+.pb-nav-label { color:#9fb3cc; font-size:.66rem; font-weight:750; letter-spacing:.12em; margin:.35rem 0 .3rem; }
+.pb-status { display:inline-block; padding:.2rem .58rem; border-radius:999px; font-weight:750; font-size:.69rem; letter-spacing:.025em; }
 .pb-status.good { color:#096b53; background:#dff6ee; }.pb-status.warn { color:#934b08; background:#fff1dc; }.pb-status.bad { color:#9b241c; background:#fee4e2; }.pb-status.neutral { color:#344054; background:#eaecf0; }
-.pb-step { background:#fff; border:1px solid var(--pb-border); border-radius:10px; padding:.8rem 1rem; margin-bottom:.45rem; }
+[data-testid="stSidebar"] .pb-status.neutral { color:#e7eef8; background:#344d70; border:1px solid #577397; }
+[data-testid="stSidebar"] .pb-status.good { color:#c9fff0; background:#13654f; border:1px solid #27876e; }
+.pb-step { background:#fff; border:1px solid var(--pb-border); border-radius:10px; padding:.8rem 1rem; margin-bottom:.45rem; min-height:100px; box-sizing:border-box; }
 .pb-step strong { color:var(--pb-navy); }
 [data-testid="stMetric"] { background:white; border:1px solid var(--pb-border); border-radius:11px; padding:.65rem .8rem; box-shadow:0 2px 8px rgba(22,45,78,.04); }
-[data-testid="stExpander"] { background:white; border:1px solid var(--pb-border); border-radius:10px; }
-.stButton > button, .stDownloadButton > button { border-radius:8px; font-weight:650; }
+[data-testid="stExpander"] { background:white; border:1px solid var(--pb-border); border-radius:10px; overflow:hidden; }
+[data-testid="stForm"], [data-testid="stDataFrame"], [data-testid="stFileUploader"] { max-width:100%; }
+.stButton > button, .stDownloadButton > button { border-radius:8px; font-weight:650; min-height:2.35rem; }
 .stButton > button[kind="primary"] { background:var(--pb-blue); border-color:var(--pb-blue); }
 hr { border-color:var(--pb-border); }
+@media (max-width:1100px) {
+  .block-container { padding:3.15rem 1.35rem 3rem!important; }
+  .pb-topbar { padding:1.15rem 1.2rem; }
+  [data-testid="stHorizontalBlock"] { gap:.65rem; }
+}
+@media (max-width:760px) {
+  .block-container { padding:3rem .85rem 2.5rem!important; }
+  .pb-topbar { border-radius:11px; margin-top:.1rem; }
+  .pb-subtitle { font-size:.87rem; }
+  .pb-card,.pb-step { min-height:auto; }
+  [data-testid="column"] { min-width:100%!important; width:100%!important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -100,10 +177,12 @@ def sidebar_navigation(version: str, project: Any = None) -> str:
     default_group = st.session_state.get("nav_group", "Overview")
     if default_group not in group_names:
         default_group = "Overview"
-    group = st.sidebar.selectbox("Workspace area", group_names, index=group_names.index(default_group), key="nav_group")
+    st.sidebar.markdown('<div class="pb-nav-label">WORKSPACE AREA</div>', unsafe_allow_html=True)
+    group = st.sidebar.selectbox("Workspace area", group_names, index=group_names.index(default_group), key="nav_group", label_visibility="collapsed")
     entries = NAVIGATION[group]
     labels = [f"{icon}  {label}" for label, _, icon in entries]
-    selected_label = st.sidebar.radio("Navigation", labels, key=f"nav_page_{group}")
+    st.sidebar.markdown('<div class="pb-nav-label" style="margin-top:.8rem">SCREENS</div>', unsafe_allow_html=True)
+    selected_label = st.sidebar.radio("Navigation", labels, key=f"nav_page_{group}", label_visibility="collapsed")
     selected_index = labels.index(selected_label)
     page = entries[selected_index][1]
     st.sidebar.divider()

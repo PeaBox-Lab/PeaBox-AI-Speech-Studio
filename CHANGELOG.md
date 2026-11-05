@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.07.1 — 2026-11-05
+
+### Fixed
+
+- White-on-white Workspace Area selector caused by a global sidebar color override
+- Low-contrast sidebar captions and project-status badges
+- Weak selected-screen navigation state
+- Top-banner clipping and insufficient fixed-header clearance
+- Horizontal overflow and text wrapping at narrower viewport widths
+
+### Improved
+
+- Explicit workspace and screen navigation labels
+- Select focus and dropdown popover accessibility
+- Responsive content padding and mobile column stacking
+- Card, expander, button, and header visual consistency
+
+### Added
+
+- Static visual-contract regression tests
+- UI defect analysis and fix documentation
+
 ## v0.07.0 — 2026-11-05
 
 ### Added
@@ -63,41 +85,6 @@
 - Clip records now include an asset-content hash
 - Bundle imports clear prior timeline export history
 
-## v0.05.00 — 2026-11-05
-
-### Added
-
-- Durable project audio-clip records
-- Cached normalized waveform peaks
-- Source-block hashes and stale-render detection
-- Missing-file and audio-format validation
-- Clip track, order, enable, start-time, and gain controls
-- Automatic sequential arrangement with configurable gaps
-- Overlapping multitrack PCM mixing
-- Merged WAV and timeline manifest export
-- Timeline export history
-- Timeline, mixing, stale-state, navigation, and UI regression tests
-
-### Scope
-
-- Timeline controls are form-based in Streamlit; drag-and-drop waveforms remain planned for the React/Web Audio phase
-
-## v0.04.10 — 2026-11-05
-
-### Added
-
-- Audio Quality Lab for uncompressed 16-bit PCM WAV files
-- Duration, channel, sample-rate, peak, RMS, clipping, and size metrics
-- Non-destructive peak normalization
-- Leading/trailing silence trimming with threshold and padding controls
-- A/B Kokoro voice and speed comparisons
-- Project comparison history, preference, notes, and deletion controls
-- Audio processing, comparison, navigation, and UI regression tests
-
-### Scope
-
-- Processing is WAV-first; multitrack mixing and timeline editing remain planned for v0.05.00
-
 ## v0.04.01 — 2026-11-05
 
 ### Added
@@ -120,25 +107,6 @@
 
 - v0.04.00 quality and transcription features
 - v0.03.12 UI rendering regression protection
-
-## v0.04.00 — 2026-11-05
-
-### Added
-
-- Project pronunciation dictionary with whole-word and case controls
-- Safe pause markers and processed-text previews
-- Cloud SSML break compilation and local Kokoro pause approximations
-- Original and processed text snapshots in batch jobs
-- Editable transcript segments with speaker fields and search
-- TXT, SRT, and WebVTT exports
-- Saved project transcript sessions
-- Quality, transcript, cloud-SSML, migration, navigation, and UI regression tests
-
-### Preserved
-
-- v0.03.12 Streamlit navigation fix and visible version diagnostics
-- v0.03.11 voice catalogs and presets
-- v0.03.10 multi-provider resumable jobs
 
 ## v0.03.12 — 2026-11-05
 
