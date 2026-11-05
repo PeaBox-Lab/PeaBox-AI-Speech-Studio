@@ -5,14 +5,19 @@ import streamlit as st
 from peabox_voice_studio.config import APP_NAME, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, VERSION
 from peabox_voice_studio.models import Project, ScriptBlock
 from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, PROVIDER_RATES
-from peabox_voice_studio.services.batch import build_manifest, render_local_blocks, summarize_results
+from peabox_voice_studio.services.batch import build_manifest
 from peabox_voice_studio.services.files import build_render_zip, safe_filename
 from peabox_voice_studio.services.history import record_render
+from peabox_voice_studio.services.jobs import add_job, create_job, replace_job, request_cancel, retry_failed, run_job
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
 from peabox_voice_studio.services.subtitles import to_srt
 
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide")
 store = ProjectStore()
+profiles = st.session_state.setdefault("provider_profiles", {})
+
+def configured_providers() -> set[str]:
+    return {"Kokoro local", *profiles.keys()}
 
 
 def current_project() -> Project | None:
@@ -34,10 +39,17 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
         block.title = st.text_input("Block title", block.title, key=f"title_{block.id}")
         block.text = st.text_area("Text", block.text, height=180, max_chars=MAX_BLOCK_CHARS, key=f"text_{block.id}")
         a, b, c, d = st.columns(4)
-        block.provider = a.selectbox("Provider", ["Kokoro local", "Azure Speech", "Amazon Polly standard", "Amazon Polly neural", "Google Cloud TTS"], index=["Kokoro local", "Azure Speech", "Amazon Polly standard", "Amazon Polly neural", "Google Cloud TTS"].index(block.provider) if block.provider in ["Kokoro local", "Azure Speech", "Amazon Polly standard", "Amazon Polly neural", "Google Cloud TTS"] else 0, key=f"provider_{block.id}")
-        block.language = b.selectbox("Language", list(KOKORO_VOICES), index=list(KOKORO_VOICES).index(block.language) if block.language in KOKORO_VOICES else 0, key=f"lang_{block.id}")
-        voices = KOKORO_VOICES[block.language]
-        block.voice = c.selectbox("Voice", voices, index=voices.index(block.voice) if block.voice in voices else 0, key=f"voice_{block.id}")
+        providers = ["Kokoro local", "Azure Speech", "Amazon Polly standard", "Amazon Polly neural", "Google Cloud TTS"]
+        block.provider = a.selectbox("Provider", providers, index=providers.index(block.provider) if block.provider in providers else 0, key=f"provider_{block.id}")
+        if block.provider == "Kokoro local":
+            block.language = b.selectbox("Language", list(KOKORO_VOICES), index=list(KOKORO_VOICES).index(block.language) if block.language in KOKORO_VOICES else 0, key=f"lang_{block.id}")
+            voices = KOKORO_VOICES[block.language]
+            block.voice = c.selectbox("Voice", voices, index=voices.index(block.voice) if block.voice in voices else 0, key=f"voice_{block.id}")
+        else:
+            default_language = block.language if block.language not in KOKORO_VOICES else "en-US"
+            block.language = b.text_input("Language code", default_language, key=f"lang_{block.id}")
+            default_voice = block.voice if block.voice not in sum(KOKORO_VOICES.values(), []) else ""
+            block.voice = c.text_input("Provider voice ID", default_voice, key=f"voice_{block.id}")
         block.speed = d.slider("Speed", 0.6, 1.6, float(block.speed), 0.05, key=f"speed_{block.id}")
         block.notes = st.text_input("Direction notes", block.notes, placeholder="Optional pacing, pronunciation, or performance note", key=f"notes_{block.id}")
         u, dn, dup, delete = st.columns(4)
@@ -52,8 +64,8 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Reliable multi-block voice production")
-page = st.sidebar.radio("Studio", ["Projects", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
+st.caption(f"Version {VERSION} · Resumable multi-provider voice production")
+page = st.sidebar.radio("Studio", ["Projects", "Provider Setup", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
 st.sidebar.success(f"Active: {project.name}") if project else st.sidebar.info("No active project")
 
@@ -101,6 +113,47 @@ if page == "Projects":
                 confirm = st.checkbox("I understand this permanently deletes the project")
                 if st.button("Delete permanently", disabled=not confirm): store.delete(project.id); st.session_state.pop("project", None); st.rerun()
 
+
+elif page == "Provider Setup":
+    st.header("Provider Setup")
+    st.warning("Credentials are held only in this Streamlit session. They are not saved in projects, exports, manifests, or logs.")
+    tabs = st.tabs(["Azure Speech", "Amazon Polly", "Google Cloud TTS"])
+    with tabs[0]:
+        azure_key = st.text_input("Azure API key", type="password", key="azure_key")
+        azure_region = st.text_input("Azure region", profiles.get("Azure Speech", {}).get("region", "centralindia"), key="azure_region")
+        if st.button("Use Azure for this session"):
+            if azure_key.strip() and azure_region.strip():
+                profiles["Azure Speech"] = {"key": azure_key.strip(), "region": azure_region.strip()}; st.success("Azure session profile is ready")
+            else: st.error("API key and region are required")
+        if st.button("Clear Azure session profile"):
+            profiles.pop("Azure Speech", None); st.rerun()
+    with tabs[1]:
+        aws_access = st.text_input("AWS access key ID", type="password", key="aws_access")
+        aws_secret = st.text_input("AWS secret access key", type="password", key="aws_secret")
+        aws_token = st.text_input("AWS session token, optional", type="password", key="aws_token")
+        aws_region = st.text_input("AWS region", profiles.get("Amazon Polly standard", {}).get("region", "ap-south-1"), key="aws_region")
+        if st.button("Use Polly for this session"):
+            if aws_access.strip() and aws_secret.strip() and aws_region.strip():
+                profile = {"access_key": aws_access.strip(), "secret_key": aws_secret.strip(), "session_token": aws_token.strip(), "region": aws_region.strip()}
+                profiles["Amazon Polly standard"] = profile; profiles["Amazon Polly neural"] = profile
+                st.success("Polly session profiles are ready")
+            else: st.error("Access key, secret key, and region are required")
+        if st.button("Clear Polly session profiles"):
+            profiles.pop("Amazon Polly standard", None); profiles.pop("Amazon Polly neural", None); st.rerun()
+    with tabs[2]:
+        google_file = st.file_uploader("Google service-account JSON", type="json", key="google_profile")
+        if st.button("Use Google for this session", disabled=google_file is None):
+            try:
+                json.loads(google_file.getvalue().decode("utf-8"))
+                profiles["Google Cloud TTS"] = {"service_account_json": google_file.getvalue().decode("utf-8")}
+                st.success("Google session profile is ready")
+            except Exception: st.error("The uploaded file is not valid JSON")
+        if st.button("Clear Google session profile"):
+            profiles.pop("Google Cloud TTS", None); st.rerun()
+    status_rows = [{"Provider": name, "Ready": name in configured_providers()} for name in ["Kokoro local", "Azure Speech", "Amazon Polly standard", "Amazon Polly neural", "Google Cloud TTS"]]
+    st.subheader("Session readiness")
+    st.dataframe(status_rows, use_container_width=True, hide_index=True)
+
 elif page == "Script Blocks":
     st.header("Script Blocks")
     if not project: st.info("Open a project first.")
@@ -124,42 +177,57 @@ elif page == "Script Blocks":
 
 elif page == "Batch Production":
     st.header("Batch Production")
-    if not project: st.info("Open a project first.")
-    elif not project.blocks: st.info("Create script blocks before building a batch.")
+    if not project:
+        st.info("Open a project first.")
+    elif not project.blocks:
+        st.info("Create script blocks before building a batch.")
     else:
-        manifest = build_manifest(project, PROVIDER_RATES)
+        ready_providers = configured_providers()
+        manifest = build_manifest(project, PROVIDER_RATES, ready_providers)
         totals = manifest["totals"]
         a, b, c, d = st.columns(4)
         a.metric("Enabled blocks", totals["enabled_blocks"]); b.metric("Characters", f"{totals['characters']:,}"); c.metric("Est. audio", f"{totals['estimated_minutes']:.1f} min"); d.metric("Est. cost", f"${totals['estimated_cost_usd']:.4f}")
         st.dataframe(manifest["blocks"], use_container_width=True, hide_index=True)
         validation = manifest["validation"]
-        if validation["ready"]:
-            st.success(f"Batch validation passed with {validation['warnings']} warning(s).")
-        else:
-            st.error(f"Batch is not ready: {validation['errors']} error(s), {validation['warnings']} warning(s).")
-        if validation["issues"]:
-            st.dataframe(validation["issues"], use_container_width=True, hide_index=True)
+        if validation["ready"]: st.success(f"Batch validation passed with {validation['warnings']} warning(s).")
+        else: st.error(f"Batch is not ready: {validation['errors']} error(s), {validation['warnings']} warning(s).")
+        if validation["issues"]: st.dataframe(validation["issues"], use_container_width=True, hide_index=True)
         st.download_button("Download render manifest", json.dumps(manifest, ensure_ascii=False, indent=2), f"{safe_filename(project.name)}_manifest.json", "application/json")
-        st.warning("This release batch-renders Kokoro local blocks. Cloud blocks remain in the manifest and are skipped until credential profiles and asynchronous jobs are added.")
-        if st.button("Render enabled local blocks", type="primary", disabled=not validation["ready"] or not any(b.enabled and b.provider == "Kokoro local" and b.text.strip() for b in project.blocks)):
-            from peabox_voice_studio.providers.kokoro import generate
-            def local_generate(text, voice, language, speed, name):
-                return generate(text, voice, KOKORO_LANGS.get(language, "en-us"), speed, name)
-            with st.spinner("Rendering enabled local blocks..."):
-                files, results = render_local_blocks(project, local_generate)
-            manifest["results"] = results
-            summary = summarize_results(results)
-            project.settings["last_batch"] = {"created_at": manifest["created_at"], "summary": summary, "results": results}
-            save_project(project)
-            if files:
-                package = build_render_zip(files, manifest)
-                st.success(f"Rendered {summary['rendered']} block(s); skipped {summary['skipped']}; failed {summary['failed']}.")
-                st.download_button("Download batch ZIP", package, f"{safe_filename(project.name)}_batch.zip", "application/zip")
-            st.dataframe(results, use_container_width=True, hide_index=True)
-        last_batch = project.settings.get("last_batch")
-        if last_batch:
-            with st.expander("Last saved batch result"):
-                st.json(last_batch)
+        if st.button("Create resumable job", type="primary", disabled=not validation["ready"]):
+            try:
+                job = create_job(project, PROVIDER_RATES, ready_providers); add_job(project, job); save_project(project); st.success("Batch job created")
+            except Exception as exc: st.error(f"Job creation failed: {exc}")
+        jobs = project.settings.get("batch_jobs", [])
+        if jobs:
+            selected_job = st.selectbox("Saved batch jobs", jobs, format_func=lambda item: f"{item['created_at']} · {item['status']} · {item['id'][:8]}")
+            summary = selected_job.get("summary", {})
+            st.caption(f"Estimated ${summary.get('estimated_cost_usd', 0):.4f} · Recorded usage cost ${summary.get('actual_cost_usd', 0):.4f}. Recorded usage cost is calculated from successful characters at the planning rate; it is not a provider invoice.")
+            b1, b2, b3 = st.columns(3)
+            run_clicked = b1.button("Run or resume job", disabled=selected_job.get("status") in {"completed", "cancelled"})
+            retry_clicked = b2.button("Retry failed items", disabled=not any(i["status"] == "failed" for i in selected_job["items"]))
+            cancel_clicked = b3.button("Cancel queued items", disabled=selected_job.get("status") in {"completed", "cancelled", "failed"})
+            if retry_clicked:
+                retry_failed(selected_job); replace_job(project, selected_job); save_project(project); st.rerun()
+            if cancel_clicked:
+                request_cancel(selected_job); replace_job(project, selected_job); save_project(project); st.rerun()
+            if run_clicked:
+                from peabox_voice_studio.providers.kokoro import generate as kokoro_generate
+                from peabox_voice_studio.providers.cloud import generate_azure, generate_google, generate_polly
+                renderers = {
+                    "Kokoro local": lambda item, name: kokoro_generate(item["text"], item["voice"], KOKORO_LANGS.get(item["language"], "en-us"), item["speed"], name),
+                }
+                if "Azure Speech" in profiles: renderers["Azure Speech"] = lambda item, name: generate_azure(item["text"], profiles["Azure Speech"], item["voice"], item["speed"], name)
+                if "Amazon Polly standard" in profiles: renderers["Amazon Polly standard"] = lambda item, name: generate_polly(item["text"], profiles["Amazon Polly standard"], item["voice"], "standard", name)
+                if "Amazon Polly neural" in profiles: renderers["Amazon Polly neural"] = lambda item, name: generate_polly(item["text"], profiles["Amazon Polly neural"], item["voice"], "neural", name)
+                if "Google Cloud TTS" in profiles: renderers["Google Cloud TTS"] = lambda item, name: generate_google(item["text"], profiles["Google Cloud TTS"], item["voice"], item["language"], name)
+                with st.spinner("Running queued job items..."):
+                    files, selected_job = run_job(selected_job, renderers)
+                replace_job(project, selected_job); save_project(project); st.rerun()
+            st.dataframe(selected_job["items"], use_container_width=True, hide_index=True)
+            rendered_files = [Path(item["file"]) for item in selected_job["items"] if item["status"] == "rendered" and item.get("file") and Path(item["file"]).exists()]
+            if rendered_files:
+                job_manifest = {"project": project.name, "job": selected_job}
+                st.download_button("Download job outputs", build_render_zip(rendered_files, job_manifest), f"{safe_filename(project.name)}_{selected_job['id'][:8]}_job.zip", "application/zip")
 
 elif page == "Create Speech":
     st.header("Create Speech")
@@ -204,19 +272,19 @@ else:
     st.header("Roadmap & Help")
     st.markdown("""
 ### Current release
-- Portable project JSON export/import with collision-safe imported identities
-- Ordered script blocks with bulk enable/disable, filtering, and append-or-replace paragraph import
-- Batch-readiness validation for missing titles, empty enabled text, voices, and unsupported cloud execution
-- Versioned render manifests, local Kokoro batch ZIPs, and persistent last-batch results
-- Local Faster-Whisper transcription with TXT and standards-compatible SRT export
+- Session-only Azure, Polly, and Google credential profiles that are excluded from project files and exports
+- Provider-aware block validation and cloud voice identifiers
+- Persistent resumable jobs with queued, running, rendered, failed, and cancelled item states
+- Retry failed items, cancel queued work, download completed job outputs, and compare estimated with recorded usage cost
+- Portable projects, local Kokoro production, and local Faster-Whisper transcription
 
 ### Planned next
-1. Credential profiles and asynchronous cloud batch jobs
-2. Waveform metadata and non-destructive clip timeline
-3. Voice library filters, pronunciation dictionary, and reusable presets
-4. Optional local diarization and speaker-labelled transcripts
-5. SQLite repository and background workers before hosted multi-user use
-6. Consent/provenance modules only after authoritative legal and technical validation
+1. Background worker process for non-blocking generation and live progress
+2. Dynamic provider voice discovery and cached capability catalogs
+3. Pronunciation dictionary, SSML controls, and reusable presets
+4. Waveform metadata and non-destructive clip timeline
+5. Optional local diarization and speaker-labelled transcripts
+6. SQLite repository before hosted multi-user use
 
 ### Setup
 Run `start_windows.bat`. The launcher accepts installed Python 3.10, 3.11, or 3.12 and creates or reuses `.venv`. Install FFmpeg for compressed media transcription.

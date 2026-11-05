@@ -24,13 +24,14 @@ This stage addresses the supplied multi-voice workflow and creates the clip obje
 
 This maintenance stage reduces data-loss and failed-render risk before cloud batch execution is introduced.
 
-## Next — v0.03.10: Cloud batch and configuration
+## Delivered — v0.03.10: Cloud batch foundation
 
-- Encrypted/session-scoped provider profiles
-- Dynamic voice discovery cache and provider capability matrix
-- Asynchronous per-block cloud generation with retry and cancellation
-- Actual-versus-estimated cost ledger
-- Batch status, partial retry, and resumable manifests
+- Session-only cloud credential profiles excluded from project data
+- Provider readiness and provider-specific block identifiers
+- Persistent resumable jobs, retries, cancellation, and output packages
+- Estimated and recorded usage cost tracking
+
+The remaining cloud-production gap is moving execution into a separate worker with live progress and dynamic voice discovery.
 
 ## v0.04.00: Quality and transcription studio
 

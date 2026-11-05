@@ -12,10 +12,10 @@ from peabox_voice_studio.services.files import build_render_zip
 class BatchTests(unittest.TestCase):
     def test_manifest_has_validation_and_enabled_totals(self):
         project = Project("Demo", blocks=[ScriptBlock("A", text="one two"), ScriptBlock("B", text="ignored", enabled=False), ScriptBlock("C", text="abc", provider="Azure Speech")])
-        manifest = build_manifest(project, {"Kokoro local": 0, "Azure Speech": 15})
+        manifest = build_manifest(project, {"Kokoro local": 0, "Azure Speech": 15}, {"Kokoro local", "Azure Speech"})
         self.assertEqual(manifest["schema_version"], 2)
         self.assertTrue(manifest["validation"]["ready"])
-        self.assertEqual(manifest["validation"]["warnings"], 1)
+        self.assertEqual(manifest["validation"]["warnings"], 0)
         self.assertEqual(manifest["totals"]["enabled_blocks"], 2)
         self.assertEqual(manifest["totals"]["characters"], 10)
 

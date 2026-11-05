@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.03.01 Release Notes
+# PeaBox Voice Studio v0.03.10 Release Notes
 
-This maintenance release makes the v0.03.00 multi-block workflow safer and easier to move between installations. Complete projects can now be exported and imported as JSON. Imports receive a new identity when needed, preventing accidental overwrite of an existing local project.
+This release activates the cloud-batch foundation from the roadmap. Azure Speech, Amazon Polly, and Google Cloud TTS can be configured for the current Streamlit session, while Kokoro remains available without credentials. Secret values are deliberately excluded from projects and exports.
 
-Batch Production now validates readiness before generation. Empty enabled blocks and other blocking problems are shown as errors; cloud blocks appear as warnings because this release's executable batch path remains Kokoro local. Render manifests include validation results, and completed batch outcomes are saved back to the project for later review.
+Batch Production now creates persistent job snapshots. Each block tracks its own state, attempts, output, failure message, estimated cost, and recorded usage cost. Successful items are not repeated when a job resumes; failed items can be queued again; queued work can be cancelled. Completed files and job metadata can be downloaded together.
 
-Block editing adds search/filter, bulk enable/disable, and append-or-replace paragraph import. Existing v0.03.00 projects remain compatible.
+Execution remains UI-initiated and process-bound. The next scalability step is a separate worker and live progress channel rather than claiming that this release provides true background execution.

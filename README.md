@@ -1,23 +1,28 @@
-# PeaBox Voice Studio v0.03.01
+# PeaBox Voice Studio v0.03.10
 
-A local-first Streamlit workspace for portable projects, multi-block scripts, validated Kokoro batch rendering, and Faster-Whisper transcription.
+A local-first Streamlit workspace for portable projects, provider-aware script blocks, resumable multi-provider jobs, Kokoro production, and Faster-Whisper transcription.
 
-## v0.03.01 highlights
+## v0.03.10 highlights
 
-- Export a complete project—including Master Script, blocks, settings, and history—as JSON
-- Import project JSON with a new collision-safe project identity
-- Choose whether Master Script paragraph import appends blocks or replaces existing blocks
-- Filter blocks by title, text, provider, voice, or direction notes
-- Enable or disable all blocks in one action
-- Validate batch readiness before rendering
-- Block local rendering when enabled blocks have empty text or other errors
-- Identify cloud blocks as warnings because the local renderer will skip them
-- Save the last batch result summary and per-block outcomes in the project
-- Upgrade render manifests to schema version 2 with validation details
+- Session-only setup for Azure Speech, Amazon Polly, and Google Cloud TTS
+- Credentials are never written to project JSON, exported projects, job manifests, or logs
+- Provider-specific language codes and voice identifiers on cloud blocks
+- Provider readiness validation before job creation
+- Persistent job snapshots with queued, running, rendered, failed, and cancelled item states
+- Resume queued jobs after reopening a project
+- Retry failed items without repeating successful renders
+- Cancel queued items
+- Download completed job audio and job metadata in one ZIP
+- Estimated cost at job creation and recorded usage cost for successful generations
+- Job history limited to the most recent 20 records per project
 
-## Compatibility
+## Important behavior
 
-Existing v0.03.00 project JSON files remain readable. Newly exported project bundles use a wrapper with `schema_version`, `exported_at`, and `project`; the importer also accepts a raw project object.
+The Streamlit session must still contain the relevant provider credentials when a saved cloud job is resumed. Project files contain provider names and generation settings, but never secret values.
+
+Recorded usage cost is calculated from successfully rendered character counts using the configured planning rate. It is useful for project tracking but is not a provider invoice and may differ from billed usage, taxes, free tiers, regional pricing, or contracts.
+
+Jobs are resumable and persistent, but execution is still initiated from the UI and runs in the application process. A separate background worker and live progress channel remain planned for the next architecture stage.
 
 ## Windows setup
 
@@ -26,16 +31,14 @@ Existing v0.03.00 project JSON files remain readable. Newly exported project bun
 3. Run `start_windows.bat`.
 4. Install FFmpeg and add it to PATH for compressed audio/video transcription.
 
-The launcher selects the newest compatible installed Python, creates or reuses `.venv`, installs dependencies, and starts Streamlit.
+## Workflow
 
-## Recommended workflow
-
-1. Create or import a project.
-2. Maintain the Master Script and export the project JSON as a backup.
-3. Create or edit script blocks; use filtering and bulk enable/disable for larger projects.
-4. Open Batch Production and resolve validation errors.
-5. Download the schema-v2 manifest, render enabled Kokoro blocks, and download the batch ZIP.
-6. Review the persistent last-batch result before retrying failed work.
+1. Open Provider Setup and configure only the providers needed for the current session.
+2. Create or import a project and configure its blocks.
+3. Enter exact cloud language codes and provider voice IDs on cloud blocks.
+4. Open Batch Production and resolve readiness errors.
+5. Create a persistent job, then run or resume it.
+6. Retry failed items, cancel queued work, or download completed job outputs.
 
 ## Tests
 

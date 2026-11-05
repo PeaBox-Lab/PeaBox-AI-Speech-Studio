@@ -5,21 +5,22 @@ from peabox_voice_studio.models import Project, ScriptBlock, utc_now
 from peabox_voice_studio.services.files import safe_filename
 
 
-def validate_block(block: ScriptBlock, index: int) -> list[dict]:
+def validate_block(block: ScriptBlock, index: int, configured_providers: set[str] | None = None) -> list[dict]:
     issues: list[dict] = []
+    configured_providers = configured_providers or {"Kokoro local"}
     if not block.title.strip():
         issues.append({"severity": "error", "block": index, "block_id": block.id, "message": "Block title is empty"})
     if block.enabled and not block.text.strip():
         issues.append({"severity": "error", "block": index, "block_id": block.id, "message": "Enabled block has no text"})
     if block.provider == "Kokoro local" and block.enabled and not block.voice.strip():
         issues.append({"severity": "error", "block": index, "block_id": block.id, "message": "Local block has no voice"})
-    if block.enabled and block.provider != "Kokoro local":
-        issues.append({"severity": "warning", "block": index, "block_id": block.id, "message": "Cloud block will be skipped by the local renderer"})
+    if block.enabled and block.provider not in configured_providers:
+        issues.append({"severity": "error", "block": index, "block_id": block.id, "message": f"{block.provider} is not configured for this session"})
     return issues
 
 
-def validate_batch(project: Project) -> dict:
-    issues = [issue for index, block in enumerate(project.blocks, 1) for issue in validate_block(block, index)]
+def validate_batch(project: Project, configured_providers: set[str] | None = None) -> dict:
+    issues = [issue for index, block in enumerate(project.blocks, 1) for issue in validate_block(block, index, configured_providers)]
     enabled = [block for block in project.blocks if block.enabled]
     if not project.blocks:
         issues.append({"severity": "error", "block": None, "block_id": None, "message": "Project has no script blocks"})
@@ -37,9 +38,9 @@ def estimate_block(block: ScriptBlock, rates: dict[str, float]) -> dict:
     return {"id": block.id, "title": block.title, "provider": block.provider, "voice": block.voice, "characters": characters, "words": words, "estimated_minutes": round(words / 150, 2), "estimated_cost_usd": round(characters / 1_000_000 * rate, 6), "enabled": block.enabled}
 
 
-def build_manifest(project: Project, rates: dict[str, float]) -> dict:
+def build_manifest(project: Project, rates: dict[str, float], configured_providers: set[str] | None = None) -> dict:
     rows = [estimate_block(block, rates) for block in project.blocks]
-    validation = validate_batch(project)
+    validation = validate_batch(project, configured_providers)
     return {
         "schema_version": 2,
         "project_id": project.id,

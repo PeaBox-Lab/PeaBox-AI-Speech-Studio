@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.03.10 — 2026-11-05
+
+### Added
+
+- Session-only Azure Speech, Amazon Polly, and Google Cloud TTS profiles
+- Provider-specific cloud voice and language identifiers
+- Provider-readiness validation before job creation
+- Persistent resumable batch jobs and per-item state
+- Retry failed items and cancel queued work
+- Job output ZIPs and a 20-job project history
+- Estimated-versus-recorded usage cost tracking
+- Tests covering jobs, retries, cancellation, job persistence, and credential exclusion
+
+### Security
+
+- API keys, AWS secrets, tokens, and Google service-account contents remain only in Streamlit session state
+- Project exports and job records contain no credential values
+
+### Limitation
+
+- Jobs execute in the Streamlit process when the user runs them; a separate background worker is not yet included
+
 ## v0.03.01 — 2026-11-05
 
 ### Added
