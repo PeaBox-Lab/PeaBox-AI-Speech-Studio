@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.06.0 — 2026-11-05
+
+### Added
+
+- Corporate visual theme and reusable UI component system
+- Executive Dashboard with KPIs, readiness, workflow, and recent activity
+- Grouped business navigation across five workspace areas
+- Contextual page headers with project and version context
+- Consolidated Activity & History tabs
+- Corporate UI, dashboard, navigation, page-smoke, and feature-preservation tests
+- UI design specification
+
+### Changed
+
+- Reordered and renamed menu labels for clearer business workflows
+- Replaced the flat sidebar menu with area selection plus screen navigation
+- Improved spacing, cards, metrics, callouts, expanders, and button hierarchy
+
+### Compatibility
+
+- All v0.05.01 project and bundle formats remain compatible
+- No production feature was removed
+
 ## v0.05.01 — 2026-11-05
 
 ### Added

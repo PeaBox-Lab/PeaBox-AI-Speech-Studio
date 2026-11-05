@@ -20,8 +20,10 @@ from peabox_voice_studio.services.quality import add_pronunciation, delete_pronu
 from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
+from peabox_voice_studio.ui import callout, inject_corporate_theme, kpi_card, page_header, section, sidebar_navigation, status_badge, workflow_step
 
-st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide")
+st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide", initial_sidebar_state="expanded")
+inject_corporate_theme()
 store = ProjectStore()
 profiles = st.session_state.setdefault("provider_profiles", {})
 voice_catalogs = st.session_state.setdefault("voice_catalogs", {})
@@ -99,18 +101,62 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
             project.blocks.pop(index); save_project(project); st.rerun()
 
 
-st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Portable timeline studio")
-page = st.sidebar.radio("Studio", ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
-st.sidebar.caption(f"PeaBox v{VERSION}")
-if project:
-    st.sidebar.success(f"Active: {project.name}")
-else:
-    st.sidebar.info("No active project")
+page = sidebar_navigation(VERSION, project)
+page_header(page, VERSION, project)
 
-if page == "Projects":
-    st.header("Project Workspace")
+if page == "Dashboard":
+    projects = store.list()
+    diagnostics = system_diagnostics()
+    ready_checks = sum(row["Status"] == "Ready" for row in diagnostics)
+    total_checks = len(diagnostics)
+    if project:
+        clips = list_clips(project)
+        jobs = project.settings.get("batch_jobs", [])
+        transcript_sessions = project.settings.get("transcript_sessions", [])
+        comparison_history = project.settings.get("comparison_history", [])
+        cols = st.columns(4)
+        with cols[0]: kpi_card("Script blocks", str(len(project.blocks)), "Structured production units")
+        with cols[1]: kpi_card("Timeline clips", str(len(clips)), "Durable WAV assets")
+        with cols[2]: kpi_card("Batch jobs", str(len(jobs)), "Saved production runs")
+        with cols[3]: kpi_card("Transcripts", str(len(transcript_sessions)), "Saved editing sessions")
+        section("Production readiness", "Current project health across script, providers, timeline, and system dependencies.")
+        validation = validate_timeline(project) if clips else {"valid": False, "errors": 0, "warnings": 0, "enabled_clips": 0}
+        readiness_rows = [
+            {"Area": "Project", "Status": "Ready", "Detail": f"{len(project.blocks)} blocks and {len(project.script):,} master-script characters"},
+            {"Area": "Providers", "Status": "Ready" if configured_providers() else "Needs setup", "Detail": f"{len(configured_providers())} provider paths available"},
+            {"Area": "Timeline", "Status": "Ready" if validation.get("valid") else "Needs review", "Detail": f"{validation.get('enabled_clips', 0)} enabled clips; {validation.get('errors', 0)} errors"},
+            {"Area": "System", "Status": f"{ready_checks}/{total_checks} ready", "Detail": "Open System Check for details"},
+        ]
+        st.dataframe(readiness_rows, use_container_width=True, hide_index=True)
+        section("Recommended workflow", "Use the grouped navigation to move from content preparation to production and review.")
+        steps = st.columns(4)
+        with steps[0]: workflow_step(1, "Prepare", "Build the master script, script blocks, pronunciation rules, and voice presets.")
+        with steps[1]: workflow_step(2, "Generate", "Create a single render or validate and run a resumable batch job.")
+        with steps[2]: workflow_step(3, "Assemble", "Review WAV quality, add clips to Timeline Studio, and build a production master.")
+        with steps[3]: workflow_step(4, "Review", "Inspect activity, transcripts, comparisons, costs, and export history.")
+        section("Recent project activity")
+        activity = []
+        for item in project.render_history[:5]: activity.append({"Type": "Render", "When": item.get("created_at"), "Item": item.get("output"), "Status": item.get("provider")})
+        for item in project.settings.get("timeline_exports", [])[:5]: activity.append({"Type": "Timeline export", "When": item.get("created_at"), "Item": item.get("output"), "Status": "Completed"})
+        for item in jobs[:5]: activity.append({"Type": "Batch job", "When": item.get("updated_at", item.get("created_at")), "Item": item.get("id", "")[:8], "Status": item.get("status")})
+        activity = sorted(activity, key=lambda row: row.get("When") or "", reverse=True)[:10]
+        if activity: st.dataframe(activity, use_container_width=True, hide_index=True)
+        else: callout("No production activity has been recorded yet. Start with Script Editor or Speech Generator.")
+    else:
+        cols = st.columns(3)
+        with cols[0]: kpi_card("Saved projects", str(len(projects)), "Available local workspaces")
+        with cols[1]: kpi_card("System readiness", f"{ready_checks}/{total_checks}", "Core diagnostic checks ready")
+        with cols[2]: kpi_card("Active project", "None", "Open or create a project to begin")
+        section("Getting started", "PeaBox separates project management, production, audio quality, transcription, and administration into dedicated screens.")
+        callout("Open Project Workspace from the Overview area to create a new project or import an existing project or timeline bundle.")
+        c1, c2, c3 = st.columns(3)
+        with c1: workflow_step(1, "Create a project", "Name the production and write or import its master script.")
+        with c2: workflow_step(2, "Configure production", "Prepare script blocks, providers, voices, pronunciation, and presets.")
+        with c3: workflow_step(3, "Generate and assemble", "Render audio, validate quality, and create a timeline master.")
+
+elif page == "Projects":
+    section("Project portfolio", "Create, open, import, and maintain the production workspace and master script.")
     left, right = st.columns([1, 2])
     with left:
         name = st.text_input("New project name")
@@ -165,7 +211,6 @@ if page == "Projects":
 
 
 elif page == "System Check":
-    st.header("System Check")
     diagnostics = system_diagnostics()
     st.dataframe(diagnostics, use_container_width=True, hide_index=True)
     blocking = [row for row in diagnostics if row["Status"] in {"Unsupported", "Missing", "Not writable"}]
@@ -182,7 +227,6 @@ elif page == "System Check":
 """)
 
 elif page == "Provider Setup":
-    st.header("Provider Setup")
     st.warning("Credentials are held only in this Streamlit session. They are not saved in projects, exports, manifests, or logs.")
     tabs = st.tabs(["Azure Speech", "Amazon Polly", "Google Cloud TTS"])
     with tabs[0]:
@@ -243,7 +287,6 @@ elif page == "Provider Setup":
     st.dataframe(capability_rows(configured_providers(), counts), use_container_width=True, hide_index=True)
 
 elif page == "Voice Library":
-    st.header("Voice Library")
     all_voices = [{"provider": "Kokoro local", "id": voice, "name": voice, "language": language, "gender": "", "styles": []} for language, voices in KOKORO_VOICES.items() for voice in voices]
     for items in voice_catalogs.values(): all_voices.extend(items)
     facets = catalog_facets(all_voices)
@@ -265,7 +308,6 @@ elif page == "Voice Library":
         else: st.info("Save a preset from any script block to reuse its provider, voice, speed, and direction notes.")
 
 elif page == "Quality Studio":
-    st.header("Quality Studio")
     if not project:
         st.info("Open a project to manage pronunciation and direction rules.")
     else:
@@ -310,7 +352,6 @@ elif page == "Quality Studio":
         st.caption("Cloud providers compile valid pause markers to SSML breaks. Kokoro receives punctuation-based pause approximations.")
 
 elif page == "Audio Quality Lab":
-    st.header("Audio Quality Lab")
     mode = st.radio("Workflow", ["Analyze and process WAV", "A/B Kokoro comparison"], horizontal=True)
     if mode == "Analyze and process WAV":
         wav_upload = st.file_uploader("16-bit PCM WAV file", type=["wav"], key="quality_wav")
@@ -396,7 +437,7 @@ elif page == "Audio Quality Lab":
                 delete_comparison(project, selected_comparison["id"]); save_project(project); st.rerun()
 
 elif page == "Timeline Studio":
-    st.header("Timeline Studio")
+    section("Non-destructive audio assembly", "Arrange compatible WAV assets, inspect readiness, and export a mixed production master.")
     if not project:
         st.info("Open a project to create a timeline.")
     else:
@@ -493,7 +534,7 @@ elif page == "Timeline Studio":
             st.info("Add at least one WAV clip to begin arranging the timeline.")
 
 elif page == "Script Blocks":
-    st.header("Script Blocks")
+    section("Structured script production", "Each block carries independent provider, voice, pacing, pronunciation, and inclusion settings.")
     if not project: st.info("Open a project first.")
     else:
         st.caption("Divide a script into independently configurable voice blocks. Reorder, duplicate, disable, and batch-plan without changing the Master Script.")
@@ -514,7 +555,7 @@ elif page == "Script Blocks":
         for index, block in visible: block_editor(project, index, block)
 
 elif page == "Batch Production":
-    st.header("Batch Production")
+    section("Production jobs", "Validate provider readiness, create resumable jobs, and recover partial or failed work.")
     if not project:
         st.info("Open a project first.")
     elif not project.blocks:
@@ -577,7 +618,6 @@ elif page == "Batch Production":
                 st.download_button("Download job outputs", build_render_zip(rendered_files, job_manifest), f"{safe_filename(project.name)}_{selected_job['id'][:8]}_job.zip", "application/zip")
 
 elif page == "Create Speech":
-    st.header("Create Speech")
     text = st.text_area("Text", project.script if project else "", height=280, max_chars=MAX_SCRIPT_CHARS)
     output_name = st.text_input("Output name", safe_filename(project.name if project else "narration"))
     a, b, c = st.columns(3)
@@ -595,7 +635,7 @@ elif page == "Create Speech":
         except Exception as exc: st.error(f"Generation failed: {exc}")
 
 elif page == "Transcription":
-    st.header("Transcription Studio")
+    section("Local media transcription", "Transcribe privately, edit timestamped segments, validate timing, and export TXT, SRT, or VTT.")
     upload = st.file_uploader("Audio or video", type=["wav", "mp3", "m4a", "flac", "ogg", "mp4", "mov", "mkv", "webm"])
     a, b = st.columns(2)
     model_size = a.selectbox("Model", ["tiny", "base", "small", "medium", "large-v3"], index=1)
@@ -659,13 +699,39 @@ elif page == "Transcription":
                     delete_transcript_session(project, selected_session["id"]); save_project(project); st.rerun()
 
 elif page == "Render History":
-    st.header("Render History")
-    if not project: st.info("Open a project first.")
-    elif not project.render_history: st.info("No single renders recorded for this project.")
-    else: st.dataframe(project.render_history, use_container_width=True)
+    if not project:
+        st.info("Open a project to review activity and history.")
+    else:
+        section("Project activity ledger", "Review outputs and production records without changing the underlying project data.")
+        tabs = st.tabs(["Renders", "Batch jobs", "Timeline exports", "Comparisons", "Transcripts"])
+        with tabs[0]:
+            if project.render_history: st.dataframe(project.render_history, use_container_width=True, hide_index=True)
+            else: st.info("No individual renders have been recorded.")
+        with tabs[1]:
+            jobs = project.settings.get("batch_jobs", [])
+            if jobs:
+                rows = [{"Created": job.get("created_at"), "Updated": job.get("updated_at"), "Job": job.get("id", "")[:8], "Status": job.get("status"), "Items": len(job.get("items", [])), "Estimated cost": job.get("summary", {}).get("estimated_cost_usd", 0), "Recorded cost": job.get("summary", {}).get("actual_cost_usd", 0)} for job in jobs]
+                st.dataframe(rows, use_container_width=True, hide_index=True)
+            else: st.info("No batch jobs have been recorded.")
+        with tabs[2]:
+            exports = project.settings.get("timeline_exports", [])
+            if exports:
+                rows = [{"Created": item.get("created_at"), "Output": item.get("output"), "Duration": item.get("manifest", {}).get("mix", {}).get("duration_seconds"), "Clips": len(item.get("manifest", {}).get("clips", []))} for item in exports]
+                st.dataframe(rows, use_container_width=True, hide_index=True)
+            else: st.info("No timeline exports have been recorded.")
+        with tabs[3]:
+            comparisons = project.settings.get("comparison_history", [])
+            if comparisons: st.dataframe(comparisons, use_container_width=True, hide_index=True)
+            else: st.info("No A/B comparisons have been recorded.")
+        with tabs[4]:
+            transcripts = project.settings.get("transcript_sessions", [])
+            if transcripts:
+                rows = [{"Name": item.get("name"), "Source": item.get("source_name"), "Language": item.get("language"), "Created": item.get("created_at"), "Updated": item.get("updated_at"), "Segments": len(item.get("segments", []))} for item in transcripts]
+                st.dataframe(rows, use_container_width=True, hide_index=True)
+            else: st.info("No transcript sessions have been saved.")
 
 else:
-    st.header("Roadmap & Help")
+    section("Product roadmap and operating guidance", "Delivered capabilities, planned architecture, and setup notes for this release.")
     st.markdown("""
 ### Current release
 - Portable timeline bundles with project JSON and copied WAV assets

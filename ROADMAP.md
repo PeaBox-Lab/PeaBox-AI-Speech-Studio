@@ -78,6 +78,12 @@ The durable clip and manifest model is now delivered. A React/Web Audio frontend
 - Collision-safe and path-safe asset import
 - Clip relinking, metadata refresh, stale acknowledgement, and invalid-record cleanup
 
+## Delivered — v0.06.0: Corporate multi-screen workspace
+
+- Executive dashboard and workflow-aligned grouped navigation
+- Reusable corporate visual components and consistent page framing
+- Consolidated activity and history review screens
+
 ## v0.06.00: Scale and collaboration
 
 - SQLite repository migration followed by optional PostgreSQL

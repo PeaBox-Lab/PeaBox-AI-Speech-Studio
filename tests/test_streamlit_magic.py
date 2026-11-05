@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "app.py"
+UI = ROOT / "peabox_voice_studio" / "ui.py"
 
 
 class StreamlitMagicTests(unittest.TestCase):
@@ -21,13 +22,16 @@ class StreamlitMagicTests(unittest.TestCase):
         self.assertEqual(leaks, [], f"Streamlit magic would render internal objects: {leaks}")
 
     def test_sidebar_status_uses_statement_if(self):
-        source = APP.read_text(encoding="utf-8")
-        self.assertIn('if project:\n    st.sidebar.success', source)
-        self.assertIn('else:\n    st.sidebar.info("No active project")', source)
+        source = UI.read_text(encoding="utf-8")
+        self.assertIn("if project:", source)
+        self.assertIn("else:", source)
+        self.assertIn("ACTIVE PROJECT", source)
+        self.assertIn("NO ACTIVE PROJECT", source)
 
     def test_visible_version_marker(self):
-        source = APP.read_text(encoding="utf-8")
-        self.assertIn('st.sidebar.caption(f"PeaBox v{VERSION}")', source)
+        source = UI.read_text(encoding="utf-8")
+        self.assertIn('st.sidebar.caption(f"Enterprise workspace · v{version}")', source)
+        self.assertIn("sidebar_navigation(VERSION, project)", APP.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

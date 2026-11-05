@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.05.01 Release Notes
+# PeaBox Voice Studio v0.06.0 Release Notes
 
-This maintenance release makes the v0.05.00 Timeline Studio portable and recoverable. A timeline bundle includes project JSON plus copied WAV assets, while import creates a new project identity, extracts collision-safe local files, and rewrites clip references.
+This release redesigns the front interface as a corporate multi-screen workspace while preserving the full v0.05.01 production feature set.
 
-Bundle imports validate archive paths, member types, size limits, and WAV content. Original absolute file paths are never trusted. Clips whose source audio was not available during export remain unlinked so they can be recovered using the new relink workflow.
+The former flat sidebar is replaced by grouped navigation aligned to business workflows: Overview, Production, Audio & Quality, Administration, and Support. A new Executive Dashboard summarizes active-project KPIs, readiness, workflow steps, and recent activity. Every screen now uses a consistent contextual header and reusable visual components.
 
-Timeline Studio also adds metadata refresh, stale-source acknowledgement, duplicate-ID repair, confirmed missing-record cleanup, and clip-set duplication for alternate edits.
+Activity & History consolidates individual renders, batch jobs, timeline exports, comparisons, and transcript sessions into separate review tabs. No project schema or existing feature was removed.
