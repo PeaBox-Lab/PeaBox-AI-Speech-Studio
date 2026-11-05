@@ -1,17 +1,73 @@
-# PeaBox Voice Studio 2
+# PeaBox Voice Studio v0.02.01
 
-Local Kokoro TTS, Faster-Whisper transcription, and optional Azure Speech, Amazon Polly and Google Cloud TTS.
+PeaBox Voice Studio is a local-first Streamlit workspace for text-to-speech, transcription, persistent scripts, and render tracking. This release refactors the attached v0.2 prototype into a modular project structure while retaining Kokoro, Azure Speech, Amazon Polly, Google Cloud TTS, and Faster-Whisper support.
 
-## Windows
-Install 64-bit Python 3.11, extract the folder and run `start_windows.bat`. The launcher creates a clean Python 3.11 virtual environment. This avoids current Python 3.13 compatibility problems in audio/ML dependencies.
+## What changed
 
-## Features
-- Multiple Kokoro local voices and languages
-- Automatic model download on first Kokoro generation
-- Dynamic voice discovery from Azure, Polly and Google
-- Cloud MP3 generation
-- Local transcription to TXT/SRT
-- WinError 32 temporary-file lock fix
-- Cost estimates per script and provider comparison
+- Persistent project workspace with create, open, edit, save, export, and protected delete
+- Master Script connected to the speech-generation workflow
+- Project-specific render history and saved provider settings
+- Modular `providers`, `services`, configuration, and data models
+- Atomic JSON/audio writes and safer filenames
+- Script and upload size limits
+- Correct SRT timestamps (`HH:MM:SS,mmm`)
+- More actionable user-facing errors without displaying full exception traces
+- Cost guide clearly marked as inherited and not web-refreshed
+- Automated tests for projects, file safety, and subtitles
 
-Install FFmpeg and add it to PATH for MP3/video transcription. Credentials are held only in the Streamlit session. Do not commit secrets.
+## Folder structure
+
+```text
+PeaBox_Voice_Studio_v0.02.01/
+├── app.py
+├── peabox_voice_studio/
+│   ├── config.py
+│   ├── models.py
+│   ├── providers/
+│   │   ├── catalog.py
+│   │   ├── cloud.py
+│   │   └── kokoro.py
+│   └── services/
+│       ├── files.py
+│       ├── history.py
+│       ├── projects.py
+│       ├── subtitles.py
+│       └── transcription.py
+├── data/projects/
+├── models/
+├── outputs/
+├── tests/
+├── AUDIT.md
+├── ROADMAP.md
+├── CHANGELOG.md
+├── requirements.txt
+└── start_windows.bat
+```
+
+## Windows setup
+
+1. Install 64-bit Python 3.11.
+2. Extract the ZIP.
+3. Run `start_windows.bat`.
+4. Install FFmpeg and add it to PATH for compressed audio/video transcription.
+
+The launcher creates a local virtual environment, installs the declared dependencies, and starts Streamlit.
+
+## Security and privacy
+
+- Cloud credentials remain in Streamlit session state and are not written to project JSON.
+- Project filenames are generated from internal IDs rather than user-provided names.
+- Keep `data/projects`, `outputs`, downloaded models, and credentials out of source control.
+- Verify provider pricing and credential policies before production use.
+
+## Tests
+
+From the project folder:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+## Release naming
+
+The requested release folder and package are named `PeaBox_Voice_Studio_v0.02.01`. The user-provided `v99.99.99` string is treated as a future naming placeholder rather than the current semantic release number.

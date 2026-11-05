@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+models/*.onnx
+models/*.bin
+outputs/*
+!outputs/.gitkeep
+data/projects/*.json
+!data/projects/.gitkeep
+*.log

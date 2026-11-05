@@ -1,4 +1,5 @@
 @echo off
+setlocal
 cd /d "%~dp0"
 where py >nul 2>nul || (echo Install 64-bit Python 3.11 from python.org and add it to PATH.& pause & exit /b 1)
 if not exist .venv py -3.11 -m venv .venv
