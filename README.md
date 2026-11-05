@@ -1,8 +1,16 @@
-# PeaBox Voice Studio v0.03.11
+# PeaBox Voice Studio v0.03.12
 
 A local-first Streamlit workspace for discoverable multi-provider voices, reusable voice presets, resumable production jobs, Kokoro generation, and Faster-Whisper transcription.
 
-## v0.03.11 highlights
+## v0.03.12 critical UI fix
+
+- Fixed internal `DeltaGenerator` documentation replacing the normal project screen
+- Restored unobstructed sidebar navigation and page content
+- Added a visible sidebar version marker
+- Added launcher output identifying the exact version and folder being started
+- Added regression tests for Streamlit expression leaks and every navigation page
+
+## Preserved v0.03.11 features
 
 - Discover Azure, Amazon Polly, and Google voices from configured session profiles
 - Cache normalized cloud voice catalogs only for the current Streamlit session
@@ -42,3 +50,6 @@ A saved cloud job can be reopened later, but the provider must be configured aga
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+
+See `TROUBLESHOOTING.md` if an older process or browser tab is still showing the broken screen.

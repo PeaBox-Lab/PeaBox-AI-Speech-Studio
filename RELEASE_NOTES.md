@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.03.11 Release Notes
+# PeaBox Voice Studio v0.03.12 Release Notes
 
-This release completes the interactive cloud-production layer before the planned v0.04 quality studio. Configured Azure, Polly, and Google sessions can discover and normalize voice catalogs. A combined Voice Library provides search and filters, while cloud script blocks can select cached voices instead of relying only on manual identifiers.
+This patch fixes the interface failure shown in the supplied screenshot. A conditional Streamlit expression returned an internal `DeltaGenerator` object. Streamlit's automatic expression rendering then displayed framework API documentation in the main page, obscuring the real project interface and making the application appear frozen.
 
-Projects can store reusable non-secret voice presets. A preset captures the provider, language, voice, speed, and direction notes, and can be applied to any block without replacing its title or text.
+The sidebar project-status code now uses an explicit statement-based `if/else`, so no internal UI object is emitted as page content. The sidebar also displays the running PeaBox version, and the Windows launcher prints both the version and launch folder to make stale or older running copies easy to identify.
 
-Saved jobs gain recovery and housekeeping controls: duplicate a job as a fresh queued copy, reopen cancelled items, delete obsolete records, retry failures, cancel queued work, or resume remaining items. Credentials and discovered catalogs remain session-only.
+All v0.03.11 voice catalogs, presets, provider setup, projects, jobs, transcription, and rendering features are preserved.

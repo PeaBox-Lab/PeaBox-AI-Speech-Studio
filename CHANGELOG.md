@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.03.12 — 2026-11-05
+
+### Fixed
+
+- Replaced a conditional Streamlit UI expression that leaked a `DeltaGenerator` object into page content
+- Restored the normal Projects interface and unobstructed sidebar navigation
+- Added a visible sidebar version marker to identify stale running releases
+- Added launcher output showing the exact release folder and version
+
+### Added
+
+- Regression tests for Streamlit magic-expression leaks
+- Navigation structure tests covering all registered application pages
+- Troubleshooting guidance for stopping older Streamlit processes and opening the correct local URL
+
 ## v0.03.11 — 2026-11-05
 
 ### Added

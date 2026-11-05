@@ -85,10 +85,14 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Discoverable multi-provider voice production")
+st.caption(f"Version {VERSION} · Interactive multi-provider voice production")
 page = st.sidebar.radio("Studio", ["Projects", "Provider Setup", "Voice Library", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
-st.sidebar.success(f"Active: {project.name}") if project else st.sidebar.info("No active project")
+st.sidebar.caption(f"PeaBox v{VERSION}")
+if project:
+    st.sidebar.success(f"Active: {project.name}")
+else:
+    st.sidebar.info("No active project")
 
 if page == "Projects":
     st.header("Project Workspace")
