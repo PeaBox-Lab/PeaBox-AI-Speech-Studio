@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.04.10 — 2026-11-05
+
+### Added
+
+- Audio Quality Lab for uncompressed 16-bit PCM WAV files
+- Duration, channel, sample-rate, peak, RMS, clipping, and size metrics
+- Non-destructive peak normalization
+- Leading/trailing silence trimming with threshold and padding controls
+- A/B Kokoro voice and speed comparisons
+- Project comparison history, preference, notes, and deletion controls
+- Audio processing, comparison, navigation, and UI regression tests
+
+### Scope
+
+- Processing is WAV-first; multitrack mixing and timeline editing remain planned for v0.05.00
+
 ## v0.04.01 — 2026-11-05
 
 ### Added

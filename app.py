@@ -2,10 +2,12 @@ import json
 from pathlib import Path
 import streamlit as st
 
-from peabox_voice_studio.config import APP_NAME, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, VERSION
+from peabox_voice_studio.config import APP_NAME, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, OUTPUTS_DIR, VERSION
 from peabox_voice_studio.models import Project, ScriptBlock
 from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, PROVIDER_RATES
+from peabox_voice_studio.services.audio import inspect_wav, normalize_wav, save_processed_wav, trim_silence_wav
 from peabox_voice_studio.services.batch import build_manifest
+from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
 from peabox_voice_studio.services.files import build_render_zip, safe_filename
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
@@ -96,8 +98,8 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Hardened quality and transcription studio")
-page = st.sidebar.radio("Studio", ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
+st.caption(f"Version {VERSION} · Audio quality and comparison studio")
+page = st.sidebar.radio("Studio", ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
 st.sidebar.caption(f"PeaBox v{VERSION}")
 if project:
@@ -295,6 +297,92 @@ elif page == "Quality Studio":
         st.code(prepared_preview)
         st.caption("Cloud providers compile valid pause markers to SSML breaks. Kokoro receives punctuation-based pause approximations.")
 
+elif page == "Audio Quality Lab":
+    st.header("Audio Quality Lab")
+    mode = st.radio("Workflow", ["Analyze and process WAV", "A/B Kokoro comparison"], horizontal=True)
+    if mode == "Analyze and process WAV":
+        wav_upload = st.file_uploader("16-bit PCM WAV file", type=["wav"], key="quality_wav")
+        if wav_upload:
+            raw_wav = wav_upload.getvalue()
+            try:
+                metrics = inspect_wav(raw_wav)
+                st.subheader("Source metrics")
+                st.dataframe([metrics], use_container_width=True, hide_index=True)
+                st.audio(raw_wav, format="audio/wav")
+                a, b, c = st.columns(3)
+                target_peak = a.slider("Normalize peak dBFS", -12.0, -0.1, -1.0, 0.1)
+                silence_threshold = b.slider("Silence threshold dBFS", -80.0, -10.0, -40.0, 1.0)
+                padding_ms = c.slider("Trim padding ms", 0, 1000, 100, 10)
+                n1, n2 = st.columns(2)
+                if n1.button("Create normalized copy"):
+                    processed, details = normalize_wav(raw_wav, target_peak)
+                    path = save_processed_wav(processed, Path(wav_upload.name).stem, "normalized", OUTPUTS_DIR)
+                    st.session_state.audio_processed = {"label": "Normalized", "data": processed, "path": str(path), "details": details, "metrics": inspect_wav(processed)}
+                if n2.button("Create trimmed copy"):
+                    processed, details = trim_silence_wav(raw_wav, silence_threshold, padding_ms)
+                    path = save_processed_wav(processed, Path(wav_upload.name).stem, "trimmed", OUTPUTS_DIR)
+                    st.session_state.audio_processed = {"label": "Trimmed", "data": processed, "path": str(path), "details": details, "metrics": inspect_wav(processed)}
+                processed_result = st.session_state.get("audio_processed")
+                if processed_result:
+                    st.subheader(f"{processed_result['label']} result")
+                    st.json(processed_result["details"])
+                    st.dataframe([processed_result["metrics"]], use_container_width=True, hide_index=True)
+                    st.audio(processed_result["data"], format="audio/wav")
+                    st.download_button(f"Download {processed_result['label'].lower()} WAV", processed_result["data"], Path(processed_result["path"]).name, "audio/wav")
+            except Exception as exc:
+                st.error(f"WAV processing failed: {exc}")
+    else:
+        st.caption("Generate the same prepared text twice with independent Kokoro voice and speed settings.")
+        comparison_text = st.text_area("Comparison text", project.script if project else "", height=200, max_chars=MAX_BLOCK_CHARS)
+        left, right = st.columns(2)
+        with left:
+            st.subheader("Variant A")
+            lang_a = st.selectbox("Language A", KOKORO_VOICES, key="compare_lang_a")
+            voice_a = st.selectbox("Voice A", KOKORO_VOICES[lang_a], key="compare_voice_a")
+            speed_a = st.slider("Speed A", 0.6, 1.6, 1.0, 0.05, key="compare_speed_a")
+        with right:
+            st.subheader("Variant B")
+            lang_b = st.selectbox("Language B", KOKORO_VOICES, key="compare_lang_b")
+            voice_b = st.selectbox("Voice B", KOKORO_VOICES[lang_b], key="compare_voice_b")
+            speed_b = st.slider("Speed B", 0.6, 1.6, 1.1, 0.05, key="compare_speed_b")
+        if st.button("Generate A/B comparison", type="primary", disabled=not comparison_text.strip()):
+            try:
+                from peabox_voice_studio.providers.kokoro import generate
+                prepared = prepare_text(comparison_text, project, "Kokoro local") if project else comparison_text
+                base = safe_filename(project.name if project else "comparison")
+                with st.spinner("Generating both variants..."):
+                    path_a = generate(prepared, voice_a, KOKORO_LANGS[lang_a], speed_a, f"{base}_A")
+                    path_b = generate(prepared, voice_b, KOKORO_LANGS[lang_b], speed_b, f"{base}_B")
+                metrics_a = inspect_wav(path_a.read_bytes()); metrics_b = inspect_wav(path_b.read_bytes())
+                result = {"text": comparison_text, "paths": [str(path_a), str(path_b)], "variants": [{"label": "A", "language": lang_a, "voice": voice_a, "speed": speed_a}, {"label": "B", "language": lang_b, "voice": voice_b, "speed": speed_b}], "metrics": [metrics_a, metrics_b]}
+                st.session_state.comparison_result = result
+                if project:
+                    create_comparison_record(project, comparison_text, result["variants"], [path_a, path_b], result["metrics"]); save_project(project)
+            except Exception as exc:
+                st.error(f"Comparison generation failed: {exc}")
+        result = st.session_state.get("comparison_result")
+        if result:
+            a, b = st.columns(2)
+            for column, label, path_value, variant, metrics in zip((a, b), ("A", "B"), result["paths"], result["variants"], result["metrics"]):
+                path = Path(path_value)
+                with column:
+                    st.subheader(f"Variant {label}")
+                    st.caption(f"{variant['voice']} · {variant['language']} · speed {variant['speed']}")
+                    if path.exists():
+                        data = path.read_bytes(); st.audio(data, format="audio/wav"); st.download_button(f"Download {label}", data, path.name, "audio/wav", key=f"download_compare_{label}")
+                    st.dataframe([metrics], use_container_width=True, hide_index=True)
+        if project and project.settings.get("comparison_history"):
+            st.subheader("Project comparison history")
+            history = project.settings["comparison_history"]
+            selected_comparison = st.selectbox("Saved comparison", history, format_func=lambda item: f"{item['created_at']} · {item['variants'][0]['voice']} vs {item['variants'][1]['voice']}")
+            preference = st.radio("Preferred result", ["", "A", "B", "Tie"], index=["", "A", "B", "Tie"].index(selected_comparison.get("preferred") or ""), horizontal=True)
+            comparison_notes = st.text_area("Comparison notes", selected_comparison.get("notes", ""), height=80)
+            h1, h2 = st.columns(2)
+            if h1.button("Save preference"):
+                set_comparison_preference(project, selected_comparison["id"], preference, comparison_notes); save_project(project); st.success("Comparison preference saved")
+            if h2.button("Delete comparison record"):
+                delete_comparison(project, selected_comparison["id"]); save_project(project); st.rerun()
+
 elif page == "Script Blocks":
     st.header("Script Blocks")
     if not project: st.info("Open a project first.")
@@ -471,17 +559,15 @@ else:
     st.header("Roadmap & Help")
     st.markdown("""
 ### Current release
-- Transcript overlap and duration validation with automatic timing repair
-- Safe saved-session loading, updating, and schema-v2 transcript sessions
-- System Check for Python, FFmpeg, storage, and Kokoro model readiness
-- Media-format readiness before transcription
-- Pronunciation duplicate/overlap diagnostics and match previews
-- All v0.04.00 quality, transcript, provider, catalog, preset, and job features
+- WAV metrics including duration, sample rate, channels, peak, RMS, and clipping count
+- Non-destructive peak normalization and leading/trailing silence trimming
+- Kokoro A/B voice and speed comparison with playback, metrics, downloads, and project preference history
+- Transcript, pronunciation, provider, catalog, preset, and resumable-job workflows from v0.04.01
 
 ### Planned next
 1. Optional speaker diarization and speaker alignment
-2. Audio normalization, silence trimming, and A/B comparison renders
-3. Waveform metadata and non-destructive clip timeline
+2. Waveform peak caching and clip asset records
+3. Non-destructive multitrack timeline and merged WAV export
 4. Separate worker process and SQLite repository before hosted multi-user use
 
 ### Setup

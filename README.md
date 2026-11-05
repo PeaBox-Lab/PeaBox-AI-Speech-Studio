@@ -1,52 +1,58 @@
-# PeaBox Voice Studio v0.04.01
+# PeaBox Voice Studio v0.04.10
 
-A hardened local-first multi-provider voice production and transcription workspace with system diagnostics, transcript timing validation and repair, pronunciation conflict checks, safe pause controls, reusable presets, and resumable jobs.
+A local-first voice production, transcription, and WAV quality workspace with non-destructive audio processing, A/B Kokoro comparisons, project pronunciation rules, session-cached cloud voices, and resumable multi-provider jobs.
 
-## v0.04.01 highlights
+## v0.04.10 Audio Quality Lab
 
-### System Check
+### WAV analysis
 
-- Reports the running Python version and supported range
-- Detects whether FFmpeg is available
-- Checks project and output storage write access
-- Shows whether Kokoro model and voice files are ready or will download on first use
-- Explains which compressed media formats require FFmpeg
+For uncompressed 16-bit PCM WAV files, the app reports:
 
-### Transcript safety
+- Duration
+- Sample rate
+- Channel count
+- Frame count
+- Peak level in dBFS
+- RMS level in dBFS
+- Clipped-sample count
+- File size
 
-- Detects overlapping segments
-- Detects zero-duration or reversed timing
-- Warns about empty segment text
-- Blocks SRT/VTT export and project saving while timing errors remain
-- Automatically repairs overlaps and minimum duration
-- Safely repairs older invalid sessions when they are loaded
-- Supports updating an existing saved transcript session
-- Saves new sessions with schema version 2 and an updated timestamp
+### Non-destructive processing
 
-### Quality-rule diagnostics
+- Create a normalized copy with a target peak from -30 to 0 dBFS
+- Trim leading and trailing silence using a configurable threshold
+- Preserve configurable padding around detected audio
+- Preview, compare metrics, and download the processed WAV
+- Save processed copies into the release output folder without overwriting the source
 
-- Detects duplicate pronunciation rules
-- Identifies overlapping rule sources where rule order can change output
-- Shows whether pronunciation rules changed preview text
-- Preserves the existing safe pause-marker workflow
+### A/B Kokoro comparisons
 
-### Preserved
+- Generate identical prepared text with two independent language, voice, and speed settings
+- Play and download both WAV files
+- Compare duration, peak, RMS, and clipping metrics
+- Save comparison records in the active project
+- Record A, B, Tie, or no preference with review notes
+- Keep the latest 20 comparison records per project
 
-- v0.04.00 Quality and Transcription Studio
-- v0.03.12 UI rendering fix and navigation smoke tests
-- Session-cached provider voice catalogs and presets
-- Resumable cloud and local production jobs
-- Portable project import and export
+## Scope boundary
+
+The Audio Quality Lab supports uncompressed **16-bit PCM WAV** processing. Cloud MP3 output should be converted to WAV before using normalization or silence trimming. This release is not yet a multitrack editor and does not merge tracks.
+
+## Preserved capabilities
+
+- v0.04.01 system and media diagnostics
+- Transcript validation, repair, TXT/SRT/VTT export, and saved sessions
+- Pronunciation rules and safe pause markers
+- Cloud provider catalogs, presets, and resumable jobs
+- v0.03.12 UI regression protection
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
-3. Run `start_windows.bat` from that folder.
-4. Open **System Check** after startup.
-5. Install FFmpeg and add it to PATH if compressed audio/video transcription is required.
-
-The sidebar must display `PeaBox v0.04.01`.
+3. Run `start_windows.bat`.
+4. Confirm the sidebar displays `PeaBox v0.04.10`.
+5. Use **System Check** to verify FFmpeg and storage readiness.
 
 ## Tests
 

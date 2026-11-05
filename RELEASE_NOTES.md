@@ -1,9 +1,7 @@
-# PeaBox Voice Studio v0.04.01 Release Notes
+# PeaBox Voice Studio v0.04.10 Release Notes
 
-This maintenance release hardens the Quality and Transcription Studio introduced in v0.04.00.
+This release adds the Audio Quality Lab planned after the Quality and Transcription Studio. Users can inspect uncompressed 16-bit PCM WAV files, create peak-normalized copies, and remove leading or trailing silence without overwriting the source.
 
-Transcript edits are now validated before subtitle export or project saving. Overlaps, zero-duration segments, and invalid timing are surfaced directly. An automatic repair action makes segments sequential and applies a minimum duration. Older saved sessions are validated and repaired when loaded, and existing sessions can be updated in place.
+A/B Kokoro comparisons generate the same prepared text using two voice and speed configurations. Both variants include playback, downloads, and audio metrics. Active projects retain comparison settings, output names, metrics, preference, and notes for later review.
 
-A new System Check page reports Python compatibility, FFmpeg availability, writable project/output storage, and Kokoro model readiness. Compressed-media transcription is disabled with a clear explanation when FFmpeg is unavailable, while WAV input remains usable.
-
-Pronunciation rules now display duplicate and overlap diagnostics, and the preview states whether any rule actually changed the text.
+This release remains intentionally WAV-first and non-destructive. Waveform timeline editing and mixed-track export remain part of the later v0.05.00 phase.

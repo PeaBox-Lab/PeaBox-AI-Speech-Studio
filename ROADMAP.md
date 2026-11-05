@@ -56,6 +56,12 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 - Transcript overlap validation, automatic timing repair, and safer session recovery
 - Pronunciation duplicate/overlap diagnostics and match previews
 
+## Delivered — v0.04.10: Audio Quality Lab
+
+- WAV analysis with peak, RMS, clipping, format, and duration metrics
+- Non-destructive peak normalization and silence trimming
+- Kokoro A/B voice and speed comparison history
+
 ## v0.05.00: Non-destructive timeline
 
 - AudioClip repository separated from script blocks
