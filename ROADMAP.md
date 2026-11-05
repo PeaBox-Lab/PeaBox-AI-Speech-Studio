@@ -1,83 +1,52 @@
-# Product Roadmap
+# Evidence-Based Product Roadmap
 
-## Evidence boundary
+## Roadmap basis
 
-This roadmap is based on the attached v0.2 code and the engineering gaps identified in `AUDIT.md`. It does not claim current market size, competitor capabilities, pricing, or user-demand rankings.
+This roadmap translates the attached market, architecture, UX, and user-story context into build stages appropriate for the existing local Streamlit application. The attached market figures and legal statements are treated as supplied planning context, not independently verified claims.
 
-## Product direction
+## Delivered — v0.03.00: Multi-block production
 
-Evolve PeaBox Voice Studio from a provider demo into a local-first speech-production workspace: persistent projects, repeatable settings, multi-part scripts, reliable renders, and export workflows. Keep local operation simple while creating clean seams for future hosted deployment.
+- Ordered script blocks derived from a Master Script
+- Per-block provider, voice, language, speed, notes, and enabled state
+- Reordering, duplication, selective inclusion, and project persistence
+- Batch planning totals and portable JSON manifest
+- Kokoro local batch rendering with downloadable ZIP
 
-## Release sequence
+This stage addresses the supplied multi-voice workflow and creates the clip object model required by a later timeline without forcing an immediate frontend rewrite.
 
-### v0.02.01 — Project foundation (built here)
+## Next — v0.03.10: Cloud batch and configuration
 
-- Persistent local projects and Master Script
-- Project-linked render history and last-used settings
-- Modular providers and services
-- Safer filenames, atomic writes, and resource limits
-- Standards-compatible SRT export
-- Automated core tests and documented limitations
+- Encrypted/session-scoped provider profiles
+- Dynamic voice discovery cache and provider capability matrix
+- Asynchronous per-block cloud generation with retry and cancellation
+- Actual-versus-estimated cost ledger
+- Batch status, partial retry, and resumable manifests
 
-### v0.03.00 — Script blocks and batch production
+## v0.04.00: Quality and transcription studio
 
-- Split a master script into ordered blocks
-- Assign voice, provider, speed, and language per block
-- Reorder, duplicate, disable, and preview blocks
-- Batch-render selected blocks with progress and cancellation
-- Produce a manifest connecting each output to text and settings
+- Pronunciation dictionary and provider-aware SSML controls
+- Reusable voice/direction presets and searchable voice filters
+- Audio normalization and silence controls
+- Optional speaker diarization with explicit model setup
+- Speaker-labelled TXT, SRT, and VTT exports
 
-### v0.04.00 — Voice direction and quality controls
+## v0.05.00: Non-destructive timeline
 
-- Pronunciation dictionary and replacements
-- Pauses, emphasis, rate, pitch, and style controls where supported
-- Voice favorites, searchable filters, and reusable presets
-- Side-by-side A/B renders with user notes
-- Loudness normalization and configurable silence trimming
+- AudioClip repository separated from script blocks
+- Waveform peak extraction and clip duration metadata
+- Drag/reorder timeline with start offsets and regeneration status
+- Background music track and mix preview
+- Merged WAV export and chapter/manifest outputs
 
-### v0.05.00 — Timeline and publishing
+A React/Web Audio frontend and FastAPI service become justified at this stage, when low-latency playback and timeline interaction exceed Streamlit's strengths.
 
-- Assemble rendered blocks on a simple timeline
-- Regenerate one block without rebuilding the whole project
-- Export merged audio, SRT/VTT, transcript, and project manifest
-- Add chapter markers and target-duration indicators
-- Validate missing or stale render dependencies before export
+## v0.06.00: Scale and collaboration
 
-### v0.06.00 — Reliability and scale
+- SQLite repository migration followed by optional PostgreSQL
+- Background job queue and local worker process
+- Object-storage abstraction, quotas, structured logs, and health checks
+- Authentication, roles, shared projects, and review comments
 
-- Background job queue for long renders and transcription
-- SQLite/PostgreSQL repository abstraction
-- Object-storage abstraction for generated media
-- Resumable jobs, structured logging, health checks, and quotas
-- Authentication and role controls for hosted deployments
+## Guarded research track
 
-## UX priorities
-
-1. Make project state obvious at all times.
-2. Preserve user work automatically or clearly indicate unsaved changes.
-3. Keep provider-specific settings inside a consistent generation flow.
-4. Present plain-language errors with a recovery action.
-5. Make expensive or destructive actions explicit and reversible where possible.
-6. Keep transcripts, subtitles, scripts, settings, and audio traceable to one project.
-
-## Performance priorities
-
-- Cache model instances rather than rebuilding them per action.
-- Move long-running work off the UI thread.
-- Stream or chunk large media where provider APIs allow it.
-- Avoid loading complete render histories or media bytes until requested.
-- Add timing and failure metrics before optimizing provider-specific paths.
-
-## Future market and alternatives research checklist
-
-When web-enabled research is available, collect dated evidence for:
-
-- Primary user segments and jobs-to-be-done
-- Named desktop, web, cloud, and open-source alternatives
-- Pricing units, free tiers, voice/language coverage, and export limits
-- Project organization, collaboration, batch, timeline, and API features
-- Privacy posture, local/offline capability, credential handling, and data retention
-- Review themes around onboarding, voice quality, speed, reliability, and support
-- Differentiation opportunities supported by repeated user evidence
-
-Do not convert this checklist into product claims until each item is supported by current evidence.
+Voice cloning, consent ledgers, C2PA, deep watermarking, and real-time agents must not be presented as legally compliant or production-ready merely because they appear in a market plan. Before implementation, validate model licenses, consent requirements, jurisdictional applicability, export-tool compatibility, security controls, and authoritative current guidance.

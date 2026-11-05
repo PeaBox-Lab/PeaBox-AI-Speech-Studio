@@ -1,73 +1,42 @@
-# PeaBox Voice Studio v0.02.02
+# PeaBox Voice Studio v0.03.00
 
-PeaBox Voice Studio is a local-first Streamlit workspace for text-to-speech, transcription, persistent scripts, and render tracking. This release refactors the attached v0.2 prototype into a modular project structure while retaining Kokoro, Azure Speech, Amazon Polly, Google Cloud TTS, and Faster-Whisper support.
+A local-first Streamlit workspace for project-based voice production, multi-block scripts, Kokoro batch rendering, and Faster-Whisper transcription.
 
-## What changed
+## v0.03.00 highlights
 
-- Persistent project workspace with create, open, edit, save, export, and protected delete
-- Master Script connected to the speech-generation workflow
-- Project-specific render history and saved provider settings
-- Modular `providers`, `services`, configuration, and data models
-- Atomic JSON/audio writes and safer filenames
-- Script and upload size limits
-- Correct SRT timestamps (`HH:MM:SS,mmm`)
-- More actionable user-facing errors without displaying full exception traces
-- Cost guide clearly marked as inherited and not web-refreshed
-- Automated tests for projects, file safety, and subtitles
+- Convert the Master Script into ordered paragraph blocks
+- Assign provider, language, voice, speed, direction notes, and enabled state per block
+- Add, edit, reorder, duplicate, disable, and delete blocks
+- Produce live block-level and batch-level character, duration, and inherited cost estimates
+- Export a portable JSON render manifest
+- Render enabled Kokoro blocks and download audio plus manifest as one ZIP
+- Preserve projects and blocks in migration-safe JSON
+- Retain local transcription, TXT/SRT export, render history, resource limits, and flexible Python 3.10–3.12 startup
 
-## Folder structure
+## Important scope boundary
 
-```text
-PeaBox_Voice_Studio_v0.02.02/
-├── app.py
-├── peabox_voice_studio/
-│   ├── config.py
-│   ├── models.py
-│   ├── providers/
-│   │   ├── catalog.py
-│   │   ├── cloud.py
-│   │   └── kokoro.py
-│   └── services/
-│       ├── files.py
-│       ├── history.py
-│       ├── projects.py
-│       ├── subtitles.py
-│       └── transcription.py
-├── data/projects/
-├── models/
-├── outputs/
-├── tests/
-├── AUDIT.md
-├── ROADMAP.md
-├── CHANGELOG.md
-├── requirements.txt
-└── start_windows.bat
-```
+The attached research describes a long-term React/FastAPI digital audio workstation, cloud aggregation, cloning, diarization, provenance, and consent architecture. This release deliberately implements the production model that can be delivered safely in the current local application: script blocks and local batch rendering. Cloud batch jobs, cloning, diarization, watermarking, and legal compliance enforcement remain roadmap items until their dependencies and authoritative requirements are validated.
 
-## Windows setup
+## Windows
 
-1. Install 64-bit Python 3.10, 3.11, or 3.12. The launcher prefers the newest compatible installed version.
+1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP.
-3. Run `start_windows.bat`. It checks the Python Launcher, `python`, and `python3`, then creates or reuses `.venv`.
+3. Run `start_windows.bat`.
 4. Install FFmpeg and add it to PATH for compressed audio/video transcription.
 
-The launcher creates a local virtual environment, installs the declared dependencies, and starts Streamlit. It does not silently require Python 3.11 and does not attempt an unattended Python installation. If no compatible version is found, it shows the supported versions and exits without modifying the system.
+The launcher selects the newest compatible installed Python, creates or reuses `.venv`, installs dependencies, and starts Streamlit.
 
-## Security and privacy
+## Workflow
 
-- Cloud credentials remain in Streamlit session state and are not written to project JSON.
-- Project filenames are generated from internal IDs rather than user-provided names.
-- Keep `data/projects`, `outputs`, downloaded models, and credentials out of source control.
-- Verify provider pricing and credential policies before production use.
+1. Create or open a project.
+2. Write a Master Script.
+3. Create blocks from blank paragraphs or add them manually.
+4. Configure each block and save.
+5. Open Batch Production to review totals and download a manifest.
+6. Render enabled Kokoro local blocks and download the batch ZIP.
 
 ## Tests
-
-From the project folder:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
-
-## Release naming
-
-The requested release folder and package are named `PeaBox_Voice_Studio_v0.02.02`. The user-provided `v99.99.99` string is treated as a future naming placeholder rather than the current semantic release number.

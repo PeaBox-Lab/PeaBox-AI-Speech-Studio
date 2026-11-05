@@ -1,13 +1,16 @@
+import io
+import json
 import os
 import re
 import tempfile
 import time
+import zipfile
 from pathlib import Path
+from typing import Any
 
 
 def safe_filename(value: str, fallback: str = "audio", limit: int = 80) -> str:
-    clean = re.sub(r"[^A-Za-z0-9_.-]+", "_", (value or "").strip())
-    clean = clean.strip("._")[:limit]
+    clean = re.sub(r"[^A-Za-z0-9_.-]+", "_", (value or "").strip()).strip("._")[:limit]
     return clean or fallback
 
 
@@ -42,3 +45,13 @@ def delete_with_retry(path: Path, attempts: int = 10, delay: float = 0.3) -> Non
             if attempt == attempts - 1:
                 raise
             time.sleep(delay)
+
+
+def build_render_zip(files: list[Path], manifest: dict[str, Any]) -> bytes:
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2))
+        for path in files:
+            if path.exists():
+                archive.write(path, f"audio/{path.name}")
+    return buffer.getvalue()

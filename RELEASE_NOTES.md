@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.02.02 Release Notes
+# PeaBox Voice Studio v0.03.00 Release Notes
 
-This maintenance release fixes Windows startup when Python 3.11 is not installed. `start_windows.bat` now delegates to a PowerShell launcher that searches for Python 3.12, 3.11, and 3.10 in that order, then checks the `python` and `python3` commands. It creates the virtual environment with the first compatible interpreter found.
+This release moves PeaBox from a single-script utility toward the multi-voice production workflow described in the attached development context. A project can now contain ordered script blocks, each with independent provider, voice, language, speed, direction notes, and batch inclusion settings.
 
-A valid existing `.venv` is reused. An incomplete environment or one outside the supported 3.10–3.12 range is rebuilt. If no compatible Python is available, the launcher exits with clear instructions rather than silently skipping environment creation or attempting an unattended system installation.
+The Batch Production view turns those blocks into a portable render manifest, summarizes estimated length and inherited provider cost, renders enabled Kokoro local blocks, and packages generated audio with its manifest. Cloud blocks remain visible and portable but are intentionally skipped by the local batch renderer until credential profiles, asynchronous jobs, retries, and actual-cost tracking are implemented.
 
-All v0.02.01 project workspace, provider, transcription, render-history, audit, and roadmap capabilities are preserved.
+The supplied context also informs a staged roadmap for cloud aggregation, pronunciation and diarization, a non-destructive timeline, scale, provenance, and consent. No claim is made that the market or legal figures were independently verified in this workspace.

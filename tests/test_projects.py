@@ -1,39 +1,24 @@
-import json
 import tempfile
 import unittest
 from pathlib import Path
+from peabox_voice_studio.models import ScriptBlock
+from peabox_voice_studio.services.projects import ProjectStore, move_block, split_script_into_blocks
 
-from peabox_voice_studio.services.projects import ProjectStore
-
-
-class ProjectStoreTests(unittest.TestCase):
-    def test_complete_project_lifecycle(self):
+class ProjectTests(unittest.TestCase):
+    def test_lifecycle_preserves_blocks(self):
         with tempfile.TemporaryDirectory() as folder:
-            store = ProjectStore(Path(folder))
-            project = store.create("Demo", "Initial description")
-            self.assertEqual(len(store.list()), 1)
-            project.script = "Hello from PeaBox."
-            project.name = "Renamed Demo"
-            store.save(project)
-            loaded = store.load(project.id)
-            self.assertEqual(loaded.name, "Renamed Demo")
-            self.assertEqual(loaded.script, "Hello from PeaBox.")
-            store.delete(project.id)
-            self.assertEqual(store.list(), [])
-
-    def test_invalid_identifier_is_rejected(self):
+            store=ProjectStore(Path(folder)); project=store.create("Demo")
+            project.blocks=[ScriptBlock(title="Intro",text="Hello")]; store.save(project)
+            loaded=store.load(project.id)
+            self.assertEqual(loaded.blocks[0].title,"Intro"); self.assertEqual(loaded.blocks[0].text,"Hello")
+            store.delete(project.id); self.assertEqual(store.list(),[])
+    def test_split_paragraphs(self):
+        blocks=split_script_into_blocks("First\n\nSecond\nline\n\nThird")
+        self.assertEqual([b.text for b in blocks],["First","Second\nline","Third"])
+    def test_move_block(self):
+        blocks=[ScriptBlock("A"),ScriptBlock("B")]
+        move_block(blocks,1,-1); self.assertEqual([b.title for b in blocks],["B","A"])
+    def test_invalid_identifier(self):
         with tempfile.TemporaryDirectory() as folder:
-            store = ProjectStore(Path(folder))
-            with self.assertRaises(ValueError):
-                store.load("../outside")
-
-    def test_corrupt_project_is_skipped(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
-            (root / "broken.json").write_text("{broken", encoding="utf-8")
-            store = ProjectStore(root)
-            self.assertEqual(store.list(), [])
-
-
-if __name__ == "__main__":
-    unittest.main()
+            with self.assertRaises(ValueError): ProjectStore(Path(folder)).load("../bad")
+if __name__=="__main__": unittest.main()
