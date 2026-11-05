@@ -8,7 +8,8 @@ from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, P
 from peabox_voice_studio.services.audio import inspect_wav, normalize_wav, save_processed_wav, trim_silence_wav
 from peabox_voice_studio.services.batch import build_manifest
 from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
-from peabox_voice_studio.services.files import build_render_zip, safe_filename
+from peabox_voice_studio.services.bundles import export_timeline_bundle, import_timeline_bundle
+from peabox_voice_studio.services.files import atomic_write_bytes, build_render_zip, safe_filename
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
@@ -16,7 +17,7 @@ from peabox_voice_studio.services.presets import apply_preset, create_preset, de
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
 from peabox_voice_studio.services.diagnostics import system_diagnostics, transcription_readiness
 from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, pronunciation_conflicts, pronunciation_preview, validate_pause_markers
-from peabox_voice_studio.services.timeline import add_clip, arrange_sequential, clip_status, list_clips, mix_timeline, move_clip, remove_clip, timeline_manifest, validate_timeline
+from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
 
@@ -99,7 +100,7 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Non-destructive timeline studio")
+st.caption(f"Version {VERSION} · Portable timeline studio")
 page = st.sidebar.radio("Studio", ["Projects", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
 st.sidebar.caption(f"PeaBox v{VERSION}")
@@ -129,6 +130,16 @@ if page == "Projects":
                 st.rerun()
             except Exception as exc:
                 st.error(f"Import failed: {exc}")
+        st.subheader("Import timeline bundle")
+        bundle_file = st.file_uploader("PeaBox timeline bundle ZIP", type="zip", key="timeline_bundle_import")
+        if st.button("Import bundle and open", disabled=bundle_file is None):
+            try:
+                imported_project = import_timeline_bundle(bundle_file.getvalue(), OUTPUTS_DIR)
+                st.session_state.project = store.save(imported_project)
+                st.success("Timeline bundle imported with local asset copies")
+                st.rerun()
+            except Exception as exc:
+                st.error(f"Bundle import failed: {exc}")
     with right:
         project = current_project()
         if not project: st.info("Create or open a project to begin.")
@@ -408,11 +419,19 @@ elif page == "Timeline Studio":
         if clips:
             st.subheader("Timeline controls")
             gap = st.slider("Sequential gap seconds", 0.0, 5.0, 0.25, 0.05)
-            t1, t2 = st.columns(2)
-            if t1.button("Arrange enabled clips sequentially"):
+            t1, t2, t3, t4 = st.columns(4)
+            if t1.button("Arrange sequentially"):
                 arrange_sequential(project, gap); save_project(project); st.rerun()
+            if t2.button("Repair clip records"):
+                result = cleanup_invalid_clips(project, remove_missing=False); save_project(project); st.success(f"Kept {result['kept']} clips; repaired {result['repaired_ids']} duplicate IDs")
+            if t3.button("Duplicate all clips", disabled=not clips):
+                duplicate_timeline(project); save_project(project); st.rerun()
             manifest_json = json.dumps(timeline_manifest(project), ensure_ascii=False, indent=2)
-            t2.download_button("Download timeline manifest", manifest_json, f"{safe_filename(project.name)}_timeline_manifest.json", "application/json")
+            t4.download_button("Download manifest", manifest_json, f"{safe_filename(project.name)}_timeline_manifest.json", "application/json")
+            st.download_button("Download portable timeline bundle", export_timeline_bundle(project), f"{safe_filename(project.name)}_timeline_bundle.zip", "application/zip")
+            remove_missing = st.checkbox("Allow removal of missing clip records")
+            if st.button("Clean invalid and missing clips", disabled=not remove_missing):
+                result = cleanup_invalid_clips(project, remove_missing=True); save_project(project); st.success(f"Removed {result['removed']} missing clips"); st.rerun()
             validation = validate_timeline(project)
             v1, v2, v3 = st.columns(3)
             v1.metric("Enabled clips", validation["enabled_clips"]); v2.metric("Errors", validation["errors"]); v3.metric("Warnings", validation["warnings"])
@@ -428,8 +447,26 @@ elif page == "Timeline Studio":
                     clip["start_seconds"] = x3.number_input("Start seconds", min_value=0.0, value=float(clip.get("start_seconds", 0)), step=0.05, key=f"clip_start_{clip['id']}")
                     clip["gain_db"] = x4.slider("Gain dB", -60.0, 12.0, float(clip.get("gain_db", 0)), 0.5, key=f"clip_gain_{clip['id']}")
                     st.caption(f"{clip['file_name']} · {clip['duration_seconds']:.3f}s · {clip['sample_rate_hz']} Hz · {clip['channels']} channel(s)")
-                    if status["missing"]: st.error("The referenced audio file is missing.")
+                    if status["missing"]: st.error("The referenced audio file is missing. Upload a replacement WAV below.")
                     elif status["stale"]: st.warning("The linked script block changed after this clip was rendered.")
+                    replacement = st.file_uploader("Relink replacement WAV", type=["wav"], key=f"relink_{clip['id']}")
+                    r1, r2 = st.columns(2)
+                    if r1.button("Relink uploaded WAV", key=f"do_relink_{clip['id']}", disabled=replacement is None):
+                        try:
+                            base = safe_filename(Path(replacement.name).stem)
+                            destination = OUTPUTS_DIR / f"{base}.wav"
+                            counter = 2
+                            while destination.exists():
+                                destination = OUTPUTS_DIR / f"{base}_{counter}.wav"; counter += 1
+                            atomic_write_bytes(destination, replacement.getvalue())
+                            relink_clip(clip, destination); save_project(project); st.rerun()
+                        except Exception as exc: st.error(f"Relink failed: {exc}")
+                    if r2.button("Refresh audio metadata", key=f"refresh_clip_{clip['id']}", disabled=status["missing"]):
+                        try:
+                            refresh_clip(clip); save_project(project); st.rerun()
+                        except Exception as exc: st.error(f"Refresh failed: {exc}")
+                    if status["stale"] and st.button("Acknowledge current block version", key=f"ack_stale_{clip['id']}"):
+                        acknowledge_clip_source(project, clip); save_project(project); st.rerun()
                     peaks = clip.get("peaks", [])
                     if peaks: st.bar_chart({"peak": peaks}, height=120)
                     if not status["missing"]:
@@ -631,15 +668,14 @@ else:
     st.header("Roadmap & Help")
     st.markdown("""
 ### Current release
-- Durable project audio clips with cached waveform peaks and source-block hashes
-- Non-destructive track, order, start-time, gap, enable, and gain controls
-- Missing-file and stale-render detection
-- Format validation and overlapping multitrack PCM mixing
-- Merged WAV and timeline/chapter manifest export
-- Audio Quality Lab, transcription, pronunciation, provider, catalog, preset, and resumable-job workflows
+- Portable timeline bundles with project JSON and copied WAV assets
+- Collision-safe bundle import with rewritten local clip paths
+- Missing-asset relinking, metadata refresh, stale-link acknowledgement, and invalid-record cleanup
+- Timeline duplication and safer project migration
+- Non-destructive sequencing, mixing, waveform peaks, merged WAV, and manifest export
 
 ### Planned next
-1. Background-music import controls and fades
+1. Background-music fades and automation controls
 2. Interactive waveform dragging in a React/Web Audio frontend
 3. Optional speaker diarization and speaker alignment
 4. Separate worker process and SQLite repository before hosted multi-user use

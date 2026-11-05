@@ -1,21 +1,21 @@
 # Troubleshooting
 
-## Confirm the running release
+## A timeline clip is missing
 
-The sidebar must show `PeaBox v0.04.01`. If it shows another version, stop older Streamlit terminals with `Ctrl+C`, close old browser tabs, and use the exact Local URL printed by the new launcher.
+Open the clip in **Timeline Studio**, upload the replacement WAV under **Relink replacement WAV**, and choose **Relink uploaded WAV**. PeaBox copies it into the output folder and refreshes its metadata and waveform peaks.
 
-## Compressed media cannot be transcribed
+## A clip is marked stale
 
-Open **System Check**. MP3, M4A, OGG, MP4, MOV, MKV, and WebM require FFmpeg. WAV can be transcribed without it. After installing FFmpeg and adding it to PATH, restart PeaBox.
+The linked script block changed after rendering. Regenerate and relink the audio, or review the current audio and choose **Acknowledge current block version**.
 
-## Transcript export buttons are unavailable
+## Bundle import fails
 
-Review the timing validation table. Subtitle export and project saving are blocked if segments overlap or have zero duration. Use **Repair timing automatically**, review the repaired values, then export.
+PeaBox rejects unsafe archive paths, encrypted members, symbolic links, oversized bundles, and non-WAV referenced assets. Recreate the bundle from v0.05.01 rather than manually modifying it.
 
-## Pronunciation output is unexpected
+## Imported asset name changed
 
-Open **Quality Studio** and review duplicate or overlapping rule diagnostics. Rules are applied in displayed order, so overlapping sources can affect the result.
+A file with the same name already existed. PeaBox created a collision-safe numbered filename and rewrote the imported clip reference automatically.
 
-## The page shows `DeltaGenerator` documentation
+## The sidebar shows an older version
 
-That issue was fixed in v0.03.12 and remains covered by regression tests. If it appears, an older release is still running. Stop all older Streamlit terminals and start this release from its own folder.
+Stop older Streamlit terminals with `Ctrl+C`, close stale browser tabs, and use the exact Local URL printed by the v0.05.01 launcher.

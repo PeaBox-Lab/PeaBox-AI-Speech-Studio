@@ -65,6 +65,7 @@ def add_clip(project: Project, path: Path, title: str = "", track: str = "Voiceo
         "sample_rate_hz": metrics["sample_rate_hz"],
         "channels": metrics["channels"],
         "peaks": waveform_peaks(raw),
+        "asset_hash": hashlib.sha256(raw).hexdigest(),
         "source_block_id": block.id if block else None,
         "source_hash": block_hash(block) if block else None,
     }
@@ -192,3 +193,71 @@ def _write_wav(params: wave._wave_params, samples: array) -> bytes:
         writer.setnchannels(params.nchannels); writer.setsampwidth(2); writer.setframerate(params.framerate)
         writer.setcomptype("NONE", "not compressed"); writer.writeframes(samples.tobytes())
     return buffer.getvalue()
+
+
+def refresh_clip(clip: dict, path: Path | None = None) -> dict:
+    resolved = Path(path) if path is not None else Path(clip.get("file", ""))
+    if not resolved.exists():
+        raise FileNotFoundError("Audio file does not exist")
+    raw = resolved.read_bytes()
+    metrics = inspect_wav(raw)
+    clip["file"] = str(resolved)
+    clip["file_name"] = resolved.name
+    clip["duration_seconds"] = metrics["duration_seconds"]
+    clip["sample_rate_hz"] = metrics["sample_rate_hz"]
+    clip["channels"] = metrics["channels"]
+    clip["peaks"] = waveform_peaks(raw)
+    clip["asset_hash"] = hashlib.sha256(raw).hexdigest()
+    clip["updated_at"] = utc_now()
+    return clip
+
+
+def relink_clip(clip: dict, new_path: Path) -> dict:
+    return refresh_clip(clip, new_path)
+
+
+def acknowledge_clip_source(project: Project, clip: dict) -> bool:
+    block = next((item for item in project.blocks if item.id == clip.get("source_block_id")), None)
+    if block is None:
+        return False
+    clip["source_hash"] = block_hash(block)
+    clip["updated_at"] = utc_now()
+    return True
+
+
+def cleanup_invalid_clips(project: Project, remove_missing: bool = False) -> dict:
+    clips = list_clips(project)
+    kept = []
+    removed = []
+    repaired = 0
+    seen = set()
+    for clip in clips:
+        clip_id = clip.get("id") or uuid4().hex
+        if clip_id in seen:
+            clip_id = uuid4().hex
+            repaired += 1
+        clip["id"] = clip_id
+        seen.add(clip_id)
+        clip["start_seconds"] = round(max(0.0, float(clip.get("start_seconds", 0) or 0)), 3)
+        clip["gain_db"] = round(max(-60.0, min(12.0, float(clip.get("gain_db", 0) or 0))), 2)
+        clip["track"] = str(clip.get("track") or "Voiceover")[:80]
+        clip["title"] = str(clip.get("title") or clip.get("file_name") or "Clip")[:120]
+        if remove_missing and not Path(clip.get("file", "")).exists():
+            removed.append(clip)
+            continue
+        kept.append(clip)
+    project.settings["audio_clips"] = kept
+    return {"kept": len(kept), "removed": len(removed), "repaired_ids": repaired}
+
+
+def duplicate_timeline(project: Project) -> list[dict]:
+    import copy
+    original = list(list_clips(project))
+    duplicate = copy.deepcopy(original)
+    for clip in duplicate:
+        clip["id"] = uuid4().hex
+        clip["created_at"] = utc_now()
+        clip["updated_at"] = clip["created_at"]
+        clip["title"] = f"{clip.get('title', 'Clip')} copy"[:120]
+    project.settings["audio_clips"] = original + duplicate
+    return duplicate

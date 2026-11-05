@@ -72,6 +72,12 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 
 The durable clip and manifest model is now delivered. A React/Web Audio frontend remains justified for direct waveform dragging and low-latency interactive playback.
 
+## Delivered — v0.05.01: Timeline portability and recovery
+
+- Portable project-plus-WAV timeline bundles
+- Collision-safe and path-safe asset import
+- Clip relinking, metadata refresh, stale acknowledgement, and invalid-record cleanup
+
 ## v0.06.00: Scale and collaboration
 
 - SQLite repository migration followed by optional PostgreSQL

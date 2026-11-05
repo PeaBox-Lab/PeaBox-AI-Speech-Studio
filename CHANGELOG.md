@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.05.01 — 2026-11-05
+
+### Added
+
+- Portable timeline ZIP bundles with project JSON and copied WAV assets
+- Collision-safe bundle import with new project identity and rewritten paths
+- Archive traversal, symbolic-link, encryption, count, and size protections
+- WAV-content validation before asset extraction
+- Clip relinking, metadata refresh, stale-source acknowledgement, and record cleanup
+- Clip-set duplication for alternate timeline arrangements
+- Bundle security, roundtrip, collision, relinking, repair, navigation, and regression tests
+
+### Changed
+
+- Clip records now include an asset-content hash
+- Bundle imports clear prior timeline export history
+
 ## v0.05.00 — 2026-11-05
 
 ### Added

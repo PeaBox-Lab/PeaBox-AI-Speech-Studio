@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.05.00 Release Notes
+# PeaBox Voice Studio v0.05.01 Release Notes
 
-This release delivers the first non-destructive Timeline Studio phase from the supplied product roadmap. WAV assets become durable project clip records rather than only downloaded files. Each clip stores cached waveform peaks, timing, gain, track, source linkage, and readiness information.
+This maintenance release makes the v0.05.00 Timeline Studio portable and recoverable. A timeline bundle includes project JSON plus copied WAV assets, while import creates a new project identity, extracts collision-safe local files, and rewrites clip references.
 
-Clips can be arranged sequentially or overlapped at explicit start times. Timeline export validates missing files and incompatible audio formats, mixes enabled clips into a new 16-bit PCM WAV, and creates a portable manifest. Original source audio is never modified.
+Bundle imports validate archive paths, member types, size limits, and WAV content. Original absolute file paths are never trusted. Clips whose source audio was not available during export remain unlinked so they can be recovered using the new relink workflow.
 
-This is a Streamlit form-based timeline, not yet the later React/Web Audio drag-and-drop interface. The clip and manifest schema provides the migration foundation for that frontend.
+Timeline Studio also adds metadata refresh, stale-source acknowledgement, duplicate-ID repair, confirmed missing-record cleanup, and clip-set duplication for alternate edits.
