@@ -1,4 +1,4 @@
-# PeaBox Voice Studio v0.07.3
+# PeaBox Speech Studio v0.07.3
 
 A governed, corporate, local-first voice-production workspace with a searchable command center, first-run onboarding, actionable empty states, fast project continuation, multi-provider speech, transcription, quality processing, portable timelines, and structured local review.
 
