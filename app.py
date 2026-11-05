@@ -7,6 +7,7 @@ from peabox_voice_studio.models import Project, ScriptBlock
 from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, PROVIDER_RATES
 from peabox_voice_studio.services.audio import inspect_wav, normalize_wav, save_processed_wav, trim_silence_wav
 from peabox_voice_studio.services.batch import build_manifest
+from peabox_voice_studio.services.commands import onboarding_status, record_command, resolve_commands, search_commands
 from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
 from peabox_voice_studio.services.bundles import export_timeline_bundle, import_timeline_bundle
 from peabox_voice_studio.services.files import atomic_write_bytes, build_render_zip, safe_filename
@@ -22,7 +23,7 @@ from peabox_voice_studio.services.quality import add_pronunciation, delete_pronu
 from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
-from peabox_voice_studio.ui import callout, inject_corporate_theme, kpi_card, navigate_to, page_header, section, sidebar_navigation, status_badge, workflow_step
+from peabox_voice_studio.ui import callout, empty_state, inject_corporate_theme, kpi_card, navigate_to, page_header, section, sidebar_navigation, status_badge, workflow_step
 
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide", initial_sidebar_state="expanded")
 ui_preferences = st.session_state.setdefault("ui_preferences", load_preferences())
@@ -122,6 +123,17 @@ if page == "Dashboard":
     diagnostics = system_diagnostics()
     ready_checks = sum(row["Status"] == "Ready" for row in diagnostics)
     total_checks = len(diagnostics)
+    onboarding = onboarding_status(project, len(configured_providers()))
+    if not ui_preferences.get("onboarding_dismissed", False) and onboarding["completed"] < onboarding["total"]:
+        section("Getting started progress", f"{onboarding['completed']} of {onboarding['total']} setup steps complete")
+        st.progress(onboarding["percent"] / 100)
+        onboarding_columns = st.columns([4, 1])
+        with onboarding_columns[0]:
+            for step in onboarding["steps"]:
+                marker = "✓" if step["complete"] else "○"
+                st.markdown(f"**{marker} {step['label']}**")
+        if onboarding_columns[1].button("Dismiss guide", use_container_width=True):
+            ui_preferences["onboarding_dismissed"] = True; save_preferences(ui_preferences); st.rerun()
     if project:
         clips = list_clips(project)
         jobs = project.settings.get("batch_jobs", [])
@@ -190,6 +202,28 @@ if page == "Dashboard":
         with c2: workflow_step(2, "Configure production", "Prepare script blocks, providers, voices, pronunciation, and presets.")
         with c3: workflow_step(3, "Generate and assemble", "Render audio, validate quality, and create a timeline master.")
 
+elif page == "Command Center":
+    section("Search workspace commands", "Commands navigate to safe screens and never execute destructive project actions.")
+    command_query = st.text_input("Search screens and workflows", placeholder="Try: transcript, batch, provider, approval, timeline")
+    command_results = search_commands(command_query, project is not None)
+    if command_results:
+        selected_command = st.selectbox("Command results", command_results, format_func=lambda item: f"{item['group']} · {item['label']}{'' if item['available'] else ' · project required'}")
+        st.caption(f"Keywords: {selected_command['keywords']}")
+        if st.button("Open selected command", type="primary", disabled=not selected_command["available"]):
+            record_command(ui_preferences, selected_command["id"]); save_preferences(ui_preferences); navigate_to(selected_command["page"]); st.rerun()
+        if not selected_command["available"]:
+            empty_state("Active project required", "Open or create a project before using this command.", "Open Project Workspace", "Projects")
+    else:
+        empty_state("No command found", "Try a broader term such as audio, script, review, provider, or history.")
+    recent_commands = resolve_commands(ui_preferences.get("recent_command_ids", []))
+    if recent_commands:
+        section("Recent commands", "Reopen frequently used workflows without searching again.")
+        recent_columns = st.columns(min(4, len(recent_commands)))
+        for index, command in enumerate(recent_commands[:8]):
+            column = recent_columns[index % len(recent_columns)]
+            if column.button(command["label"], key=f"recent_command_{command['id']}", use_container_width=True):
+                record_command(ui_preferences, command["id"]); save_preferences(ui_preferences); navigate_to(command["page"]); st.rerun()
+
 elif page == "Preferences":
     section("Personal workspace preferences", "These preferences are stored locally on this device and are not included in project exports.")
     area_options = ["Overview", "Production", "Audio & Quality", "Administration", "Support"]
@@ -203,12 +237,16 @@ elif page == "Preferences":
         save_preferences(ui_preferences)
         st.success("Preferences saved. Layout preferences apply immediately after refresh.")
     section("Local preference data", "Favorites and recent-project history can be cleared without modifying project files.")
-    c1, c2 = st.columns(2)
+    c1, c2, c3, c4 = st.columns(4)
     if c1.button("Clear recent projects", disabled=not ui_preferences.get("recent_project_ids")):
         ui_preferences["recent_project_ids"] = []; save_preferences(ui_preferences); st.rerun()
     if c2.button("Clear favorites", disabled=not ui_preferences.get("favorite_project_ids")):
         ui_preferences["favorite_project_ids"] = []; save_preferences(ui_preferences); st.rerun()
-    st.json({"default_area": ui_preferences.get("default_area"), "dashboard_detail": ui_preferences.get("dashboard_detail"), "compact_navigation": ui_preferences.get("compact_navigation"), "reduced_motion": ui_preferences.get("reduced_motion"), "recent_projects": len(ui_preferences.get("recent_project_ids", [])), "favorites": len(ui_preferences.get("favorite_project_ids", []))})
+    if c3.button("Clear recent commands", disabled=not ui_preferences.get("recent_command_ids")):
+        ui_preferences["recent_command_ids"] = []; save_preferences(ui_preferences); st.rerun()
+    if c4.button("Show onboarding again", disabled=not ui_preferences.get("onboarding_dismissed", False)):
+        ui_preferences["onboarding_dismissed"] = False; save_preferences(ui_preferences); st.rerun()
+    st.json({"default_area": ui_preferences.get("default_area"), "dashboard_detail": ui_preferences.get("dashboard_detail"), "compact_navigation": ui_preferences.get("compact_navigation"), "reduced_motion": ui_preferences.get("reduced_motion"), "recent_projects": len(ui_preferences.get("recent_project_ids", [])), "favorites": len(ui_preferences.get("favorite_project_ids", [])), "recent_commands": len(ui_preferences.get("recent_command_ids", [])), "onboarding_dismissed": ui_preferences.get("onboarding_dismissed", False)})
 
 elif page == "Projects":
     section("Project portfolio", "Create, open, import, and maintain the production workspace and master script.")
@@ -277,7 +315,7 @@ elif page == "Projects":
 
 elif page == "Governance":
     if not project:
-        st.info("Open a project to manage governance and review records.")
+        empty_state("No active project", "Open a project before managing ownership, reviews, and decisions.", "Open Project Workspace", "Projects")
     else:
         actor = st.text_input("Current local actor label", value=st.session_state.get("governance_actor", "Local User"), key="governance_actor_input")
         st.session_state.governance_actor = actor.strip() or "Local User"
@@ -368,7 +406,7 @@ elif page == "Governance":
 
 elif page == "Approvals":
     if not project:
-        st.info("Open a project to manage approval requests.")
+        empty_state("No active project", "Open a project before requesting or deciding approvals.", "Open Project Workspace", "Projects")
     else:
         actor = st.text_input("Current local actor label", value=st.session_state.get("governance_actor", "Local User"), key="approval_actor_input")
         st.session_state.governance_actor = actor.strip() or "Local User"
@@ -639,7 +677,7 @@ elif page == "Audio Quality Lab":
 elif page == "Timeline Studio":
     section("Non-destructive audio assembly", "Arrange compatible WAV assets, inspect readiness, and export a mixed production master.")
     if not project:
-        st.info("Open a project to create a timeline.")
+        empty_state("No active project", "Open a project before assembling timeline clips.", "Open Project Workspace", "Projects")
     else:
         st.caption("Arrange existing 16-bit PCM WAV assets non-destructively. Original files are never modified.")
         available_wavs = sorted(OUTPUTS_DIR.glob("*.wav"), key=lambda path: path.stat().st_mtime, reverse=True)
@@ -735,7 +773,8 @@ elif page == "Timeline Studio":
 
 elif page == "Script Blocks":
     section("Structured script production", "Each block carries independent provider, voice, pacing, pronunciation, and inclusion settings.")
-    if not project: st.info("Open a project first.")
+    if not project:
+        empty_state("No active project", "Open or create a project before editing script blocks.", "Open Project Workspace", "Projects")
     else:
         st.caption("Divide a script into independently configurable voice blocks. Reorder, duplicate, disable, and batch-plan without changing the Master Script.")
         a, b, c, d, e = st.columns(5)
@@ -757,9 +796,9 @@ elif page == "Script Blocks":
 elif page == "Batch Production":
     section("Production jobs", "Validate provider readiness, create resumable jobs, and recover partial or failed work.")
     if not project:
-        st.info("Open a project first.")
+        empty_state("No active project", "Open a project before creating production jobs.", "Open Project Workspace", "Projects")
     elif not project.blocks:
-        st.info("Create script blocks before building a batch.")
+        empty_state("No script blocks", "Create script blocks before validating or running a batch.", "Open Script Editor", "Script Blocks")
     else:
         ready_providers = configured_providers()
         manifest = build_manifest(project, PROVIDER_RATES, ready_providers)

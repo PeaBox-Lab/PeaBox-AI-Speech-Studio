@@ -85,6 +85,12 @@ Authenticated identities, permissions, and shared storage remain part of the fut
 - Favorite and recent projects
 - Persistent local interface density, motion, startup, and dashboard preferences
 
+## Delivered — v0.07.3: Command discovery and guided onboarding
+
+- Searchable safe-navigation command center
+- Project-aware command availability and recent commands
+- First-run progress and actionable prerequisite empty states
+
 ## v0.06.00: Scale and collaboration
 
 - SQLite repository migration followed by optional PostgreSQL

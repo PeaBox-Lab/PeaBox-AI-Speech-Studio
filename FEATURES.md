@@ -1,38 +1,43 @@
 # Features Guide
 
-## Overview and navigation
+## Workspace productivity
 
-- Executive dashboard with readiness and governance KPIs
-- Project Workspace for create/open/import/export
-- Favorite and recent project shortcuts
-- Quick Access sidebar and project-aware dashboard actions
-- Persistent interface preferences
+- Executive Dashboard
+- Workspace Command Center
+- Grouped corporate navigation
+- Sidebar Quick Access
+- Favorite and recent projects
+- Recent command history
+- First-run onboarding
+- Interface density, motion, startup, and dashboard preferences
 
-## Production
+## Projects and production
 
-- Master Script and provider-aware script blocks
-- Local Kokoro generation
-- Azure Speech, Amazon Polly, and Google Cloud TTS session profiles
-- Resumable multi-provider batch jobs
-- Non-destructive Timeline Studio and merged WAV export
+- Portable project workspace and master script
+- Provider-aware script blocks
+- Single speech generation and resumable batch jobs
+- Multi-provider voice discovery
+- Non-destructive Timeline Studio and merged WAV exports
 
-## Audio and quality
+## Audio, quality, and transcription
 
-- Voice Library and reusable presets
+- Voice Library and presets
 - Pronunciation dictionary and safe pause markers
-- WAV inspection, peak normalization, silence trimming
-- Kokoro A/B comparisons
-- Editable transcription with TXT, SRT, and VTT exports
+- WAV analysis, normalization, silence trimming, and A/B comparisons
+- Local transcription with editable segments and TXT/SRT/VTT export
 
-## Administration and governance
+## Governance
 
-- System and FFmpeg diagnostics
-- Governance Center and Approval Queue
-- Review comments, decisions, workflow states, and audit history
-- Consolidated Activity & History
+- Owners, contributors, risk, target date, and workflow states
+- Review comments and resolutions
+- Decision register
+- Approval Queue
+- Application governance audit log
 
-## Portability
+## Portability and safety
 
 - Project JSON import/export
-- Secure timeline bundles containing project data and WAV assets
-- Asset relinking and stale-source detection
+- Secure timeline bundles with copied WAV assets
+- Missing-asset relinking
+- Session-only cloud credentials
+- Setup diagnostics and visual regression protections

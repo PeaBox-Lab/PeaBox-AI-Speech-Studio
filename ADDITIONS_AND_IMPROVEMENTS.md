@@ -1,28 +1,26 @@
-# v0.07.2 Additions and Improvements
+# v0.07.3 Additions and Improvements
 
-## Navigation productivity
+## Command discovery
 
-- Four sidebar Quick Access actions
-- Five active-project dashboard actions
-- Programmatic navigation helper preserving grouped navigation state
+- Searchable catalog of 17 safe navigation commands
+- Keyword matching across page, group, label, and task terms
+- Project-aware availability rules
+- Ten-command local history
 
-## Project access
+## Onboarding
 
-- Persistent favorites
-- Twelve-item recent project list
-- Favorite/recent ordering with missing-project cleanup at display time
+- Five measurable setup milestones
+- Percentage progress
+- Dismiss and restore behavior
+- No automatic project mutations
 
-## Personalization
+## Empty-state usability
 
-- Default workspace area
-- Compact navigation density
-- Reduced motion
-- Three dashboard detail levels
-- Preference reset actions
+- Shared corporate empty-state component
+- Direct prerequisite navigation
+- Clearer instructions on project-dependent screens
 
-## Architecture
+## Persistence
 
-- Separate local preference service
-- Atomic preference writes
-- Corrupt preference recovery
-- No change to project or timeline bundle schema
+- Recent commands and onboarding dismissal stored in local UI preferences
+- Preference schema remains independent from portable project data

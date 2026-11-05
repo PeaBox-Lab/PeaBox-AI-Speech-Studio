@@ -7,6 +7,7 @@ NAVIGATION = {
     "Overview": [
         ("Executive Dashboard", "Dashboard", "▦"),
         ("Project Workspace", "Projects", "▣"),
+        ("Command Center", "Command Center", "⌕"),
         ("Interface Preferences", "Preferences", "◐"),
     ],
     "Production": [
@@ -36,6 +37,7 @@ NAVIGATION = {
 PAGE_META = {
     "Dashboard": ("Executive Dashboard", "Portfolio status, production readiness, and recommended next actions.", "Overview"),
     "Projects": ("Project Workspace", "Create, open, import, export, and maintain portable production projects.", "Overview"),
+    "Command Center": ("Workspace Command Center", "Search screens, discover project-aware actions, and reopen recent commands.", "Overview"),
     "Preferences": ("Interface Preferences", "Personalize navigation density, startup area, motion, and dashboard detail on this device.", "Overview"),
     "Script Blocks": ("Script Editor", "Structure the master script into reusable, provider-aware production blocks.", "Production"),
     "Create Speech": ("Speech Generator", "Generate and review individual local voice outputs.", "Production"),
@@ -153,6 +155,9 @@ div[data-baseweb="popover"] li[role="option"]:hover { background:#edf4fc!importa
 .pb-section-title { font-weight:720; color:var(--pb-navy); font-size:1.05rem; }
 .pb-section-note { color:var(--pb-muted); font-size:.82rem; margin-top:.15rem; }
 .pb-callout { background:#edf5ff; border:1px solid #c8dcf5; border-radius:10px; padding:.8rem 1rem; color:#25446e; margin:.5rem 0 1rem; }
+.pb-empty { background:#fff; border:1px dashed #b7c7da; border-radius:12px; padding:1.2rem 1.3rem; margin:.65rem 0; }
+.pb-empty-title { color:var(--pb-navy); font-weight:750; font-size:1rem; }
+.pb-empty-text { color:var(--pb-muted); font-size:.86rem; margin-top:.3rem; line-height:1.45; }
 .pb-nav-label { color:#9fb3cc; font-size:.66rem; font-weight:750; letter-spacing:.12em; margin:.35rem 0 .3rem; }
 .pb-status { display:inline-block; padding:.2rem .58rem; border-radius:999px; font-weight:750; font-size:.69rem; letter-spacing:.025em; }
 .pb-status.good { color:#096b53; background:#dff6ee; }.pb-status.warn { color:#934b08; background:#fff1dc; }.pb-status.bad { color:#9b241c; background:#fee4e2; }.pb-status.neutral { color:#344054; background:#eaecf0; }
@@ -254,6 +259,17 @@ def kpi_card(label: str, value: str, note: str = "") -> None:
 
 def callout(text: str) -> None:
     st.markdown(f'<div class="pb-callout">{escape(text)}</div>', unsafe_allow_html=True)
+
+
+def empty_state(title: str, text: str, action_label: str = "", target_page: str = "") -> None:
+    st.markdown(
+        f'<div class="pb-empty"><div class="pb-empty-title">{escape(title)}</div>'
+        f'<div class="pb-empty-text">{escape(text)}</div></div>',
+        unsafe_allow_html=True,
+    )
+    if action_label and target_page and st.button(action_label, key=f"empty_{target_page}"):
+        navigate_to(target_page)
+        st.rerun()
 
 
 def status_badge(text: str, tone: str = "neutral") -> str:

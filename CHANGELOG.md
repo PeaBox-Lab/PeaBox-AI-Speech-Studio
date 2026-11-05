@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.07.3 — 2026-11-05
+
+### Added
+
+- Workspace Command Center with screen and workflow search
+- Project-aware command availability and safe navigation-only execution
+- Recent command history
+- Five-step first-run onboarding progress
+- Dismiss and restore onboarding controls
+- Shared actionable empty-state component
+- Direct prerequisite navigation for project-dependent screens
+- Command, onboarding, navigation, page-smoke, and compatibility tests
+
+### Compatibility
+
+- Recent commands and onboarding state are local interface preferences
+- Project and timeline bundle formats remain unchanged
+
 ## v0.07.2 — 2026-11-05
 
 ### Added

@@ -16,11 +16,11 @@ class NavigationStructureTests(unittest.TestCase):
             self.assertIn(f'"{group}"', self.ui_source)
 
     def test_professional_display_labels_exist(self):
-        labels = ["Executive Dashboard", "Project Workspace", "Interface Preferences", "Script Editor", "Speech Generator", "Batch Jobs", "Timeline Studio", "Transcription Studio", "Governance Center", "Approval Queue", "Activity & History"]
+        labels = ["Executive Dashboard", "Project Workspace", "Command Center", "Interface Preferences", "Script Editor", "Speech Generator", "Batch Jobs", "Timeline Studio", "Transcription Studio", "Governance Center", "Approval Queue", "Activity & History"]
         for label in labels: self.assertIn(f'"{label}"', self.ui_source)
 
     def test_all_internal_page_branches_exist(self):
-        branches = ["Dashboard", "Projects", "Preferences", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History"]
+        branches = ["Dashboard", "Projects", "Command Center", "Preferences", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History"]
         for page in branches: self.assertIn(f'page == "{page}"', self.app_source)
 
     def test_sidebar_uses_grouped_navigation(self):

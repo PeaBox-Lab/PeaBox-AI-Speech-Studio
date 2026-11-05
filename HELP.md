@@ -1,25 +1,25 @@
 # Help Articles
 
-## I cannot find a screen
+## No command is found
 
-Use **Workspace Area** to choose a business area, then choose the screen below it. Use Quick Access for Dashboard, Script, Generate, and Timeline.
+Use shorter terms. Useful examples: `audio`, `script`, `voice`, `provider`, `transcript`, `review`, `approval`, `history`, and `timeline`.
 
-## I want to continue a recent project
+## A command says project required
 
-On the dashboard with no active project, use **Quick project access**. Favorites appear before recent projects.
+Open Project Workspace, select or create a project, then return to Command Center.
 
-## I want a simpler dashboard
+## The onboarding guide is hidden
 
-Open **Interface Preferences** and choose Compact dashboard detail. Standard includes workflow guidance; Detailed also includes recent activity.
+Open Interface Preferences and select **Show onboarding again**.
 
-## The sidebar feels too large
+## A screen is empty
 
-Enable Compact sidebar navigation in Interface Preferences.
+Use the action button in the empty-state panel. PeaBox will navigate to the screen that supplies the missing prerequisite.
 
-## I prefer fewer animations
+## Recent commands or projects are outdated
 
-Enable Reduce interface motion. This disables most transitions and animation timing.
+Missing projects and unknown commands are ignored automatically. Use Interface Preferences to clear recent projects, commands, or favorites.
 
-## Preferences appear lost
+## Keyboard use
 
-Confirm the extracted release folder and its `data` directory are writable. Preferences are stored locally and are not part of project exports.
+Use Tab and Shift+Tab to move through Streamlit controls, Enter/Space to activate controls, and type directly into the Command Center search field to narrow results.

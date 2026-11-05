@@ -1,13 +1,13 @@
-# Detailed Release Notes — v0.07.2
+# Detailed Release Notes — v0.07.3
 
-## Problem addressed
+## Design objective
 
-The corporate UI was clearer after v0.07.1, but repeated daily tasks still required navigating through area and screen selectors. Project continuation also depended on manually finding the project each time.
+PeaBox had grown to many dedicated screens. Grouped navigation and quick actions improved daily use, but new and occasional users still needed to know where a task lived. v0.07.3 adds task-oriented discovery without restructuring the underlying features again.
 
-## Solution
+## Command safety
 
-v0.07.2 adds local user-level productivity state without contaminating portable projects. Recent and favorite project IDs, dashboard density, default area, compact navigation, and reduced-motion settings are stored independently.
+Commands only navigate to existing screens. They do not delete data, submit approvals, generate paid cloud audio, or change project content. Project-dependent results are disabled until prerequisites are available.
 
-## Compatibility
+## Onboarding behavior
 
-No project data migration is required. Existing projects and timeline bundles remain compatible. Deleting local UI preferences does not affect projects or generated media.
+Onboarding derives progress from current project state and provider availability. Dismissing the guide changes only local interface preferences. It can be restored at any time.

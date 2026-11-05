@@ -13,6 +13,8 @@ DEFAULTS = {
     "dashboard_detail": "Standard",
     "favorite_project_ids": [],
     "recent_project_ids": [],
+    "recent_command_ids": [],
+    "onboarding_dismissed": False,
 }
 
 
@@ -42,6 +44,8 @@ def sanitize_preferences(preferences: dict[str, Any]) -> dict[str, Any]:
     clean["dashboard_detail"] = detail if detail in {"Compact", "Standard", "Detailed"} else "Standard"
     clean["favorite_project_ids"] = _clean_ids(preferences.get("favorite_project_ids", []), 100)
     clean["recent_project_ids"] = _clean_ids(preferences.get("recent_project_ids", []), 12)
+    clean["recent_command_ids"] = _clean_command_ids(preferences.get("recent_command_ids", []), 10)
+    clean["onboarding_dismissed"] = bool(preferences.get("onboarding_dismissed", False))
     return clean
 
 
@@ -77,6 +81,19 @@ def _clean_ids(values: Any, limit: int) -> list[str]:
     for value in values:
         item = str(value).strip()
         if item and item.isalnum() and item not in result:
+            result.append(item)
+        if len(result) >= limit:
+            break
+    return result
+
+
+def _clean_command_ids(values: Any, limit: int) -> list[str]:
+    result = []
+    if not isinstance(values, list):
+        return result
+    for value in values:
+        item = str(value).strip()[:80]
+        if item and all(character.isalnum() or character in "-_" for character in item) and item not in result:
             result.append(item)
         if len(result) >= limit:
             break

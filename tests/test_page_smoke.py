@@ -6,9 +6,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGES = ["Dashboard", "Projects", "Preferences", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
+PAGES = ["Dashboard", "Projects", "Command Center", "Preferences", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
 NAVIGATION = {
-    "Overview": [("Executive Dashboard", "Dashboard", "▦"), ("Project Workspace", "Projects", "▣"), ("Interface Preferences", "Preferences", "◐")],
+    "Overview": [("Executive Dashboard", "Dashboard", "▦"), ("Project Workspace", "Projects", "▣"), ("Command Center", "Command Center", "⌕"), ("Interface Preferences", "Preferences", "◐")],
     "Production": [("Script Editor", "Script Blocks", "✎"), ("Speech Generator", "Create Speech", "◉"), ("Batch Jobs", "Batch Production", "⇄"), ("Timeline Studio", "Timeline Studio", "≡")],
     "Audio & Quality": [("Voice Library", "Voice Library", "◫"), ("Quality Studio", "Quality Studio", "✓"), ("Audio Quality Lab", "Audio Quality Lab", "∿"), ("Transcription Studio", "Transcription", "▤")],
     "Administration": [("Governance Center", "Governance", "◆"), ("Approval Queue", "Approvals", "✓"), ("Provider Setup", "Provider Setup", "⚙"), ("System Check", "System Check", "◇"), ("Activity & History", "Render History", "◷")],
