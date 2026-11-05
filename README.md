@@ -1,28 +1,25 @@
-# PeaBox Voice Studio v0.03.10
+# PeaBox Voice Studio v0.03.11
 
-A local-first Streamlit workspace for portable projects, provider-aware script blocks, resumable multi-provider jobs, Kokoro production, and Faster-Whisper transcription.
+A local-first Streamlit workspace for discoverable multi-provider voices, reusable voice presets, resumable production jobs, Kokoro generation, and Faster-Whisper transcription.
 
-## v0.03.10 highlights
+## v0.03.11 highlights
 
-- Session-only setup for Azure Speech, Amazon Polly, and Google Cloud TTS
-- Credentials are never written to project JSON, exported projects, job manifests, or logs
-- Provider-specific language codes and voice identifiers on cloud blocks
-- Provider readiness validation before job creation
-- Persistent job snapshots with queued, running, rendered, failed, and cancelled item states
-- Resume queued jobs after reopening a project
-- Retry failed items without repeating successful renders
-- Cancel queued items
-- Download completed job audio and job metadata in one ZIP
-- Estimated cost at job creation and recorded usage cost for successful generations
-- Job history limited to the most recent 20 records per project
+- Discover Azure, Amazon Polly, and Google voices from configured session profiles
+- Cache normalized cloud voice catalogs only for the current Streamlit session
+- Search the combined Kokoro and cloud catalog by name, ID, provider, language, or gender
+- Filter the library by language and gender
+- View provider readiness, cached voice counts, output types, supported controls, and credential requirements
+- Select cached provider voices directly while editing cloud script blocks
+- Save reusable project presets containing provider, language, voice, speed, and direction notes
+- Apply or delete project presets without changing block text
+- Duplicate jobs as clean queued copies
+- Reopen cancelled job items, delete obsolete jobs, retry failures, and cancel queued work
 
-## Important behavior
+## Credential and catalog safety
 
-The Streamlit session must still contain the relevant provider credentials when a saved cloud job is resumed. Project files contain provider names and generation settings, but never secret values.
+Cloud credentials and discovered voice catalogs exist only in Streamlit session state. They are not saved in project JSON, project exports, manifests, presets, or job history. Presets contain only non-secret generation choices.
 
-Recorded usage cost is calculated from successfully rendered character counts using the configured planning rate. It is useful for project tracking but is not a provider invoice and may differ from billed usage, taxes, free tiers, regional pricing, or contracts.
-
-Jobs are resumable and persistent, but execution is still initiated from the UI and runs in the application process. A separate background worker and live progress channel remain planned for the next architecture stage.
+A saved cloud job can be reopened later, but the provider must be configured again for the new session before it can run.
 
 ## Windows setup
 
@@ -31,14 +28,14 @@ Jobs are resumable and persistent, but execution is still initiated from the UI 
 3. Run `start_windows.bat`.
 4. Install FFmpeg and add it to PATH for compressed audio/video transcription.
 
-## Workflow
+## Recommended workflow
 
-1. Open Provider Setup and configure only the providers needed for the current session.
-2. Create or import a project and configure its blocks.
-3. Enter exact cloud language codes and provider voice IDs on cloud blocks.
-4. Open Batch Production and resolve readiness errors.
-5. Create a persistent job, then run or resume it.
-6. Retry failed items, cancel queued work, or download completed job outputs.
+1. Configure the required provider for the current session.
+2. Discover its voices and inspect them in Voice Library.
+3. Assign catalog voices to script blocks.
+4. Save frequently used combinations as project presets.
+5. Validate and create a resumable batch job.
+6. Run, retry, cancel, reopen, duplicate, clean up, or download job results.
 
 ## Tests
 

@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.03.11 — 2026-11-05
+
+### Added
+
+- Azure, Polly, and Google voice discovery
+- Session-cached normalized voice catalogs
+- Searchable cross-provider Voice Library and capability matrix
+- Catalog-backed cloud voice selection in script blocks
+- Reusable project voice/direction presets
+- Job duplication, cancelled-item reopening, and job deletion
+- Catalog, preset, normalization, and job-recovery tests
+
+### Security
+
+- Credentials and discovered catalogs remain session-only
+- Presets store only non-secret generation settings
+
+### Compatibility
+
+- v0.03.10 projects and saved jobs remain readable
+
 ## v0.03.10 — 2026-11-05
 
 ### Added

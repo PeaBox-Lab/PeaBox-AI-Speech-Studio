@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.03.10 Release Notes
+# PeaBox Voice Studio v0.03.11 Release Notes
 
-This release activates the cloud-batch foundation from the roadmap. Azure Speech, Amazon Polly, and Google Cloud TTS can be configured for the current Streamlit session, while Kokoro remains available without credentials. Secret values are deliberately excluded from projects and exports.
+This release completes the interactive cloud-production layer before the planned v0.04 quality studio. Configured Azure, Polly, and Google sessions can discover and normalize voice catalogs. A combined Voice Library provides search and filters, while cloud script blocks can select cached voices instead of relying only on manual identifiers.
 
-Batch Production now creates persistent job snapshots. Each block tracks its own state, attempts, output, failure message, estimated cost, and recorded usage cost. Successful items are not repeated when a job resumes; failed items can be queued again; queued work can be cancelled. Completed files and job metadata can be downloaded together.
+Projects can store reusable non-secret voice presets. A preset captures the provider, language, voice, speed, and direction notes, and can be applied to any block without replacing its title or text.
 
-Execution remains UI-initiated and process-bound. The next scalability step is a separate worker and live progress channel rather than claiming that this release provides true background execution.
+Saved jobs gain recovery and housekeeping controls: duplicate a job as a fresh queued copy, reopen cancelled items, delete obsolete records, retry failures, cancel queued work, or resume remaining items. Credentials and discovered catalogs remain session-only.

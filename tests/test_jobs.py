@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from peabox_voice_studio.models import Project, ScriptBlock
-from peabox_voice_studio.services.jobs import add_job, create_job, request_cancel, retry_failed, run_job
+from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, request_cancel, retry_failed, run_job
 
 
 class JobTests(unittest.TestCase):
@@ -46,6 +46,25 @@ class JobTests(unittest.TestCase):
         project = self.project()
         for index in range(25): add_job(project, {"id": str(index)}, keep=20)
         self.assertEqual(len(project.settings["batch_jobs"]), 20)
+
+    def test_duplicate_job_resets_execution_state(self):
+        job = create_job(self.project(), {"Kokoro local": 0, "Azure Speech": 15}, {"Kokoro local", "Azure Speech"})
+        job["items"][0]["status"] = "rendered"; job["items"][0]["file"] = "old.wav"; job["items"][0]["actual_cost_usd"] = 1
+        copy = duplicate_job(job)
+        self.assertNotEqual(copy["id"], job["id"])
+        self.assertTrue(all(item["status"] == "queued" and item["file"] is None for item in copy["items"]))
+
+    def test_reopen_cancelled(self):
+        job = create_job(self.project(), {"Kokoro local": 0, "Azure Speech": 15}, {"Kokoro local", "Azure Speech"})
+        request_cancel(job); reopen_cancelled(job)
+        self.assertEqual(job["status"], "queued")
+        self.assertTrue(all(item["status"] == "queued" for item in job["items"]))
+
+    def test_delete_job(self):
+        project = self.project(); job = create_job(project, {"Kokoro local": 0, "Azure Speech": 15}, {"Kokoro local", "Azure Speech"})
+        add_job(project, job)
+        self.assertTrue(delete_job(project, job["id"]))
+        self.assertEqual(project.settings["batch_jobs"], [])
 
 
 if __name__ == "__main__": unittest.main()

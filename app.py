@@ -8,13 +8,16 @@ from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, P
 from peabox_voice_studio.services.batch import build_manifest
 from peabox_voice_studio.services.files import build_render_zip, safe_filename
 from peabox_voice_studio.services.history import record_render
-from peabox_voice_studio.services.jobs import add_job, create_job, replace_job, request_cancel, retry_failed, run_job
+from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
+from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
+from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
 from peabox_voice_studio.services.subtitles import to_srt
 
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide")
 store = ProjectStore()
 profiles = st.session_state.setdefault("provider_profiles", {})
+voice_catalogs = st.session_state.setdefault("voice_catalogs", {})
 
 def configured_providers() -> set[str]:
     return {"Kokoro local", *profiles.keys()}
@@ -46,12 +49,30 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
             voices = KOKORO_VOICES[block.language]
             block.voice = c.selectbox("Voice", voices, index=voices.index(block.voice) if block.voice in voices else 0, key=f"voice_{block.id}")
         else:
-            default_language = block.language if block.language not in KOKORO_VOICES else "en-US"
-            block.language = b.text_input("Language code", default_language, key=f"lang_{block.id}")
-            default_voice = block.voice if block.voice not in sum(KOKORO_VOICES.values(), []) else ""
-            block.voice = c.text_input("Provider voice ID", default_voice, key=f"voice_{block.id}")
+            provider_voices = voice_catalogs.get(block.provider, [])
+            if provider_voices:
+                language_options = sorted({item["language"] for item in provider_voices if item.get("language")})
+                current_language = block.language if block.language in language_options else (language_options[0] if language_options else "")
+                block.language = b.selectbox("Language code", language_options or [current_language], index=(language_options or [current_language]).index(current_language), key=f"lang_{block.id}")
+                matching = [item for item in provider_voices if not block.language or item.get("language") == block.language]
+                voice_ids = [item["id"] for item in matching]
+                current_voice = block.voice if block.voice in voice_ids else (voice_ids[0] if voice_ids else block.voice)
+                block.voice = c.selectbox("Provider voice", voice_ids or [current_voice], index=(voice_ids or [current_voice]).index(current_voice), key=f"voice_{block.id}")
+            else:
+                default_language = block.language if block.language not in KOKORO_VOICES else "en-US"
+                block.language = b.text_input("Language code", default_language, key=f"lang_{block.id}")
+                default_voice = block.voice if block.voice not in sum(KOKORO_VOICES.values(), []) else ""
+                block.voice = c.text_input("Provider voice ID", default_voice, key=f"voice_{block.id}")
         block.speed = d.slider("Speed", 0.6, 1.6, float(block.speed), 0.05, key=f"speed_{block.id}")
         block.notes = st.text_input("Direction notes", block.notes, placeholder="Optional pacing, pronunciation, or performance note", key=f"notes_{block.id}")
+        presets = list_presets(project)
+        if presets:
+            preset = st.selectbox("Apply project preset", [None] + presets, format_func=lambda item: "Choose a preset" if item is None else item["name"], key=f"preset_{block.id}")
+            if st.button("Apply selected preset", key=f"apply_preset_{block.id}", disabled=preset is None):
+                apply_preset(block, preset); save_project(project); st.rerun()
+        preset_name = st.text_input("Save current settings as preset", key=f"preset_name_{block.id}")
+        if st.button("Save preset", key=f"save_preset_{block.id}", disabled=not preset_name.strip()):
+            create_preset(project, preset_name, block); save_project(project); st.success("Preset saved")
         u, dn, dup, delete = st.columns(4)
         if u.button("Move up", key=f"up_{block.id}", disabled=index == 0):
             move_block(project.blocks, index, -1); save_project(project); st.rerun()
@@ -64,8 +85,8 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Resumable multi-provider voice production")
-page = st.sidebar.radio("Studio", ["Projects", "Provider Setup", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
+st.caption(f"Version {VERSION} · Discoverable multi-provider voice production")
+page = st.sidebar.radio("Studio", ["Projects", "Provider Setup", "Voice Library", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
 st.sidebar.success(f"Active: {project.name}") if project else st.sidebar.info("No active project")
 
@@ -125,8 +146,14 @@ elif page == "Provider Setup":
             if azure_key.strip() and azure_region.strip():
                 profiles["Azure Speech"] = {"key": azure_key.strip(), "region": azure_region.strip()}; st.success("Azure session profile is ready")
             else: st.error("API key and region are required")
+        if st.button("Discover Azure voices", disabled="Azure Speech" not in profiles):
+            try:
+                from peabox_voice_studio.providers.cloud import discover_azure_voices
+                with st.spinner("Discovering Azure voices..."): voice_catalogs["Azure Speech"] = discover_azure_voices(profiles["Azure Speech"])
+                st.success(f"Cached {len(voice_catalogs['Azure Speech'])} Azure voices for this session")
+            except Exception as exc: st.error(f"Voice discovery failed: {exc}")
         if st.button("Clear Azure session profile"):
-            profiles.pop("Azure Speech", None); st.rerun()
+            profiles.pop("Azure Speech", None); voice_catalogs.pop("Azure Speech", None); st.rerun()
     with tabs[1]:
         aws_access = st.text_input("AWS access key ID", type="password", key="aws_access")
         aws_secret = st.text_input("AWS secret access key", type="password", key="aws_secret")
@@ -138,8 +165,16 @@ elif page == "Provider Setup":
                 profiles["Amazon Polly standard"] = profile; profiles["Amazon Polly neural"] = profile
                 st.success("Polly session profiles are ready")
             else: st.error("Access key, secret key, and region are required")
+        polly_engine = st.radio("Polly catalog engine", ["standard", "neural"], horizontal=True)
+        if st.button("Discover Polly voices", disabled="Amazon Polly standard" not in profiles):
+            try:
+                from peabox_voice_studio.providers.cloud import discover_polly_voices
+                provider_name = "Amazon Polly neural" if polly_engine == "neural" else "Amazon Polly standard"
+                with st.spinner("Discovering Polly voices..."): voice_catalogs[provider_name] = discover_polly_voices(profiles[provider_name], polly_engine)
+                st.success(f"Cached {len(voice_catalogs[provider_name])} {provider_name} voices for this session")
+            except Exception as exc: st.error(f"Voice discovery failed: {exc}")
         if st.button("Clear Polly session profiles"):
-            profiles.pop("Amazon Polly standard", None); profiles.pop("Amazon Polly neural", None); st.rerun()
+            profiles.pop("Amazon Polly standard", None); profiles.pop("Amazon Polly neural", None); voice_catalogs.pop("Amazon Polly standard", None); voice_catalogs.pop("Amazon Polly neural", None); st.rerun()
     with tabs[2]:
         google_file = st.file_uploader("Google service-account JSON", type="json", key="google_profile")
         if st.button("Use Google for this session", disabled=google_file is None):
@@ -148,11 +183,40 @@ elif page == "Provider Setup":
                 profiles["Google Cloud TTS"] = {"service_account_json": google_file.getvalue().decode("utf-8")}
                 st.success("Google session profile is ready")
             except Exception: st.error("The uploaded file is not valid JSON")
+        google_language = st.text_input("Optional Google language filter", value="", key="google_language_filter")
+        if st.button("Discover Google voices", disabled="Google Cloud TTS" not in profiles):
+            try:
+                from peabox_voice_studio.providers.cloud import discover_google_voices
+                with st.spinner("Discovering Google voices..."): voice_catalogs["Google Cloud TTS"] = discover_google_voices(profiles["Google Cloud TTS"], google_language)
+                st.success(f"Cached {len(voice_catalogs['Google Cloud TTS'])} Google voices for this session")
+            except Exception as exc: st.error(f"Voice discovery failed: {exc}")
         if st.button("Clear Google session profile"):
-            profiles.pop("Google Cloud TTS", None); st.rerun()
-    status_rows = [{"Provider": name, "Ready": name in configured_providers()} for name in ["Kokoro local", "Azure Speech", "Amazon Polly standard", "Amazon Polly neural", "Google Cloud TTS"]]
-    st.subheader("Session readiness")
-    st.dataframe(status_rows, use_container_width=True, hide_index=True)
+            profiles.pop("Google Cloud TTS", None); voice_catalogs.pop("Google Cloud TTS", None); st.rerun()
+    counts = {name: len(items) for name, items in voice_catalogs.items()}
+    st.subheader("Provider capabilities and readiness")
+    st.dataframe(capability_rows(configured_providers(), counts), use_container_width=True, hide_index=True)
+
+elif page == "Voice Library":
+    st.header("Voice Library")
+    all_voices = [{"provider": "Kokoro local", "id": voice, "name": voice, "language": language, "gender": "", "styles": []} for language, voices in KOKORO_VOICES.items() for voice in voices]
+    for items in voice_catalogs.values(): all_voices.extend(items)
+    facets = catalog_facets(all_voices)
+    a, b, c = st.columns(3)
+    query = a.text_input("Search voices", placeholder="Name, ID, provider, or language")
+    language_filter = b.selectbox("Language", ["All"] + facets["languages"])
+    gender_filter = c.selectbox("Gender", ["All"] + facets["genders"])
+    visible_voices = filter_voices(all_voices, query, language_filter, gender_filter)
+    st.caption(f"Showing {len(visible_voices)} of {len(all_voices)} session voices. Cloud catalogs are cached only for this session.")
+    st.dataframe(visible_voices, use_container_width=True, hide_index=True)
+    if project:
+        presets = list_presets(project)
+        st.subheader("Project voice presets")
+        if presets:
+            st.dataframe(presets, use_container_width=True, hide_index=True)
+            preset_to_delete = st.selectbox("Delete preset", presets, format_func=lambda item: item["name"])
+            if st.button("Delete selected preset"):
+                delete_preset(project, preset_to_delete["id"]); save_project(project); st.rerun()
+        else: st.info("Save a preset from any script block to reuse its provider, voice, speed, and direction notes.")
 
 elif page == "Script Blocks":
     st.header("Script Blocks")
@@ -202,14 +266,23 @@ elif page == "Batch Production":
             selected_job = st.selectbox("Saved batch jobs", jobs, format_func=lambda item: f"{item['created_at']} · {item['status']} · {item['id'][:8]}")
             summary = selected_job.get("summary", {})
             st.caption(f"Estimated ${summary.get('estimated_cost_usd', 0):.4f} · Recorded usage cost ${summary.get('actual_cost_usd', 0):.4f}. Recorded usage cost is calculated from successful characters at the planning rate; it is not a provider invoice.")
-            b1, b2, b3 = st.columns(3)
-            run_clicked = b1.button("Run or resume job", disabled=selected_job.get("status") in {"completed", "cancelled"})
-            retry_clicked = b2.button("Retry failed items", disabled=not any(i["status"] == "failed" for i in selected_job["items"]))
-            cancel_clicked = b3.button("Cancel queued items", disabled=selected_job.get("status") in {"completed", "cancelled", "failed"})
+            b1, b2, b3, b4, b5, b6 = st.columns(6)
+            run_clicked = b1.button("Run/resume", disabled=selected_job.get("status") in {"completed", "cancelled"})
+            retry_clicked = b2.button("Retry failed", disabled=not any(i["status"] == "failed" for i in selected_job["items"]))
+            cancel_clicked = b3.button("Cancel queued", disabled=selected_job.get("status") in {"completed", "cancelled", "failed"})
+            reopen_clicked = b4.button("Reopen cancelled", disabled=not any(i["status"] == "cancelled" for i in selected_job["items"]))
+            duplicate_clicked = b5.button("Duplicate job")
+            delete_clicked = b6.button("Delete job")
             if retry_clicked:
                 retry_failed(selected_job); replace_job(project, selected_job); save_project(project); st.rerun()
             if cancel_clicked:
                 request_cancel(selected_job); replace_job(project, selected_job); save_project(project); st.rerun()
+            if reopen_clicked:
+                reopen_cancelled(selected_job); replace_job(project, selected_job); save_project(project); st.rerun()
+            if duplicate_clicked:
+                add_job(project, duplicate_job(selected_job)); save_project(project); st.rerun()
+            if delete_clicked:
+                delete_job(project, selected_job["id"]); save_project(project); st.rerun()
             if run_clicked:
                 from peabox_voice_studio.providers.kokoro import generate as kokoro_generate
                 from peabox_voice_studio.providers.cloud import generate_azure, generate_google, generate_polly
@@ -272,19 +345,18 @@ else:
     st.header("Roadmap & Help")
     st.markdown("""
 ### Current release
-- Session-only Azure, Polly, and Google credential profiles that are excluded from project files and exports
-- Provider-aware block validation and cloud voice identifiers
-- Persistent resumable jobs with queued, running, rendered, failed, and cancelled item states
-- Retry failed items, cancel queued work, download completed job outputs, and compare estimated with recorded usage cost
-- Portable projects, local Kokoro production, and local Faster-Whisper transcription
+- Session-cached voice discovery for Azure, Polly, and Google with a searchable cross-provider library
+- Provider capability/readiness matrix and catalog-aware block voice selection
+- Reusable project voice presets with provider, language, voice, speed, and direction notes
+- Persistent jobs with resume, retry, cancellation, reopen, duplicate, delete, and output download controls
+- Session-only credentials excluded from project files and exports
 
 ### Planned next
-1. Background worker process for non-blocking generation and live progress
-2. Dynamic provider voice discovery and cached capability catalogs
-3. Pronunciation dictionary, SSML controls, and reusable presets
+1. Pronunciation dictionary and provider-aware SSML controls
+2. Transcript editing, VTT export, and optional diarization
+3. Audio normalization, silence controls, and A/B renders
 4. Waveform metadata and non-destructive clip timeline
-5. Optional local diarization and speaker-labelled transcripts
-6. SQLite repository before hosted multi-user use
+5. Separate worker process and SQLite repository before hosted multi-user use
 
 ### Setup
 Run `start_windows.bat`. The launcher accepts installed Python 3.10, 3.11, or 3.12 and creates or reuses `.venv`. Install FFmpeg for compressed media transcription.

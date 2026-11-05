@@ -31,7 +31,15 @@ This maintenance stage reduces data-loss and failed-render risk before cloud bat
 - Persistent resumable jobs, retries, cancellation, and output packages
 - Estimated and recorded usage cost tracking
 
-The remaining cloud-production gap is moving execution into a separate worker with live progress and dynamic voice discovery.
+Dynamic voice discovery, capability catalogs, reusable presets, and expanded job recovery were delivered in v0.03.11. The remaining infrastructure gap is moving execution into a separate worker with live progress.
+
+## Delivered — v0.03.11: Cloud production usability
+
+- Session-cached Azure, Polly, and Google voice discovery
+- Searchable normalized voice library and provider capability matrix
+- Reusable project voice/direction presets
+- Job duplicate, reopen, retry, cancellation, deletion, and output recovery controls
+
 
 ## v0.04.00: Quality and transcription studio
 

@@ -118,3 +118,38 @@ def replace_job(project: Project, job: dict) -> None:
             jobs[index] = job
             return
     jobs.insert(0, job)
+
+
+def duplicate_job(job: dict) -> dict:
+    import copy
+    duplicate = copy.deepcopy(job)
+    duplicate["id"] = uuid4().hex
+    duplicate["created_at"] = utc_now()
+    duplicate["updated_at"] = duplicate["created_at"]
+    duplicate["status"] = "queued"
+    duplicate["cancel_requested"] = False
+    for item in duplicate["items"]:
+        item["id"] = uuid4().hex
+        item["status"] = "queued"
+        item["attempts"] = 0
+        item["file"] = None
+        item["error"] = None
+        item["actual_cost_usd"] = None
+    duplicate["summary"] = summarize_job_items(duplicate["items"])
+    return duplicate
+
+
+def reopen_cancelled(job: dict) -> dict:
+    for item in job["items"]:
+        if item["status"] == "cancelled":
+            item["status"] = "queued"
+            item["error"] = None
+    job["cancel_requested"] = False
+    return refresh_job_status(job)
+
+
+def delete_job(project: Project, job_id: str) -> bool:
+    jobs = project.settings.setdefault("batch_jobs", [])
+    before = len(jobs)
+    project.settings["batch_jobs"] = [job for job in jobs if job.get("id") != job_id]
+    return len(project.settings["batch_jobs"]) < before

@@ -48,3 +48,60 @@ def generate_google(text: str, profile: dict, voice: str, language: str, output_
         audio_config=texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3),
     ).audio_content
     return atomic_write_bytes(OUTPUTS_DIR / f"{safe_filename(output_name)}.mp3", data)
+
+
+def discover_azure_voices(profile: dict) -> list[dict]:
+    import requests
+    response = requests.get(
+        f"https://{profile['region']}.tts.speech.microsoft.com/cognitiveservices/voices/list",
+        headers={"Ocp-Apim-Subscription-Key": profile["key"]}, timeout=30,
+    )
+    response.raise_for_status()
+    return normalize_azure_voices(response.json())
+
+
+def discover_polly_voices(profile: dict, engine: str) -> list[dict]:
+    import boto3
+    client = boto3.client(
+        "polly", region_name=profile["region"], aws_access_key_id=profile["access_key"],
+        aws_secret_access_key=profile["secret_key"], aws_session_token=profile.get("session_token") or None,
+    )
+    voices = client.describe_voices(Engine=engine, IncludeAdditionalLanguageCodes=True).get("Voices", [])
+    return normalize_polly_voices(voices, engine)
+
+
+def discover_google_voices(profile: dict, language: str = "") -> list[dict]:
+    from google.cloud import texttospeech
+    from google.oauth2 import service_account
+    info = json.loads(profile["service_account_json"])
+    credentials = service_account.Credentials.from_service_account_info(info, scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    client = texttospeech.TextToSpeechClient(credentials=credentials)
+    voices = client.list_voices(language_code=language or None).voices
+    return normalize_google_voices(voices)
+
+
+def normalize_azure_voices(voices: list[dict]) -> list[dict]:
+    return sorted([{
+        "provider": "Azure Speech", "id": item.get("ShortName", ""), "name": item.get("DisplayName", item.get("ShortName", "")),
+        "language": item.get("Locale", ""), "gender": item.get("Gender", ""), "styles": item.get("StyleList", []),
+    } for item in voices if item.get("ShortName")], key=lambda item: (item["language"], item["name"]))
+
+
+def normalize_polly_voices(voices: list[dict], engine: str) -> list[dict]:
+    provider = "Amazon Polly neural" if engine == "neural" else "Amazon Polly standard"
+    return sorted([{
+        "provider": provider, "id": item.get("Id", ""), "name": item.get("Name", item.get("Id", "")),
+        "language": item.get("LanguageCode", ""), "gender": item.get("Gender", ""), "styles": [],
+    } for item in voices if item.get("Id")], key=lambda item: (item["language"], item["name"]))
+
+
+def normalize_google_voices(voices) -> list[dict]:
+    result = []
+    for item in voices:
+        name = getattr(item, "name", "")
+        languages = list(getattr(item, "language_codes", []) or [])
+        gender_value = getattr(getattr(item, "ssml_gender", None), "name", "")
+        if name:
+            for language in languages or [""]:
+                result.append({"provider": "Google Cloud TTS", "id": name, "name": name, "language": language, "gender": gender_value, "styles": []})
+    return sorted(result, key=lambda item: (item["language"], item["name"]))
