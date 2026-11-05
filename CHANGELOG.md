@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.07.4 — 2026-11-05
+
+### Fixed
+
+- Silent overwrite of generated output files
+- Timeline readiness failing to detect altered audio content
+- Imported batch jobs retaining the old project ID and absolute output paths
+- Non-transactional bundle extraction
+- Launcher displaying an obsolete version
+- Estimated costs being presented as actual usage
+
+### Added
+
+- Project schema 2 migration framework
+- Project write locks
+- Timeline memory and bundle-size guards
+- Model instance caching and Kokoro checksum sidecars
+- User-safe error sanitization
+- Direct dependency constraints
+- Integrity, migration, rollback, runtime, model, and release-consistency tests
+
 ## v0.07.3 — 2026-11-05
 
 ### Added

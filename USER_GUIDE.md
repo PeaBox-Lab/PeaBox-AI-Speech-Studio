@@ -1,28 +1,20 @@
 # User Guide
 
-## Find a workflow quickly
+## Preserve output history
 
-1. Open **Overview → Command Center**.
-2. Search for a task such as `subtitle`, `batch`, `timeline`, `provider`, or `approval`.
-3. Choose the result and select **Open selected command**.
-4. Project-dependent commands remain disabled until a project is active.
+PeaBox automatically creates numbered filenames when output names repeat. Existing files remain untouched.
 
-## Complete first-run setup
+## Move a project
 
-The Executive Dashboard shows setup progress until all five steps are complete or the guide is dismissed. Each step identifies the relevant screen. Restore the guide from Interface Preferences.
+- Use Project JSON for scripts, settings, governance, and metadata. Non-portable media paths are removed on import.
+- Use a timeline bundle to move validated WAV assets with the project.
 
-## Continue existing work
+## Resolve timeline integrity warnings
 
-- Use favorite and recent projects on the Dashboard or Project Workspace.
-- Use Recent Commands in Command Center.
-- Use sidebar Quick Access for Dashboard, Script, Generate, and Timeline.
+- **Audio changed:** refresh metadata only after confirming the current file is correct.
+- **Source stale:** regenerate or acknowledge the current script-block version after review.
+- **File missing:** relink a replacement WAV.
 
-## Core production workflow
+## Monitor costs
 
-1. Create or open a project.
-2. Prepare the master script and blocks.
-3. Configure voices and quality rules.
-4. Generate individual audio or run batch jobs.
-5. Inspect and process WAV files.
-6. Assemble clips in Timeline Studio.
-7. Review governance, approvals, and activity history.
+Recorded planning-rate usage is an estimate based on successfully generated characters. It is not the provider invoice.

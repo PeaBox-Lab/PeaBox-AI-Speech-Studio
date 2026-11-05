@@ -8,3 +8,13 @@ class FileTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             path=Path(folder)/"x"; atomic_write_bytes(path,b"ok"); self.assertEqual(path.read_bytes(),b"ok")
 if __name__=="__main__": unittest.main()
+
+class FileLockTests(unittest.TestCase):
+    def test_lock_prevents_concurrent_entry(self):
+        from peabox_voice_studio.services.files import FileLock
+        with tempfile.TemporaryDirectory() as folder:
+            lock=Path(folder)/'x.lock'
+            with FileLock(lock):
+                with self.assertRaises(TimeoutError):
+                    with FileLock(lock,timeout=0.01,delay=0.001): pass
+            self.assertFalse(lock.exists())

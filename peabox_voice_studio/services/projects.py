@@ -4,9 +4,10 @@ from uuid import uuid4
 
 from peabox_voice_studio.config import MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, PROJECTS_DIR
 from peabox_voice_studio.models import Project, ScriptBlock, utc_now
-from peabox_voice_studio.services.files import atomic_write_bytes
+from peabox_voice_studio.services.files import FileLock, atomic_write_bytes
+from peabox_voice_studio.services.migrations import CURRENT_PROJECT_SCHEMA, migrate_project_payload, rewrite_import_references
 
-PROJECT_EXPORT_SCHEMA = 1
+PROJECT_EXPORT_SCHEMA = CURRENT_PROJECT_SCHEMA
 
 
 class ProjectStore:
@@ -30,7 +31,9 @@ class ProjectStore:
         if not project.name:
             raise ValueError("Project name is required")
         project.touch()
-        atomic_write_bytes(self._path(project.id), json.dumps(project.to_dict(), ensure_ascii=False, indent=2).encode("utf-8"))
+        path = self._path(project.id)
+        with FileLock(path.with_suffix(".lock")):
+            atomic_write_bytes(path, json.dumps(project.to_dict(), ensure_ascii=False, indent=2).encode("utf-8"))
         return project
 
     def load(self, project_id: str) -> Project:
@@ -56,16 +59,20 @@ class ProjectStore:
         payload = json.loads(text)
         if not isinstance(payload, dict):
             raise ValueError("Project JSON must contain an object")
-        project_data = payload.get("project", payload)
-        if not isinstance(project_data, dict):
-            raise ValueError("Project JSON must contain an object")
+        raw_project_data = payload.get("project", payload)
+        project_data, migration_notes = migrate_project_payload(raw_project_data)
+        original = Project.from_dict(project_data)
+        new_id = original.id if preserve_identity and not self._path(original.id).exists() else uuid4().hex
+        migration_notes.extend(rewrite_import_references(project_data, new_id, preserve_asset_paths=False))
         project = Project.from_dict(project_data)
-        if not preserve_identity or self._path(project.id).exists():
-            project.id = uuid4().hex
-            project.created_at = utc_now()
+        project.id = new_id
+        project.created_at = original.created_at if new_id == original.id else utc_now()
         project.name = f"{project.name} (imported)"[:120]
         project.updated_at = utc_now()
+        if migration_notes:
+            project.settings["last_import_migration"] = {"at": project.updated_at, "notes": migration_notes}
         return self.save(project)
+
 
 
 def validate_project_limits(project: Project) -> None:

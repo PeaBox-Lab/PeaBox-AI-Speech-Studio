@@ -1,44 +1,33 @@
-# PeaBox Speech Studio v0.07.3
+# PeaBox Voice Studio v0.07.4
 
-A governed, corporate, local-first voice-production workspace with a searchable command center, first-run onboarding, actionable empty states, fast project continuation, multi-provider speech, transcription, quality processing, portable timelines, and structured local review.
+A reliability-hardened, governed, corporate voice-production workspace with collision-safe outputs, asset integrity verification, project migrations, transactional bundle imports, bounded audio mixing, command discovery, multi-provider generation, transcription, quality processing, portable timelines, and local review workflows.
 
-## v0.07.3 Workspace Command Center
+## v0.07.4 Reliability & Integrity
 
-- Search all screens by name, purpose, provider, or workflow keyword
-- Project-aware command availability
-- Safe navigation-only command execution
-- Recent command history
-- Quick return to frequently used workflows
+- Collision-safe generated WAV, MP3, processed WAV, and timeline output names
+- Live timeline asset SHA-256 verification
+- Project schema version 2 and legacy migration
+- Imported nested job-ID repair and non-portable path cleanup
+- Transactional timeline bundle staging and rollback
+- Local project write locks
+- Bounded timeline mixing with compact float buffers
+- Atomic Kokoro downloads, minimum-size validation, and checksum sidecars
+- Cached Kokoro and Faster-Whisper model instances
+- Sanitized user-facing errors
+- Honest recorded planning-rate usage separate from actual invoice cost
+- Correct v0.07.4 launcher banner and constrained direct dependencies
 
-## Guided onboarding
+## Cumulative capabilities
 
-- Five-step setup progress on the Executive Dashboard
-- Tracks project creation, script preparation, provider readiness, first render, and timeline assembly
-- Dismissible guide stored in local preferences
-- Restore onboarding from Interface Preferences
-
-## Actionable empty states
-
-Key project-dependent screens now explain what is missing and provide a direct navigation action:
-
-- Script Editor
-- Batch Jobs
-- Timeline Studio
-- Governance Center
-- Approval Queue
-- Command Center project-required results
-
-## Cumulative platform
-
-v0.07.3 preserves the corporate dashboard, responsive theme, interface preferences, favorites and recents, governance and approvals, cloud and local providers, voice catalogs and presets, transcription, quality tools, resumable jobs, Timeline Studio, secure timeline bundles, and full activity history.
+The release retains Command Center, onboarding, preferences, corporate navigation, governance, approvals, projects, script blocks, cloud/local providers, voice discovery, quality controls, transcription, resumable jobs, Audio Quality Lab, Timeline Studio, secure bundles, and activity history.
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the sidebar displays `Enterprise workspace · v0.07.3`.
-5. Use **Overview → Command Center** to locate any workflow quickly.
+4. Confirm the launcher and sidebar display v0.07.4.
+5. Keep the `data`, `outputs`, and `models` folders writable.
 
 ## Validation
 

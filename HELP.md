@@ -1,25 +1,21 @@
 # Help Articles
 
-## No command is found
+## A timeline clip says the audio changed
 
-Use shorter terms. Useful examples: `audio`, `script`, `voice`, `provider`, `transcript`, `review`, `approval`, `history`, and `timeline`.
+The WAV content no longer matches the hash recorded when the clip was added. Review the file, then use Refresh Audio Metadata or relink the intended WAV.
 
-## A command says project required
+## My output filename has `_2` or another number
 
-Open Project Workspace, select or create a project, then return to Command Center.
+PeaBox preserves existing output files. When a filename already exists, it creates a numbered filename instead of overwriting it.
 
-## The onboarding guide is hidden
+## An imported job needs to be rerun
 
-Open Interface Preferences and select **Show onboarding again**.
+Direct project JSON does not carry media files. Rendered output paths are cleared during import and affected items are marked for rerun. Use a portable timeline bundle when WAV portability is required.
 
-## A screen is empty
+## A large timeline cannot be mixed
 
-Use the action button in the empty-state panel. PeaBox will navigate to the screen that supplies the missing prerequisite.
+The in-memory safety limit prevents the application from exhausting system memory. Shorten the timeline, export sections, or wait for the future worker/streaming mixer architecture.
 
-## Recent commands or projects are outdated
+## A Kokoro integrity check fails
 
-Missing projects and unknown commands are ignored automatically. Use Interface Preferences to clear recent projects, commands, or favorites.
-
-## Keyboard use
-
-Use Tab and Shift+Tab to move through Streamlit controls, Enter/Space to activate controls, and type directly into the Command Center search field to narrow results.
+Delete the named model and its `.sha256` sidecar, then generate again to download a fresh copy.

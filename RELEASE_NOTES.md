@@ -1,9 +1,7 @@
-# PeaBox Voice Studio v0.07.3 Release Notes
+# PeaBox Voice Studio v0.07.4 Release Notes
 
-This release adds a Workspace Command Center and first-run guidance to reduce navigation effort in the growing multi-screen application.
+This release implements the highest-priority findings from the v0.07.3 audit. Generated outputs no longer silently replace files with the same name. Timeline readiness now checks the stored audio content hash, not only file existence and script-block state.
 
-Command Center searches safe screen-navigation commands using workflow keywords. Commands that require a project are clearly marked and disabled until a project is active. Recent commands are stored in local interface preferences.
+Project imports migrate to schema 2, receive repaired nested references, and clear absolute paths that cannot safely move between machines. Timeline bundle import stages all validated media before committing and rolls back committed files if a commit step fails.
 
-The Executive Dashboard adds setup progress for project, script, provider, render, and timeline milestones. Project-dependent screens use actionable empty states that navigate users to the missing prerequisite instead of showing passive messages.
-
-All cumulative features and project formats remain compatible.
+Audio processing is more memory efficient and timeline mixing is bounded. Model instances are reused, Kokoro downloads gain integrity sidecars, unknown errors are sanitized, the launcher version is corrected, and direct dependencies are constrained.

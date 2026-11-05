@@ -22,7 +22,7 @@ class ProjectTests(unittest.TestCase):
             project.blocks = [ScriptBlock(title="A", text="Text")]; store.save(project)
             exported = export_project(project)
             payload = json.loads(exported)
-            self.assertEqual(payload["schema_version"], 1)
+            self.assertEqual(payload["schema_version"], 2)
             imported = store.import_project(exported)
             self.assertNotEqual(imported.id, project.id)
             self.assertEqual(imported.blocks[0].text, "Text")

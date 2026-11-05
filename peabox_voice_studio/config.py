@@ -1,7 +1,7 @@
 from pathlib import Path
 
 APP_NAME = "PeaBox Voice Studio"
-VERSION = "0.07.3"
+VERSION = "0.07.4"
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 PROJECTS_DIR = DATA_DIR / "projects"
@@ -13,3 +13,7 @@ MAX_UPLOAD_BYTES = 500 * 1024 * 1024
 
 for folder in (DATA_DIR, PROJECTS_DIR, OUTPUTS_DIR, MODELS_DIR):
     folder.mkdir(parents=True, exist_ok=True)
+
+MAX_TIMELINE_MIX_SAMPLES = 24_000_000
+MAX_BUNDLE_UNCOMPRESSED_BYTES = 512 * 1024 * 1024
+MAX_BUNDLE_INPUT_BYTES = 600 * 1024 * 1024

@@ -1,13 +1,17 @@
-# Detailed Release Notes — v0.07.3
+# Detailed Release Notes — v0.07.4
 
-## Design objective
+## Data integrity
 
-PeaBox had grown to many dedicated screens. Grouped navigation and quick actions improved daily use, but new and occasional users still needed to know where a task lived. v0.07.3 adds task-oriented discovery without restructuring the underlying features again.
+The application previously reused deterministic filenames. A later render could replace an earlier asset while clip metadata still described the old audio. All generated outputs now use collision-safe numbered filenames, and timeline validation compares the current file hash with the registered hash.
 
-## Command safety
+## Migration
 
-Commands only navigate to existing screens. They do not delete data, submit approvals, generate paid cloud audio, or change project content. Project-dependent results are disabled until prerequisites are available.
+Project JSON exports now declare schema version 2. Import migrates missing structures, rejects future schemas, assigns a safe identity, repairs nested batch-job references, and removes absolute paths that are not portable.
 
-## Onboarding behavior
+## Runtime
 
-Onboarding derives progress from current project state and provider availability. Dismissing the guide changes only local interface preferences. It can be restored at any time.
+Timeline mix buffers use compact numeric arrays and a sample limit. Kokoro and Whisper model instances are cached. Bundle payloads use lower safety limits.
+
+## Billing language
+
+Successful generation records planning-rate usage. It does not populate actual provider invoice cost, because provider billing and contract adjustments are not retrieved by this local application.

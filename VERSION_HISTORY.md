@@ -17,3 +17,5 @@
 - **v0.07.1** — Responsive contrast, banner, and navigation patch
 - **v0.07.2** — Quick actions, favorites, recents, and interface preferences
 - **v0.07.3** — Workspace Command Center, onboarding, and actionable empty states
+
+- **v0.07.4** — Reliability, integrity, migration, and runtime hardening

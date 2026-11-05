@@ -55,3 +55,45 @@ def build_render_zip(files: list[Path], manifest: dict[str, Any]) -> bytes:
             if path.exists():
                 archive.write(path, f"audio/{path.name}")
     return buffer.getvalue()
+
+
+def collision_safe_path(directory: Path, filename: str) -> Path:
+    directory = Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    safe = safe_filename(Path(filename).stem, fallback="output") + Path(filename).suffix.lower()
+    candidate = directory / safe
+    stem, suffix, counter = candidate.stem, candidate.suffix, 2
+    while candidate.exists():
+        candidate = directory / f"{stem}_{counter}{suffix}"
+        counter += 1
+    return candidate
+
+
+def user_safe_error(exc: Exception, fallback: str = "The operation could not be completed") -> str:
+    safe_types = (ValueError, FileNotFoundError, PermissionError, TimeoutError)
+    if isinstance(exc, safe_types):
+        text = str(exc).strip()
+        if text:
+            return text[:300]
+    return fallback
+
+
+class FileLock:
+    def __init__(self, path: Path, timeout: float = 5.0, delay: float = 0.05):
+        self.path = Path(path); self.timeout = timeout; self.delay = delay; self.fd = None
+    def __enter__(self):
+        deadline = time.monotonic() + self.timeout
+        while True:
+            try:
+                self.fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                os.write(self.fd, str(os.getpid()).encode("ascii"))
+                return self
+            except FileExistsError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError(f"Timed out waiting for file lock: {self.path.name}")
+                time.sleep(self.delay)
+    def __exit__(self, exc_type, exc, tb):
+        if self.fd is not None:
+            os.close(self.fd)
+        self.path.unlink(missing_ok=True)
+        return False

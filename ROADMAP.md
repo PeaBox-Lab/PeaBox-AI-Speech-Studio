@@ -91,6 +91,12 @@ Authenticated identities, permissions, and shared storage remain part of the fut
 - Project-aware command availability and recent commands
 - First-run progress and actionable prerequisite empty states
 
+## Delivered — v0.07.4: Reliability and integrity hardening
+
+- Collision-safe outputs and live asset hash verification
+- Schema migrations, reference repair, transactional imports, and project write locks
+- Bounded media memory, cached models, sanitized errors, and release consistency controls
+
 ## v0.06.00: Scale and collaboration
 
 - SQLite repository migration followed by optional PostgreSQL

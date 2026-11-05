@@ -8,3 +8,5 @@ outputs/*
 data/projects/*.json
 !data/projects/.gitkeep
 *.log
+models/*.sha256
+data/ui_preferences.json

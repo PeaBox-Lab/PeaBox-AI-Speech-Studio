@@ -1,0 +1,9 @@
+streamlit==1.40.0
+requests==2.32.3
+faster-whisper==1.1.1
+kokoro-onnx==0.6.1
+soundfile==0.13.1
+misaki==0.9.4
+boto3==1.35.99
+google-cloud-texttospeech==2.18.0
+google-auth==2.35.0

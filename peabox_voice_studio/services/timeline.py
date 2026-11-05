@@ -8,8 +8,9 @@ from pathlib import Path
 from uuid import uuid4
 
 from peabox_voice_studio.models import Project, ScriptBlock, utc_now
+from peabox_voice_studio.config import MAX_TIMELINE_MIX_SAMPLES
 from peabox_voice_studio.services.audio import inspect_wav
-from peabox_voice_studio.services.files import atomic_write_bytes, safe_filename
+from peabox_voice_studio.services.files import atomic_write_bytes, collision_safe_path, safe_filename
 
 
 def source_hash(text: str, provider: str = "", voice: str = "", speed: float = 1.0) -> str:
@@ -102,9 +103,12 @@ def arrange_sequential(project: Project, gap_seconds: float = 0.25, track: str |
 def clip_status(project: Project, clip: dict) -> dict:
     path = Path(clip.get("file", ""))
     missing = not path.exists()
+    asset_changed = False
+    if not missing and clip.get("asset_hash"):
+        asset_changed = hashlib.sha256(path.read_bytes()).hexdigest() != clip.get("asset_hash")
     block = next((item for item in project.blocks if item.id == clip.get("source_block_id")), None)
     stale = bool(block and clip.get("source_hash") and clip.get("source_hash") != block_hash(block))
-    return {"missing": missing, "stale": stale, "ready": not missing and not stale}
+    return {"missing": missing, "stale": stale, "asset_changed": asset_changed, "ready": not missing and not stale and not asset_changed}
 
 
 def validate_timeline(project: Project) -> dict:
@@ -118,6 +122,8 @@ def validate_timeline(project: Project) -> dict:
         if status["missing"]:
             issues.append({"severity": "error", "clip": index, "message": f"Missing file: {clip.get('file_name', '')}"})
             continue
+        if status["asset_changed"]:
+            issues.append({"severity": "error", "clip": index, "message": "Audio file content changed after this clip was registered; refresh or relink it"})
         if status["stale"]:
             issues.append({"severity": "warning", "clip": index, "message": "Source block changed after this clip was rendered"})
         current_format = (clip.get("sample_rate_hz"), clip.get("channels"))
@@ -146,7 +152,10 @@ def mix_timeline(project: Project, output_name: str, output_dir: Path) -> tuple[
         frame_count = len(samples) // channels
         end_frames = max(end_frames, start_frame + frame_count)
         decoded.append((clip, samples, start_frame, frame_count))
-    mixed = [0.0] * (end_frames * channels)
+    total_samples = end_frames * channels
+    if total_samples > MAX_TIMELINE_MIX_SAMPLES:
+        raise ValueError(f"Timeline is too large for safe in-memory mixing ({total_samples:,} samples; limit {MAX_TIMELINE_MIX_SAMPLES:,})")
+    mixed = array("f", [0.0]) * total_samples
     for clip, samples, start_frame, frame_count in decoded:
         gain = 10 ** (float(clip.get("gain_db", 0)) / 20)
         for frame in range(frame_count):
@@ -157,7 +166,7 @@ def mix_timeline(project: Project, output_name: str, output_dir: Path) -> tuple[
     clipped_before_limit = sum(abs(value) > 32767 for value in mixed)
     pcm = array("h", [max(-32768, min(32767, round(value))) for value in mixed])
     raw = _write_wav(first_params, pcm)
-    output = atomic_write_bytes(Path(output_dir) / f"{safe_filename(output_name)}_timeline.wav", raw)
+    output = atomic_write_bytes(collision_safe_path(output_dir, f"{safe_filename(output_name)}_timeline.wav"), raw)
     manifest = timeline_manifest(project, output.name)
     manifest["mix"] = {"duration_seconds": round(end_frames / sample_rate, 3), "sample_rate_hz": sample_rate, "channels": channels, "clipped_samples_before_limit": clipped_before_limit}
     project.settings.setdefault("timeline_exports", []).insert(0, {"created_at": utc_now(), "output": output.name, "manifest": manifest})

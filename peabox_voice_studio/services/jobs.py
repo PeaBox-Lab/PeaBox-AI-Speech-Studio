@@ -24,7 +24,7 @@ def create_job(project: Project, rates: dict[str, float], configured_providers: 
             "id": uuid4().hex, "block_id": block.id, "position": index, "title": block.title,
             "text": block.text, "processed_text": processed_text, "provider": block.provider, "language": block.language, "voice": block.voice,
             "speed": block.speed, "status": "queued", "attempts": 0, "file": None, "error": None,
-            "estimated_cost_usd": estimate["estimated_cost_usd"], "actual_cost_usd": None,
+            "estimated_cost_usd": estimate["estimated_cost_usd"], "recorded_usage_cost_usd": None, "actual_cost_usd": None,
         })
     return {
         "id": uuid4().hex, "schema_version": 1, "project_id": project.id, "project_name": project.name,
@@ -37,6 +37,7 @@ def summarize_job_items(items: list[dict]) -> dict:
     states = ("queued", "running", "rendered", "failed", "cancelled")
     summary = {state: sum(item["status"] == state for item in items) for state in states}
     summary["estimated_cost_usd"] = round(sum(float(item.get("estimated_cost_usd") or 0) for item in items), 6)
+    summary["recorded_usage_cost_usd"] = round(sum(float(item.get("recorded_usage_cost_usd") or 0) for item in items), 6)
     summary["actual_cost_usd"] = round(sum(float(item.get("actual_cost_usd") or 0) for item in items), 6)
     return summary
 
@@ -86,7 +87,7 @@ def run_job(job: dict, renderers: dict[str, Callable[..., Path]]) -> tuple[list[
             render_item["text"] = item.get("processed_text", item["text"])
             path = renderer(render_item, output_name)
             item["status"] = "rendered"; item["file"] = str(path)
-            item["actual_cost_usd"] = item["estimated_cost_usd"]
+            item["recorded_usage_cost_usd"] = item["estimated_cost_usd"]
             files.append(path)
         except Exception as exc:
             item["status"] = "failed"; item["error"] = str(exc)[:500]
@@ -137,6 +138,7 @@ def duplicate_job(job: dict) -> dict:
         item["attempts"] = 0
         item["file"] = None
         item["error"] = None
+        item["recorded_usage_cost_usd"] = None
         item["actual_cost_usd"] = None
     duplicate["summary"] = summarize_job_items(duplicate["items"])
     return duplicate

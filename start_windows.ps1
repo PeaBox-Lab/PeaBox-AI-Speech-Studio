@@ -9,8 +9,8 @@ if(Test-Path $venvPython){$v=Get-CompatibleVersion $venvPython;if($null-eq $v){W
 if(-not(Test-Path $venvPython)){$p=Find-CompatiblePython;if($null-eq $p){Write-Host "Install 64-bit Python 3.10, 3.11, or 3.12." -ForegroundColor Red;exit 1};Write-Host "Using $($p.Name) $($p.Version)" -ForegroundColor Green;$args=@($p.Arguments);& $p.Executable @args -m venv ".venv";if($LASTEXITCODE-ne 0){exit $LASTEXITCODE}}
 & $venvPython -m pip install --upgrade pip setuptools wheel
 if($LASTEXITCODE-ne 0){exit $LASTEXITCODE}
-& $venvPython -m pip install -r "requirements.txt"
+& $venvPython -m pip install -r "requirements.txt" -c "constraints.txt"
 if($LASTEXITCODE-ne 0){exit $LASTEXITCODE}
-Write-Host "Launching PeaBox Voice Studio v0.03.12 from $PSScriptRoot" -ForegroundColor Cyan
+Write-Host "Launching PeaBox Voice Studio v0.07.4 from $PSScriptRoot" -ForegroundColor Cyan
 & $venvPython -m streamlit run "app.py"
 exit $LASTEXITCODE

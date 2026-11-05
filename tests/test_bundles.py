@@ -77,3 +77,20 @@ class BundleTests(unittest.TestCase):
 
 
 if __name__ == "__main__": unittest.main()
+
+class BundleTransactionTests(unittest.TestCase):
+    def test_failed_commit_rolls_back_assets(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder); a=root/'a.wav'; b=root/'b.wav'; a.write_bytes(make_wav()); b.write_bytes(make_wav())
+            project=Project('P'); add_clip(project,a); add_clip(project,b)
+            raw=export_timeline_bundle(project); target=root/'target'; target.mkdir()
+            calls={'n':0}
+            def flaky(clip,path):
+                calls['n']+=1
+                if calls['n']==2: raise RuntimeError('fail')
+                from peabox_voice_studio.services.timeline import refresh_clip as real
+                return real(clip,path)
+            with patch('peabox_voice_studio.services.bundles.refresh_clip',side_effect=flaky):
+                with self.assertRaises(RuntimeError): import_timeline_bundle(raw,target)
+            self.assertEqual([p for p in target.iterdir() if p.is_file()],[])

@@ -27,7 +27,8 @@ class JobTests(unittest.TestCase):
             job = create_job(self.project(), {"Kokoro local": 0, "Azure Speech": 15}, {"Kokoro local", "Azure Speech"})
             files, job = run_job(job, {"Kokoro local": renderer, "Azure Speech": renderer})
             self.assertEqual(len(files), 2); self.assertEqual(job["status"], "completed")
-            self.assertGreater(job["summary"]["actual_cost_usd"], 0)
+            self.assertGreater(job["summary"]["recorded_usage_cost_usd"], 0)
+            self.assertEqual(job["summary"]["actual_cost_usd"], 0)
 
     def test_failed_item_can_retry(self):
         job = create_job(self.project(), {"Kokoro local": 0, "Azure Speech": 15}, {"Kokoro local", "Azure Speech"})

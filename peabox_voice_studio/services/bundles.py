@@ -2,17 +2,21 @@ import hashlib
 import io
 import json
 import zipfile
+import tempfile
+import shutil
 from pathlib import Path, PurePosixPath
 from uuid import uuid4
 
 from peabox_voice_studio.models import Project, utc_now
+from peabox_voice_studio.config import MAX_BUNDLE_INPUT_BYTES, MAX_BUNDLE_UNCOMPRESSED_BYTES
 from peabox_voice_studio.services.audio import inspect_wav
 from peabox_voice_studio.services.files import atomic_write_bytes, safe_filename
 from peabox_voice_studio.services.timeline import refresh_clip
+from peabox_voice_studio.services.migrations import migrate_project_payload, rewrite_import_references
 
 BUNDLE_SCHEMA = 1
 MAX_BUNDLE_FILES = 500
-MAX_BUNDLE_UNCOMPRESSED = 2 * 1024 * 1024 * 1024
+MAX_BUNDLE_UNCOMPRESSED = MAX_BUNDLE_UNCOMPRESSED_BYTES
 
 
 def export_timeline_bundle(project: Project) -> bytes:
@@ -20,6 +24,9 @@ def export_timeline_bundle(project: Project) -> bytes:
     project_data = project.to_dict()
     clips = project_data.get("settings", {}).get("audio_clips", [])
     asset_map = {}
+    existing_assets = [Path(clip.get("file", "")) for clip in clips if Path(clip.get("file", "")).exists()]
+    if sum(path.stat().st_size for path in existing_assets) > MAX_BUNDLE_UNCOMPRESSED:
+        raise ValueError("Timeline assets exceed the safe bundle export limit")
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
         for clip in clips:
             path = Path(clip.get("file", ""))
@@ -46,54 +53,67 @@ def export_timeline_bundle(project: Project) -> bytes:
 
 
 def import_timeline_bundle(raw: bytes, output_dir: Path) -> Project:
+    if len(raw) > MAX_BUNDLE_INPUT_BYTES:
+        raise ValueError("Compressed bundle exceeds the safe import limit")
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-        infos = archive.infolist()
-        if len(infos) > MAX_BUNDLE_FILES:
-            raise ValueError("Bundle contains too many files")
-        if sum(info.file_size for info in infos) > MAX_BUNDLE_UNCOMPRESSED:
-            raise ValueError("Bundle is too large when extracted")
-        names = {info.filename for info in infos}
-        if "project.json" not in names or "manifest.json" not in names:
-            raise ValueError("Bundle is missing project.json or manifest.json")
-        for info in infos:
-            _validate_member(info.filename)
-            if info.flag_bits & 0x1:
-                raise ValueError("Encrypted bundle members are not supported")
-            if (info.external_attr >> 16) & 0o170000 == 0o120000:
-                raise ValueError("Bundle symbolic links are not supported")
-        manifest = json.loads(archive.read("manifest.json").decode("utf-8-sig"))
-        payload = json.loads(archive.read("project.json").decode("utf-8-sig"))
-        if manifest.get("schema_version") != BUNDLE_SCHEMA:
-            raise ValueError("Unsupported timeline bundle schema")
-        project_data = payload.get("project")
-        if not isinstance(project_data, dict):
-            raise ValueError("Bundle project payload is invalid")
-        project = Project.from_dict(project_data)
-        project.id = uuid4().hex
-        project.name = f"{project.name} (bundle import)"[:120]
-        project.created_at = utc_now()
-        project.updated_at = project.created_at
-        clips = project.settings.setdefault("audio_clips", [])
-        for clip in clips:
-            asset_name = clip.pop("bundle_asset", None) or manifest.get("clip_assets", {}).get(clip.get("id"))
-            if not asset_name:
-                clip["file"] = ""
-                continue
-            _validate_member(asset_name)
-            if asset_name not in names:
-                clip["file"] = ""
-                continue
-            if PurePosixPath(asset_name).suffix.lower() != ".wav":
-                raise ValueError("Timeline bundle assets must be WAV files")
-            raw_asset = archive.read(asset_name)
-            inspect_wav(raw_asset)
-            destination = _collision_safe_path(output_dir, PurePosixPath(asset_name).name)
-            atomic_write_bytes(destination, raw_asset)
-            refresh_clip(clip, destination)
-        project.settings["timeline_exports"] = []
-        return project
+    staged_moves = []
+    with tempfile.TemporaryDirectory(dir=output_dir, prefix=".bundle-") as staging_name:
+        staging = Path(staging_name)
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            infos = archive.infolist()
+            if len(infos) > MAX_BUNDLE_FILES:
+                raise ValueError("Bundle contains too many files")
+            if sum(info.file_size for info in infos) > MAX_BUNDLE_UNCOMPRESSED:
+                raise ValueError("Bundle is too large when extracted")
+            names = {info.filename for info in infos}
+            if "project.json" not in names or "manifest.json" not in names:
+                raise ValueError("Bundle is missing project.json or manifest.json")
+            for info in infos:
+                _validate_member(info.filename)
+                if info.flag_bits & 0x1:
+                    raise ValueError("Encrypted bundle members are not supported")
+                if (info.external_attr >> 16) & 0o170000 == 0o120000:
+                    raise ValueError("Bundle symbolic links are not supported")
+            manifest = json.loads(archive.read("manifest.json").decode("utf-8-sig"))
+            payload = json.loads(archive.read("project.json").decode("utf-8-sig"))
+            if manifest.get("schema_version") != BUNDLE_SCHEMA:
+                raise ValueError("Unsupported timeline bundle schema")
+            project_data, migration_notes = migrate_project_payload(payload.get("project"))
+            new_project_id = uuid4().hex
+            migration_notes.extend(rewrite_import_references(project_data, new_project_id, preserve_asset_paths=True))
+            project = Project.from_dict(project_data)
+            project.id = new_project_id
+            project.name = f"{project.name} (bundle import)"[:120]
+            project.created_at = utc_now(); project.updated_at = project.created_at
+            clips = project.settings.setdefault("audio_clips", [])
+            for clip in clips:
+                asset_name = clip.pop("bundle_asset", None) or manifest.get("clip_assets", {}).get(clip.get("id"))
+                if not asset_name or asset_name not in names:
+                    clip["file"] = ""; continue
+                _validate_member(asset_name)
+                if PurePosixPath(asset_name).suffix.lower() != ".wav":
+                    raise ValueError("Timeline bundle assets must be WAV files")
+                raw_asset = archive.read(asset_name); inspect_wav(raw_asset)
+                staged = staging / PurePosixPath(asset_name).name
+                atomic_write_bytes(staged, raw_asset)
+                destination = _collision_safe_path(output_dir, staged.name)
+                staged_moves.append((staged, destination, clip))
+            # Commit only after every member has validated and staged successfully.
+            committed = []
+            try:
+                for staged, destination, clip in staged_moves:
+                    staged.replace(destination)
+                    committed.append(destination)
+                    refresh_clip(clip, destination)
+            except Exception:
+                for destination in committed:
+                    destination.unlink(missing_ok=True)
+                raise
+            project.settings["timeline_exports"] = []
+            if migration_notes:
+                project.settings["last_import_migration"] = {"at": project.updated_at, "notes": migration_notes}
+            return project
 
 
 def _validate_member(name: str) -> None:

@@ -10,7 +10,7 @@ from peabox_voice_studio.services.batch import build_manifest
 from peabox_voice_studio.services.commands import onboarding_status, record_command, resolve_commands, search_commands
 from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
 from peabox_voice_studio.services.bundles import export_timeline_bundle, import_timeline_bundle
-from peabox_voice_studio.services.files import atomic_write_bytes, build_render_zip, safe_filename
+from peabox_voice_studio.services.files import atomic_write_bytes, build_render_zip, safe_filename, user_safe_error
 from peabox_voice_studio.services.governance import ALLOWED_TRANSITIONS, APPROVAL_STATES, RISK_LEVELS, WORKFLOW_STATES, add_comment, add_decision, decide_approval, governance, governance_readiness, governance_summary, reopen_comment, request_approval, resolve_comment, supersede_decision, transition_status, update_project_governance
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
@@ -278,7 +278,7 @@ elif page == "Projects":
                 st.success("Project imported with a new identity")
                 st.rerun()
             except Exception as exc:
-                st.error(f"Import failed: {exc}")
+                st.error("Import failed: " + user_safe_error(exc))
         st.subheader("Import timeline bundle")
         bundle_file = st.file_uploader("PeaBox timeline bundle ZIP", type="zip", key="timeline_bundle_import")
         if st.button("Import bundle and open", disabled=bundle_file is None):
@@ -288,7 +288,7 @@ elif page == "Projects":
                 st.success("Timeline bundle imported with local asset copies")
                 st.rerun()
             except Exception as exc:
-                st.error(f"Bundle import failed: {exc}")
+                st.error("Bundle import failed: " + user_safe_error(exc))
     with right:
         project = current_project()
         if not project: st.info("Create or open a project to begin.")
@@ -354,7 +354,7 @@ elif page == "Governance":
                 if st.button("Apply workflow transition"):
                     try:
                         transition_status(project, target_status, st.session_state.governance_actor, transition_note); save_project(project); st.rerun()
-                    except Exception as exc: st.error(f"Transition blocked: {exc}")
+                    except Exception as exc: st.error("Transition blocked: " + user_safe_error(exc))
         with tabs[1]:
             section("Review thread", "Comments are retained; they can be resolved or reopened rather than deleted.")
             c1, c2 = st.columns(2)
@@ -479,7 +479,7 @@ elif page == "Provider Setup":
                 from peabox_voice_studio.providers.cloud import discover_azure_voices
                 with st.spinner("Discovering Azure voices..."): voice_catalogs["Azure Speech"] = discover_azure_voices(profiles["Azure Speech"])
                 st.success(f"Cached {len(voice_catalogs['Azure Speech'])} Azure voices for this session")
-            except Exception as exc: st.error(f"Voice discovery failed: {exc}")
+            except Exception as exc: st.error("Voice discovery failed: " + user_safe_error(exc))
         if st.button("Clear Azure session profile"):
             profiles.pop("Azure Speech", None); voice_catalogs.pop("Azure Speech", None); st.rerun()
     with tabs[1]:
@@ -500,7 +500,7 @@ elif page == "Provider Setup":
                 provider_name = "Amazon Polly neural" if polly_engine == "neural" else "Amazon Polly standard"
                 with st.spinner("Discovering Polly voices..."): voice_catalogs[provider_name] = discover_polly_voices(profiles[provider_name], polly_engine)
                 st.success(f"Cached {len(voice_catalogs[provider_name])} {provider_name} voices for this session")
-            except Exception as exc: st.error(f"Voice discovery failed: {exc}")
+            except Exception as exc: st.error("Voice discovery failed: " + user_safe_error(exc))
         if st.button("Clear Polly session profiles"):
             profiles.pop("Amazon Polly standard", None); profiles.pop("Amazon Polly neural", None); voice_catalogs.pop("Amazon Polly standard", None); voice_catalogs.pop("Amazon Polly neural", None); st.rerun()
     with tabs[2]:
@@ -517,7 +517,7 @@ elif page == "Provider Setup":
                 from peabox_voice_studio.providers.cloud import discover_google_voices
                 with st.spinner("Discovering Google voices..."): voice_catalogs["Google Cloud TTS"] = discover_google_voices(profiles["Google Cloud TTS"], google_language)
                 st.success(f"Cached {len(voice_catalogs['Google Cloud TTS'])} Google voices for this session")
-            except Exception as exc: st.error(f"Voice discovery failed: {exc}")
+            except Exception as exc: st.error("Voice discovery failed: " + user_safe_error(exc))
         if st.button("Clear Google session profile"):
             profiles.pop("Google Cloud TTS", None); voice_catalogs.pop("Google Cloud TTS", None); st.rerun()
     counts = {name: len(items) for name, items in voice_catalogs.items()}
@@ -560,7 +560,7 @@ elif page == "Quality Studio":
         if st.button("Add pronunciation rule", type="primary", disabled=not (source_word.strip() and spoken_form.strip())):
             try:
                 add_pronunciation(project, source_word, spoken_form, case_sensitive, whole_word); save_project(project); st.rerun()
-            except Exception as exc: st.error(f"Could not add rule: {exc}")
+            except Exception as exc: st.error("Could not add rule: " + user_safe_error(exc))
         entries = list_pronunciations(project)
         if entries:
             st.dataframe(entries, use_container_width=True, hide_index=True)
@@ -621,7 +621,7 @@ elif page == "Audio Quality Lab":
                     st.audio(processed_result["data"], format="audio/wav")
                     st.download_button(f"Download {processed_result['label'].lower()} WAV", processed_result["data"], Path(processed_result["path"]).name, "audio/wav")
             except Exception as exc:
-                st.error(f"WAV processing failed: {exc}")
+                st.error("WAV processing failed: " + user_safe_error(exc))
     else:
         st.caption("Generate the same prepared text twice with independent Kokoro voice and speed settings.")
         comparison_text = st.text_area("Comparison text", project.script if project else "", height=200, max_chars=MAX_BLOCK_CHARS)
@@ -650,7 +650,7 @@ elif page == "Audio Quality Lab":
                 if project:
                     create_comparison_record(project, comparison_text, result["variants"], [path_a, path_b], result["metrics"]); save_project(project)
             except Exception as exc:
-                st.error(f"Comparison generation failed: {exc}")
+                st.error("Comparison generation failed: " + user_safe_error(exc))
         result = st.session_state.get("comparison_result")
         if result:
             a, b = st.columns(2)
@@ -691,7 +691,7 @@ elif page == "Timeline Studio":
             if st.button("Add WAV to timeline", type="primary"):
                 try:
                     add_clip(project, selected_wav, clip_title, clip_track, block=source_block); save_project(project); st.rerun()
-                except Exception as exc: st.error(f"Could not add clip: {exc}")
+                except Exception as exc: st.error("Could not add clip: " + user_safe_error(exc))
         else:
             st.info("No WAV files are available yet. Generate Kokoro audio or create a processed WAV in Audio Quality Lab.")
         clips = list_clips(project)
@@ -739,11 +739,11 @@ elif page == "Timeline Studio":
                                 destination = OUTPUTS_DIR / f"{base}_{counter}.wav"; counter += 1
                             atomic_write_bytes(destination, replacement.getvalue())
                             relink_clip(clip, destination); save_project(project); st.rerun()
-                        except Exception as exc: st.error(f"Relink failed: {exc}")
+                        except Exception as exc: st.error("Relink failed: " + user_safe_error(exc))
                     if r2.button("Refresh audio metadata", key=f"refresh_clip_{clip['id']}", disabled=status["missing"]):
                         try:
                             refresh_clip(clip); save_project(project); st.rerun()
-                        except Exception as exc: st.error(f"Refresh failed: {exc}")
+                        except Exception as exc: st.error("Refresh failed: " + user_safe_error(exc))
                     if status["stale"] and st.button("Acknowledge current block version", key=f"ack_stale_{clip['id']}"):
                         acknowledge_clip_source(project, clip); save_project(project); st.rerun()
                     peaks = clip.get("peaks", [])
@@ -767,7 +767,7 @@ elif page == "Timeline Studio":
                     st.download_button("Download merged WAV", data, output_path.name, "audio/wav")
                     st.download_button("Download export manifest", json.dumps(export_manifest, ensure_ascii=False, indent=2), f"{safe_filename(export_name)}_manifest.json", "application/json")
                     st.success(f"Created {output_path.name}")
-                except Exception as exc: st.error(f"Timeline export failed: {exc}")
+                except Exception as exc: st.error("Timeline export failed: " + user_safe_error(exc))
         else:
             st.info("Add at least one WAV clip to begin arranging the timeline.")
 
@@ -814,12 +814,12 @@ elif page == "Batch Production":
         if st.button("Create resumable job", type="primary", disabled=not validation["ready"]):
             try:
                 job = create_job(project, PROVIDER_RATES, ready_providers, lambda text, provider: prepare_text(text, project, provider)); add_job(project, job); save_project(project); st.success("Batch job created")
-            except Exception as exc: st.error(f"Job creation failed: {exc}")
+            except Exception as exc: st.error("Job creation failed: " + user_safe_error(exc))
         jobs = project.settings.get("batch_jobs", [])
         if jobs:
             selected_job = st.selectbox("Saved batch jobs", jobs, format_func=lambda item: f"{item['created_at']} · {item['status']} · {item['id'][:8]}")
             summary = selected_job.get("summary", {})
-            st.caption(f"Estimated ${summary.get('estimated_cost_usd', 0):.4f} · Recorded usage cost ${summary.get('actual_cost_usd', 0):.4f}. Recorded usage cost is calculated from successful characters at the planning rate; it is not a provider invoice.")
+            st.caption(f"Estimated ${summary.get('estimated_cost_usd', 0):.4f} · Recorded planning-rate usage ${summary.get('recorded_usage_cost_usd', 0):.4f}. Recorded usage cost is calculated from successful characters at the planning rate; it is not a provider invoice.")
             b1, b2, b3, b4, b5, b6 = st.columns(6)
             run_clicked = b1.button("Run/resume", disabled=selected_job.get("status") in {"completed", "cancelled"})
             retry_clicked = b2.button("Retry failed", disabled=not any(i["status"] == "failed" for i in selected_job["items"]))
@@ -871,7 +871,7 @@ elif page == "Create Speech":
             data = path.read_bytes(); st.audio(data); st.download_button("Download WAV", data, path.name)
             if project:
                 record_render(project, "Kokoro local", path, len(text), {"language": language, "voice": voice, "speed": speed}); save_project(project)
-        except Exception as exc: st.error(f"Generation failed: {exc}")
+        except Exception as exc: st.error("Generation failed: " + user_safe_error(exc))
 
 elif page == "Transcription":
     section("Local media transcription", "Transcribe privately, edit timestamped segments, validate timing, and export TXT, SRT, or VTT.")
@@ -889,7 +889,7 @@ elif page == "Transcription":
                 rows, detected = transcribe(upload.getvalue(), upload.name, model_size, language)
             st.session_state.transcript_working = {"source_name": upload.name, "language": detected, "segments": normalize_segments(rows)}
             st.success(f"Detected language: {detected}")
-        except Exception as exc: st.error(f"Transcription failed: {exc}")
+        except Exception as exc: st.error("Transcription failed: " + user_safe_error(exc))
     working = st.session_state.get("transcript_working")
     if working:
         st.subheader("Edit transcript segments")
@@ -922,7 +922,7 @@ elif page == "Transcription":
             if st.button("Save transcript to project", disabled=not validation["valid"]):
                 try:
                     save_transcript_session(project, session_name, working["segments"], working.get("source_name", ""), working.get("language", "")); save_project(project); st.success("Transcript saved to project")
-                except Exception as exc: st.error(f"Could not save transcript: {exc}")
+                except Exception as exc: st.error("Could not save transcript: " + user_safe_error(exc))
             sessions = project.settings.get("transcript_sessions", [])
             if sessions:
                 st.subheader("Saved transcript sessions")
@@ -949,7 +949,7 @@ elif page == "Render History":
         with tabs[1]:
             jobs = project.settings.get("batch_jobs", [])
             if jobs:
-                rows = [{"Created": job.get("created_at"), "Updated": job.get("updated_at"), "Job": job.get("id", "")[:8], "Status": job.get("status"), "Items": len(job.get("items", [])), "Estimated cost": job.get("summary", {}).get("estimated_cost_usd", 0), "Recorded cost": job.get("summary", {}).get("actual_cost_usd", 0)} for job in jobs]
+                rows = [{"Created": job.get("created_at"), "Updated": job.get("updated_at"), "Job": job.get("id", "")[:8], "Status": job.get("status"), "Items": len(job.get("items", [])), "Estimated cost": job.get("summary", {}).get("estimated_cost_usd", 0), "Recorded planning-rate usage": job.get("summary", {}).get("recorded_usage_cost_usd", 0)} for job in jobs]
                 st.dataframe(rows, use_container_width=True, hide_index=True)
             else: st.info("No batch jobs have been recorded.")
         with tabs[2]:

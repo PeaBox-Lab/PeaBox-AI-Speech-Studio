@@ -1,26 +1,26 @@
-# v0.07.3 Additions and Improvements
+# v0.07.4 Additions and Improvements
 
-## Command discovery
+## Integrity
+- Collision-safe output naming
+- Asset content-hash validation
+- Atomic model downloads and local checksum verification
+- Project write locks
 
-- Searchable catalog of 17 safe navigation commands
-- Keyword matching across page, group, label, and task terms
-- Project-aware availability rules
-- Ten-command local history
+## Portability
+- Project schema 2
+- Migration registry
+- Nested project-reference rewrite
+- Absolute-path cleanup
+- Transactional bundle imports
 
-## Onboarding
+## Runtime
+- Cached model instances
+- Compact timeline buffers
+- Timeline sample limit
+- Reduced bundle limits
 
-- Five measurable setup milestones
-- Percentage progress
-- Dismiss and restore behavior
-- No automatic project mutations
-
-## Empty-state usability
-
-- Shared corporate empty-state component
-- Direct prerequisite navigation
-- Clearer instructions on project-dependent screens
-
-## Persistence
-
-- Recent commands and onboarding dismissal stored in local UI preferences
-- Preference schema remains independent from portable project data
+## UX and release
+- Sanitized errors
+- Honest cost terminology
+- Updated launcher version
+- Direct dependency constraints
