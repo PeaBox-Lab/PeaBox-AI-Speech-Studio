@@ -7,6 +7,7 @@ NAVIGATION = {
     "Overview": [
         ("Executive Dashboard", "Dashboard", "▦"),
         ("Project Workspace", "Projects", "▣"),
+        ("Interface Preferences", "Preferences", "◐"),
     ],
     "Production": [
         ("Script Editor", "Script Blocks", "✎"),
@@ -35,6 +36,7 @@ NAVIGATION = {
 PAGE_META = {
     "Dashboard": ("Executive Dashboard", "Portfolio status, production readiness, and recommended next actions.", "Overview"),
     "Projects": ("Project Workspace", "Create, open, import, export, and maintain portable production projects.", "Overview"),
+    "Preferences": ("Interface Preferences", "Personalize navigation density, startup area, motion, and dashboard detail on this device.", "Overview"),
     "Script Blocks": ("Script Editor", "Structure the master script into reusable, provider-aware production blocks.", "Production"),
     "Create Speech": ("Speech Generator", "Generate and review individual local voice outputs.", "Production"),
     "Batch Production": ("Batch Jobs", "Validate, queue, resume, retry, cancel, and package multi-provider production jobs.", "Production"),
@@ -52,8 +54,18 @@ PAGE_META = {
 }
 
 
-def inject_corporate_theme() -> None:
-    st.markdown("""
+def inject_corporate_theme(preferences: dict | None = None) -> None:
+    preferences = preferences or {}
+    compact = bool(preferences.get("compact_navigation", False))
+    reduced = bool(preferences.get("reduced_motion", False))
+    density_css = """
+[data-testid="stSidebar"] div[role="radiogroup"] label { min-height:2rem; padding:.28rem .5rem; }
+[data-testid="stSidebar"] div[data-baseweb="select"] > div { min-height:2.25rem; }
+""" if compact else ""
+    motion_css = """
+*, *::before, *::after { animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; scroll-behavior:auto!important; }
+""" if reduced else ""
+    theme_css = """
 <style>
 :root {
   --pb-navy:#13213c; --pb-navy-2:#1b3155; --pb-blue:#2f6fbb; --pb-blue-active:#316da8;
@@ -166,15 +178,34 @@ hr { border-color:var(--pb-border); }
   .pb-card,.pb-step { min-height:auto; }
   [data-testid="column"] { min-width:100%!important; width:100%!important; }
 }
+__DENSITY_CSS__
+__MOTION_CSS__
 </style>
-""", unsafe_allow_html=True)
+"""
+    theme_css = theme_css.replace("__DENSITY_CSS__", density_css).replace("__MOTION_CSS__", motion_css)
+    st.markdown(theme_css, unsafe_allow_html=True)
 
 
-def sidebar_navigation(version: str, project: Any = None) -> str:
+def page_entry(page: str) -> tuple[str, str, str, str]:
+    for group, entries in NAVIGATION.items():
+        for label, internal, icon in entries:
+            if internal == page:
+                return group, label, internal, icon
+    raise ValueError(f"Unknown page: {page}")
+
+
+def navigate_to(page: str) -> None:
+    group, label, _, icon = page_entry(page)
+    st.session_state.nav_group = group
+    st.session_state[f"nav_page_{group}"] = f"{icon}  {label}"
+
+
+def sidebar_navigation(version: str, project: Any = None, preferences: dict | None = None) -> str:
     st.sidebar.markdown('<div style="font-size:1.12rem;font-weight:750;margin:.2rem 0 .1rem">PeaBox Voice Studio</div>', unsafe_allow_html=True)
     st.sidebar.caption(f"Enterprise workspace · v{version}")
     group_names = list(NAVIGATION)
-    default_group = st.session_state.get("nav_group", "Overview")
+    preferences = preferences or {}
+    default_group = st.session_state.get("nav_group", preferences.get("default_area", "Overview"))
     if default_group not in group_names:
         default_group = "Overview"
     st.sidebar.markdown('<div class="pb-nav-label">WORKSPACE AREA</div>', unsafe_allow_html=True)
@@ -185,6 +216,14 @@ def sidebar_navigation(version: str, project: Any = None) -> str:
     selected_label = st.sidebar.radio("Navigation", labels, key=f"nav_page_{group}", label_visibility="collapsed")
     selected_index = labels.index(selected_label)
     page = entries[selected_index][1]
+    st.sidebar.divider()
+    st.sidebar.markdown('<div class="pb-nav-label">QUICK ACCESS</div>', unsafe_allow_html=True)
+    quick_pages = [("Dashboard", "Dashboard"), ("Script", "Script Blocks"), ("Generate", "Create Speech"), ("Timeline", "Timeline Studio")]
+    quick_cols = st.sidebar.columns(2)
+    for index, (label, target) in enumerate(quick_pages):
+        if quick_cols[index % 2].button(label, key=f"quick_{target}", use_container_width=True):
+            navigate_to(target)
+            st.rerun()
     st.sidebar.divider()
     if project:
         st.sidebar.markdown(f'<span class="pb-status good">ACTIVE PROJECT</span><div style="font-weight:700;margin-top:.4rem">{escape(project.name)}</div>', unsafe_allow_html=True)

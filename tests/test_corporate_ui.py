@@ -15,7 +15,7 @@ class CorporateUiTests(unittest.TestCase):
             self.assertIn(token, self.ui)
 
     def test_theme_is_applied_before_navigation(self):
-        self.assertLess(self.app.index("inject_corporate_theme()"), self.app.index("page = sidebar_navigation"))
+        self.assertLess(self.app.index("inject_corporate_theme(ui_preferences)"), self.app.index("page = sidebar_navigation"))
 
     def test_page_header_is_global(self):
         self.assertIn("page_header(page, VERSION, project)", self.app)

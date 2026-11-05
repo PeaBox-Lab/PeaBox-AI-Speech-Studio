@@ -1,73 +1,36 @@
-# PeaBox Voice Studio v0.07.1
+# PeaBox Voice Studio v0.07.2
 
-A governed corporate voice-production workspace with workflow states, ownership, review comments, decision records, approval gates, audit history, executive readiness, portable projects and timelines, multi-provider generation, transcription, and non-destructive audio assembly.
+A governed, corporate, local-first voice-production workspace with faster navigation, persistent interface preferences, favorite and recent projects, project-aware shortcuts, multi-provider generation, transcription, audio quality tools, portable timelines, and local review workflows.
 
+## v0.07.2 productivity improvements
 
-## v0.07.1 Responsive UI polish
+- Sidebar Quick Access buttons for Dashboard, Script, Generate, and Timeline
+- Dashboard actions for editing, generating, batching, assembling, and governance review
+- Favorite projects and recently opened project history
+- Quick project access when no project is active
+- Persistent default workspace area
+- Compact navigation mode
+- Reduced-motion mode
+- Compact, Standard, or Detailed dashboard modes
+- Local preference reset controls
 
-- Fixed white-on-white Workspace Area selector text
-- Added accessible dark select, focus, icon, and dropdown-option states
-- Fixed top-banner clipping with greater header clearance and overflow protection
-- Strengthened selected navigation rows and added explicit area/screen labels
-- Improved sidebar caption and project-status contrast
-- Added responsive medium and mobile breakpoints
-- Improved content width, card wrapping, column stacking, and button consistency
+## Preference scope
 
-## v0.07.0 Collaboration & Governance
+Interface preferences are stored locally under `data/ui_preferences.json`. They are deliberately separate from projects and are not included in project JSON or portable timeline bundles.
 
-### Governance Center
+## Cumulative platform
 
-- Assign a project owner and contributor labels
-- Set project risk, target date, review requirement, and approval requirement
-- Move through controlled Draft, In Review, Changes Requested, Approved, Published, and Archived states
-- View governance readiness and blocking conditions
-- Review governance KPIs directly from the corporate dashboard
-
-### Review comments
-
-- Target a project, script block, timeline clip, batch job, transcript, or other reference
-- Prioritize comments as Low, Normal, High, or Blocking
-- Resolve with a resolution note
-- Reopen resolved comments
-- Retain comments rather than deleting review history
-
-### Decision register
-
-- Record proposed or decided outcomes
-- Capture rationale and actor label
-- Mark earlier decisions as superseded while preserving history
-
-### Approval Queue
-
-- Create approval requests with requester, reviewer label, scope, and attestation
-- Approve, reject, or withdraw pending requests
-- Gate the Approved workflow state when approvals are required
-- Retain approval outcomes in the project and audit log
-
-### Governance audit
-
-- Append governance-setting, workflow, comment, decision, and approval actions
-- Filter and review audit records
-- Include governance records in project JSON and timeline bundles
-- Consolidate governance summary and recent audit entries in Activity & History
-
-## Important identity limitation
-
-v0.07.0 is still a local application. Names are local labels, not authenticated identities. Approval records are attestations, not digital signatures. Authentication, permissions, shared storage, and organization-backed roles remain planned for the multi-user architecture.
-
-## Preserved capabilities
-
-All v0.06.0 corporate screens and all v0.05.01 production, timeline, bundle, audio, transcription, provider, and quality features remain available and compatible.
+v0.07.2 retains governance, approvals, corporate dashboard, project workspaces, script blocks, cloud and local providers, voice discovery, pronunciation rules, quality processing, transcription, resumable jobs, timelines, portable bundles, and activity history.
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the sidebar shows `Enterprise workspace · v0.07.1`.
-5. Open **Administration → Governance Center** to assign ownership and workflow policy.
+4. Confirm the sidebar displays `Enterprise workspace · v0.07.2`.
+5. Open **Overview → Interface Preferences** to personalize the workspace.
 
-## Tests
+## Validation
 
 ```bash
 python -m unittest discover -s tests -v

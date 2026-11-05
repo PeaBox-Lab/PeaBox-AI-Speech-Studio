@@ -79,6 +79,12 @@ A React/Web Audio frontend and FastAPI service become justified at this stage, w
 
 Authenticated identities, permissions, and shared storage remain part of the future multi-user architecture.
 
+## Delivered — v0.07.2: Daily productivity and personalization
+
+- Project-aware quick actions and sidebar shortcuts
+- Favorite and recent projects
+- Persistent local interface density, motion, startup, and dashboard preferences
+
 ## v0.06.00: Scale and collaboration
 
 - SQLite repository migration followed by optional PostgreSQL

@@ -14,6 +14,7 @@ from peabox_voice_studio.services.governance import ALLOWED_TRANSITIONS, APPROVA
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
+from peabox_voice_studio.services.preferences import load_preferences, mark_project_opened, resolve_projects, save_preferences, toggle_favorite
 from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
 from peabox_voice_studio.services.diagnostics import system_diagnostics, transcription_readiness
@@ -21,10 +22,11 @@ from peabox_voice_studio.services.quality import add_pronunciation, delete_pronu
 from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
-from peabox_voice_studio.ui import callout, inject_corporate_theme, kpi_card, page_header, section, sidebar_navigation, status_badge, workflow_step
+from peabox_voice_studio.ui import callout, inject_corporate_theme, kpi_card, navigate_to, page_header, section, sidebar_navigation, status_badge, workflow_step
 
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide", initial_sidebar_state="expanded")
-inject_corporate_theme()
+ui_preferences = st.session_state.setdefault("ui_preferences", load_preferences())
+inject_corporate_theme(ui_preferences)
 store = ProjectStore()
 profiles = st.session_state.setdefault("provider_profiles", {})
 voice_catalogs = st.session_state.setdefault("voice_catalogs", {})
@@ -44,6 +46,14 @@ def save_project(project: Project) -> None:
 
 def open_project(project_id: str) -> None:
     st.session_state.project = store.load(project_id)
+    mark_project_opened(ui_preferences, project_id)
+    save_preferences(ui_preferences)
+
+
+def set_active_project(project: Project) -> None:
+    st.session_state.project = project
+    mark_project_opened(ui_preferences, project.id)
+    save_preferences(ui_preferences)
 
 
 def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
@@ -104,7 +114,7 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 project = current_project()
-page = sidebar_navigation(VERSION, project)
+page = sidebar_navigation(VERSION, project, ui_preferences)
 page_header(page, VERSION, project)
 
 if page == "Dashboard":
@@ -118,6 +128,12 @@ if page == "Dashboard":
         transcript_sessions = project.settings.get("transcript_sessions", [])
         comparison_history = project.settings.get("comparison_history", [])
         gov_summary = governance_summary(project)
+        section("Quick actions", "Jump directly to the next production task for the active project.")
+        quick_actions = [("Edit script", "Script Blocks"), ("Generate speech", "Create Speech"), ("Run batch", "Batch Production"), ("Open timeline", "Timeline Studio"), ("Review governance", "Governance")]
+        quick_columns = st.columns(5)
+        for index, (label, target) in enumerate(quick_actions):
+            if quick_columns[index].button(label, key=f"dashboard_quick_{target}", use_container_width=True):
+                navigate_to(target); st.rerun()
         cols = st.columns(5)
         with cols[0]: kpi_card("Workflow", gov_summary["status"], f"Risk: {gov_summary['risk_level']}")
         with cols[1]: kpi_card("Script blocks", str(len(project.blocks)), "Structured production units")
@@ -134,21 +150,24 @@ if page == "Dashboard":
             {"Area": "System", "Status": f"{ready_checks}/{total_checks} ready", "Detail": "Open System Check for details"},
         ]
         st.dataframe(readiness_rows, use_container_width=True, hide_index=True)
-        section("Recommended workflow", "Use the grouped navigation to move from content preparation to production and review.")
-        steps = st.columns(4)
-        with steps[0]: workflow_step(1, "Prepare", "Build the master script, script blocks, pronunciation rules, and voice presets.")
-        with steps[1]: workflow_step(2, "Generate", "Create a single render or validate and run a resumable batch job.")
-        with steps[2]: workflow_step(3, "Assemble", "Review WAV quality, add clips to Timeline Studio, and build a production master.")
-        with steps[3]: workflow_step(4, "Review", "Inspect activity, transcripts, comparisons, costs, and export history.")
-        section("Recent project activity")
-        activity = []
-        for item in project.render_history[:5]: activity.append({"Type": "Render", "When": item.get("created_at"), "Item": item.get("output"), "Status": item.get("provider")})
-        for item in project.settings.get("timeline_exports", [])[:5]: activity.append({"Type": "Timeline export", "When": item.get("created_at"), "Item": item.get("output"), "Status": "Completed"})
-        for item in jobs[:5]: activity.append({"Type": "Batch job", "When": item.get("updated_at", item.get("created_at")), "Item": item.get("id", "")[:8], "Status": item.get("status")})
-        for item in governance(project)["audit_log"][-5:]: activity.append({"Type": "Governance", "When": item.get("timestamp"), "Item": item.get("action"), "Status": item.get("actor")})
-        activity = sorted(activity, key=lambda row: row.get("When") or "", reverse=True)[:10]
-        if activity: st.dataframe(activity, use_container_width=True, hide_index=True)
-        else: callout("No production activity has been recorded yet. Start with Script Editor or Speech Generator.")
+        dashboard_detail = ui_preferences.get("dashboard_detail", "Standard")
+        if dashboard_detail in {"Standard", "Detailed"}:
+            section("Recommended workflow", "Use the grouped navigation to move from content preparation to production and review.")
+            steps = st.columns(4)
+            with steps[0]: workflow_step(1, "Prepare", "Build the master script, script blocks, pronunciation rules, and voice presets.")
+            with steps[1]: workflow_step(2, "Generate", "Create a single render or validate and run a resumable batch job.")
+            with steps[2]: workflow_step(3, "Assemble", "Review WAV quality, add clips to Timeline Studio, and build a production master.")
+            with steps[3]: workflow_step(4, "Review", "Inspect activity, transcripts, comparisons, costs, and export history.")
+        if dashboard_detail == "Detailed":
+            section("Recent project activity")
+            activity = []
+            for item in project.render_history[:5]: activity.append({"Type": "Render", "When": item.get("created_at"), "Item": item.get("output"), "Status": item.get("provider")})
+            for item in project.settings.get("timeline_exports", [])[:5]: activity.append({"Type": "Timeline export", "When": item.get("created_at"), "Item": item.get("output"), "Status": "Completed"})
+            for item in jobs[:5]: activity.append({"Type": "Batch job", "When": item.get("updated_at", item.get("created_at")), "Item": item.get("id", "")[:8], "Status": item.get("status")})
+            for item in governance(project)["audit_log"][-5:]: activity.append({"Type": "Governance", "When": item.get("timestamp"), "Item": item.get("action"), "Status": item.get("actor")})
+            activity = sorted(activity, key=lambda row: row.get("When") or "", reverse=True)[:10]
+            if activity: st.dataframe(activity, use_container_width=True, hide_index=True)
+            else: callout("No production activity has been recorded yet. Start with Script Editor or Speech Generator.")
     else:
         cols = st.columns(3)
         with cols[0]: kpi_card("Saved projects", str(len(projects)), "Available local workspaces")
@@ -156,10 +175,40 @@ if page == "Dashboard":
         with cols[2]: kpi_card("Active project", "None", "Open or create a project to begin")
         section("Getting started", "PeaBox separates project management, production, audio quality, transcription, and administration into dedicated screens.")
         callout("Open Project Workspace from the Overview area to create a new project or import an existing project or timeline bundle.")
+        favorite_projects = resolve_projects(projects, ui_preferences.get("favorite_project_ids", []))
+        recent_projects = resolve_projects(projects, ui_preferences.get("recent_project_ids", []))
+        if favorite_projects or recent_projects:
+            section("Quick project access", "Favorites are shown first, followed by recently opened projects.")
+            access_projects = favorite_projects + [item for item in recent_projects if item.id not in {fav.id for fav in favorite_projects}]
+            for item in access_projects[:6]:
+                cols_access = st.columns([4, 1])
+                cols_access[0].markdown(f"**{'★ ' if item.id in ui_preferences.get('favorite_project_ids', []) else ''}{item.name}**  \nUpdated {item.updated_at}")
+                if cols_access[1].button("Open", key=f"dashboard_open_{item.id}", use_container_width=True):
+                    open_project(item.id); st.rerun()
         c1, c2, c3 = st.columns(3)
         with c1: workflow_step(1, "Create a project", "Name the production and write or import its master script.")
         with c2: workflow_step(2, "Configure production", "Prepare script blocks, providers, voices, pronunciation, and presets.")
         with c3: workflow_step(3, "Generate and assemble", "Render audio, validate quality, and create a timeline master.")
+
+elif page == "Preferences":
+    section("Personal workspace preferences", "These preferences are stored locally on this device and are not included in project exports.")
+    area_options = ["Overview", "Production", "Audio & Quality", "Administration", "Support"]
+    default_area = st.selectbox("Default workspace area", area_options, index=area_options.index(ui_preferences.get("default_area", "Overview")) if ui_preferences.get("default_area") in area_options else 0)
+    dashboard_detail = st.radio("Dashboard detail", ["Compact", "Standard", "Detailed"], index=["Compact", "Standard", "Detailed"].index(ui_preferences.get("dashboard_detail", "Standard")), horizontal=True)
+    p1, p2 = st.columns(2)
+    compact_navigation = p1.checkbox("Compact sidebar navigation", value=ui_preferences.get("compact_navigation", False))
+    reduced_motion = p2.checkbox("Reduce interface motion", value=ui_preferences.get("reduced_motion", False))
+    if st.button("Save interface preferences", type="primary"):
+        ui_preferences.update({"default_area": default_area, "dashboard_detail": dashboard_detail, "compact_navigation": compact_navigation, "reduced_motion": reduced_motion})
+        save_preferences(ui_preferences)
+        st.success("Preferences saved. Layout preferences apply immediately after refresh.")
+    section("Local preference data", "Favorites and recent-project history can be cleared without modifying project files.")
+    c1, c2 = st.columns(2)
+    if c1.button("Clear recent projects", disabled=not ui_preferences.get("recent_project_ids")):
+        ui_preferences["recent_project_ids"] = []; save_preferences(ui_preferences); st.rerun()
+    if c2.button("Clear favorites", disabled=not ui_preferences.get("favorite_project_ids")):
+        ui_preferences["favorite_project_ids"] = []; save_preferences(ui_preferences); st.rerun()
+    st.json({"default_area": ui_preferences.get("default_area"), "dashboard_detail": ui_preferences.get("dashboard_detail"), "compact_navigation": ui_preferences.get("compact_navigation"), "reduced_motion": ui_preferences.get("reduced_motion"), "recent_projects": len(ui_preferences.get("recent_project_ids", [])), "favorites": len(ui_preferences.get("favorite_project_ids", []))})
 
 elif page == "Projects":
     section("Project portfolio", "Create, open, import, and maintain the production workspace and master script.")
@@ -168,16 +217,26 @@ elif page == "Projects":
         name = st.text_input("New project name")
         description = st.text_area("Description", height=90)
         if st.button("Create and open", type="primary", disabled=not name.strip()):
-            st.session_state.project = store.create(name, description); st.rerun()
+            set_active_project(store.create(name, description)); st.rerun()
         projects = store.list()
         selected = st.selectbox("Saved projects", projects, format_func=lambda p: f"{p.name} · {p.updated_at[:10]}") if projects else None
-        if st.button("Open selected", disabled=selected is None): open_project(selected.id); st.rerun()
+        p_open, p_fav = st.columns(2)
+        if p_open.button("Open selected", disabled=selected is None, use_container_width=True): open_project(selected.id); st.rerun()
+        is_favorite = bool(selected and selected.id in ui_preferences.get("favorite_project_ids", []))
+        if p_fav.button("Remove favorite" if is_favorite else "Add favorite", disabled=selected is None, use_container_width=True):
+            toggle_favorite(ui_preferences, selected.id); save_preferences(ui_preferences); st.rerun()
+        favorite_projects = resolve_projects(projects, ui_preferences.get("favorite_project_ids", []))
+        recent_projects = resolve_projects(projects, ui_preferences.get("recent_project_ids", []))
+        if favorite_projects:
+            st.caption("Favorites: " + " · ".join(item.name for item in favorite_projects[:5]))
+        if recent_projects:
+            st.caption("Recent: " + " · ".join(item.name for item in recent_projects[:5]))
         st.divider()
         st.subheader("Import project")
         imported_file = st.file_uploader("PeaBox project JSON", type="json", key="project_import")
         if st.button("Import and open", disabled=imported_file is None):
             try:
-                st.session_state.project = store.import_project(imported_file.getvalue())
+                set_active_project(store.import_project(imported_file.getvalue()))
                 st.success("Project imported with a new identity")
                 st.rerun()
             except Exception as exc:
@@ -187,7 +246,7 @@ elif page == "Projects":
         if st.button("Import bundle and open", disabled=bundle_file is None):
             try:
                 imported_project = import_timeline_bundle(bundle_file.getvalue(), OUTPUTS_DIR)
-                st.session_state.project = store.save(imported_project)
+                set_active_project(store.save(imported_project))
                 st.success("Timeline bundle imported with local asset copies")
                 st.rerun()
             except Exception as exc:

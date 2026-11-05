@@ -31,7 +31,7 @@ class StreamlitMagicTests(unittest.TestCase):
     def test_visible_version_marker(self):
         source = UI.read_text(encoding="utf-8")
         self.assertIn('st.sidebar.caption(f"Enterprise workspace · v{version}")', source)
-        self.assertIn("sidebar_navigation(VERSION, project)", APP.read_text(encoding="utf-8"))
+        self.assertIn("sidebar_navigation(VERSION, project, ui_preferences)", APP.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

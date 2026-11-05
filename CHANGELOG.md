@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.07.2 — 2026-11-05
+
+### Added
+
+- Sidebar Quick Access actions
+- Active-project dashboard shortcuts
+- Favorite and recent projects
+- Persistent default workspace area
+- Compact navigation and reduced-motion settings
+- Compact, Standard, and Detailed dashboard modes
+- Interface Preferences screen and preference reset controls
+- Local preference service with atomic writes and corruption recovery
+- Productivity, preferences, navigation, page-smoke, and compatibility tests
+
+### Compatibility
+
+- UI preferences are separate from portable project data
+- All v0.07.1 project and bundle formats remain compatible
+
 ## v0.07.1 — 2026-11-05
 
 ### Fixed
