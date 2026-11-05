@@ -14,6 +14,16 @@ This roadmap translates the attached market, architecture, UX, and user-story co
 
 This stage addresses the supplied multi-voice workflow and creates the clip object model required by a later timeline without forcing an immediate frontend rewrite.
 
+
+## Delivered — v0.03.01: Portability and batch reliability
+
+- Complete project JSON export/import with collision-safe identities
+- Append-or-replace script-block import and bulk block controls
+- Batch readiness errors and cloud-execution warnings
+- Versioned schema-v2 manifests and persistent last-batch outcomes
+
+This maintenance stage reduces data-loss and failed-render risk before cloud batch execution is introduced.
+
 ## Next — v0.03.10: Cloud batch and configuration
 
 - Encrypted/session-scoped provider profiles

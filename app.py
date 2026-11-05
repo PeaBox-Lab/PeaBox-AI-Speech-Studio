@@ -5,10 +5,10 @@ import streamlit as st
 from peabox_voice_studio.config import APP_NAME, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, VERSION
 from peabox_voice_studio.models import Project, ScriptBlock
 from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, PROVIDER_RATES
-from peabox_voice_studio.services.batch import build_manifest, render_local_blocks
+from peabox_voice_studio.services.batch import build_manifest, render_local_blocks, summarize_results
 from peabox_voice_studio.services.files import build_render_zip, safe_filename
 from peabox_voice_studio.services.history import record_render
-from peabox_voice_studio.services.projects import ProjectStore, move_block, split_script_into_blocks
+from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
 from peabox_voice_studio.services.subtitles import to_srt
 
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide")
@@ -52,7 +52,7 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Project-based multi-block voice production")
+st.caption(f"Version {VERSION} · Reliable multi-block voice production")
 page = st.sidebar.radio("Studio", ["Projects", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
 st.sidebar.success(f"Active: {project.name}") if project else st.sidebar.info("No active project")
@@ -68,6 +68,16 @@ if page == "Projects":
         projects = store.list()
         selected = st.selectbox("Saved projects", projects, format_func=lambda p: f"{p.name} · {p.updated_at[:10]}") if projects else None
         if st.button("Open selected", disabled=selected is None): open_project(selected.id); st.rerun()
+        st.divider()
+        st.subheader("Import project")
+        imported_file = st.file_uploader("PeaBox project JSON", type="json", key="project_import")
+        if st.button("Import and open", disabled=imported_file is None):
+            try:
+                st.session_state.project = store.import_project(imported_file.getvalue())
+                st.success("Project imported with a new identity")
+                st.rerun()
+            except Exception as exc:
+                st.error(f"Import failed: {exc}")
     with right:
         project = current_project()
         if not project: st.info("Create or open a project to begin.")
@@ -78,14 +88,15 @@ if page == "Projects":
             words = len(project.script.split())
             a, b, c, d = st.columns(4)
             a.metric("Characters", f"{len(project.script):,}"); b.metric("Words", f"{words:,}"); c.metric("Est. audio", f"{words/150:.1f} min"); d.metric("Blocks", len(project.blocks))
-            x, y, z = st.columns(3)
+            x, y, z, q = st.columns(4)
             if x.button("Save project", type="primary"): save_project(project); st.success("Project saved")
             y.download_button("Export script", project.script, f"{safe_filename(project.name)}.txt")
+            q.download_button("Export project JSON", export_project(project), f"{safe_filename(project.name)}_project.json", "application/json")
+            block_import_mode = st.radio("Master Script block import", ["Append", "Replace existing"], horizontal=True)
             if z.button("Create blocks from paragraphs", disabled=not project.script.strip()):
                 new_blocks = split_script_into_blocks(project.script)
-                if project.blocks: project.blocks.extend(new_blocks)
-                else: project.blocks = new_blocks
-                save_project(project); st.success(f"Added {len(new_blocks)} blocks")
+                project.blocks = new_blocks if block_import_mode == "Replace existing" else project.blocks + new_blocks
+                save_project(project); st.success(f"{'Created' if block_import_mode == 'Replace existing' else 'Added'} {len(new_blocks)} blocks")
             with st.expander("Delete project"):
                 confirm = st.checkbox("I understand this permanently deletes the project")
                 if st.button("Delete permanently", disabled=not confirm): store.delete(project.id); st.session_state.pop("project", None); st.rerun()
@@ -95,14 +106,21 @@ elif page == "Script Blocks":
     if not project: st.info("Open a project first.")
     else:
         st.caption("Divide a script into independently configurable voice blocks. Reorder, duplicate, disable, and batch-plan without changing the Master Script.")
-        a, b, c = st.columns(3)
+        a, b, c, d, e = st.columns(5)
         if a.button("Add blank block", type="primary"):
             project.blocks.append(ScriptBlock(title=f"Block {len(project.blocks)+1}")); save_project(project); st.rerun()
-        if b.button("Import Master Script paragraphs", disabled=not project.script.strip()):
+        if b.button("Import paragraphs", disabled=not project.script.strip()):
             project.blocks.extend(split_script_into_blocks(project.script)); save_project(project); st.rerun()
-        if c.button("Save all blocks", disabled=not project.blocks): save_project(project); st.success("Blocks saved")
+        if c.button("Enable all", disabled=not project.blocks):
+            set_all_blocks_enabled(project.blocks, True); save_project(project); st.rerun()
+        if d.button("Disable all", disabled=not project.blocks):
+            set_all_blocks_enabled(project.blocks, False); save_project(project); st.rerun()
+        if e.button("Save all", disabled=not project.blocks): save_project(project); st.success("Blocks saved")
+        filter_text = st.text_input("Filter blocks", placeholder="Title, text, provider, or voice").strip().lower()
+        visible = [(index, block) for index, block in enumerate(project.blocks) if not filter_text or filter_text in " ".join([block.title, block.text, block.provider, block.voice, block.notes]).lower()]
         if not project.blocks: st.info("Add a block or import paragraphs from the Master Script.")
-        for index, block in enumerate(project.blocks): block_editor(project, index, block)
+        elif not visible: st.info("No blocks match the filter.")
+        for index, block in visible: block_editor(project, index, block)
 
 elif page == "Batch Production":
     st.header("Batch Production")
@@ -114,20 +132,34 @@ elif page == "Batch Production":
         a, b, c, d = st.columns(4)
         a.metric("Enabled blocks", totals["enabled_blocks"]); b.metric("Characters", f"{totals['characters']:,}"); c.metric("Est. audio", f"{totals['estimated_minutes']:.1f} min"); d.metric("Est. cost", f"${totals['estimated_cost_usd']:.4f}")
         st.dataframe(manifest["blocks"], use_container_width=True, hide_index=True)
+        validation = manifest["validation"]
+        if validation["ready"]:
+            st.success(f"Batch validation passed with {validation['warnings']} warning(s).")
+        else:
+            st.error(f"Batch is not ready: {validation['errors']} error(s), {validation['warnings']} warning(s).")
+        if validation["issues"]:
+            st.dataframe(validation["issues"], use_container_width=True, hide_index=True)
         st.download_button("Download render manifest", json.dumps(manifest, ensure_ascii=False, indent=2), f"{safe_filename(project.name)}_manifest.json", "application/json")
         st.warning("This release batch-renders Kokoro local blocks. Cloud blocks remain in the manifest and are skipped until credential profiles and asynchronous jobs are added.")
-        if st.button("Render enabled local blocks", type="primary", disabled=not any(b.enabled and b.provider == "Kokoro local" and b.text.strip() for b in project.blocks)):
+        if st.button("Render enabled local blocks", type="primary", disabled=not validation["ready"] or not any(b.enabled and b.provider == "Kokoro local" and b.text.strip() for b in project.blocks)):
             from peabox_voice_studio.providers.kokoro import generate
             def local_generate(text, voice, language, speed, name):
                 return generate(text, voice, KOKORO_LANGS.get(language, "en-us"), speed, name)
             with st.spinner("Rendering enabled local blocks..."):
                 files, results = render_local_blocks(project, local_generate)
             manifest["results"] = results
+            summary = summarize_results(results)
+            project.settings["last_batch"] = {"created_at": manifest["created_at"], "summary": summary, "results": results}
+            save_project(project)
             if files:
                 package = build_render_zip(files, manifest)
-                st.success(f"Rendered {len(files)} block(s)")
+                st.success(f"Rendered {summary['rendered']} block(s); skipped {summary['skipped']}; failed {summary['failed']}.")
                 st.download_button("Download batch ZIP", package, f"{safe_filename(project.name)}_batch.zip", "application/zip")
             st.dataframe(results, use_container_width=True, hide_index=True)
+        last_batch = project.settings.get("last_batch")
+        if last_batch:
+            with st.expander("Last saved batch result"):
+                st.json(last_batch)
 
 elif page == "Create Speech":
     st.header("Create Speech")
@@ -172,10 +204,10 @@ else:
     st.header("Roadmap & Help")
     st.markdown("""
 ### Current release
-- Persistent project workspace and Master Script
-- Ordered script blocks with per-block provider, language, voice, speed, notes, and enabled state
-- Batch cost/duration plan and portable JSON render manifest
-- Batch rendering and ZIP packaging for enabled Kokoro local blocks
+- Portable project JSON export/import with collision-safe imported identities
+- Ordered script blocks with bulk enable/disable, filtering, and append-or-replace paragraph import
+- Batch-readiness validation for missing titles, empty enabled text, voices, and unsupported cloud execution
+- Versioned render manifests, local Kokoro batch ZIPs, and persistent last-batch results
 - Local Faster-Whisper transcription with TXT and standards-compatible SRT export
 
 ### Planned next

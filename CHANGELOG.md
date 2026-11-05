@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.03.01 — 2026-11-05
+
+### Added
+
+- Complete project JSON export and collision-safe import
+- Append-or-replace paragraph import mode
+- Block filtering and bulk enable/disable controls
+- Batch-readiness validation with errors and warnings
+- Schema-v2 render manifests with validation details
+- Persistent last-batch summary and per-block results
+- Tests for project portability, validation failures, bulk controls, and result summaries
+
+### Fixed
+
+- Empty enabled blocks are rejected before local generation
+- Render results now retain block titles for easier diagnosis
+- Project imports no longer risk overwriting an existing identity
+
+### Compatibility
+
+- Existing v0.03.00 raw project files remain readable
+- Imported bundles accept both wrapped exports and raw project objects
+
 ## v0.03.00 — 2026-11-05
 
 ### Added

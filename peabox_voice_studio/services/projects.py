@@ -1,9 +1,12 @@
 import json
 from pathlib import Path
+from uuid import uuid4
 
 from peabox_voice_studio.config import MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, PROJECTS_DIR
-from peabox_voice_studio.models import Project, ScriptBlock
+from peabox_voice_studio.models import Project, ScriptBlock, utc_now
 from peabox_voice_studio.services.files import atomic_write_bytes
+
+PROJECT_EXPORT_SCHEMA = 1
 
 
 class ProjectStore:
@@ -22,10 +25,7 @@ class ProjectStore:
         return self.save(Project(name=name.strip()[:120], description=description[:2000]))
 
     def save(self, project: Project) -> Project:
-        if len(project.script) > MAX_SCRIPT_CHARS:
-            raise ValueError("Master script exceeds the project limit")
-        if any(len(block.text) > MAX_BLOCK_CHARS for block in project.blocks):
-            raise ValueError("A script block exceeds the block limit")
+        validate_project_limits(project)
         project.name = project.name.strip()[:120]
         if not project.name:
             raise ValueError("Project name is required")
@@ -51,6 +51,33 @@ class ProjectStore:
     def delete(self, project_id: str) -> None:
         self._path(project_id).unlink(missing_ok=False)
 
+    def import_project(self, raw: bytes | str, preserve_identity: bool = False) -> Project:
+        text = raw.decode("utf-8-sig") if isinstance(raw, bytes) else raw
+        payload = json.loads(text)
+        if not isinstance(payload, dict):
+            raise ValueError("Project JSON must contain an object")
+        project_data = payload.get("project", payload)
+        if not isinstance(project_data, dict):
+            raise ValueError("Project JSON must contain an object")
+        project = Project.from_dict(project_data)
+        if not preserve_identity or self._path(project.id).exists():
+            project.id = uuid4().hex
+            project.created_at = utc_now()
+        project.name = f"{project.name} (imported)"[:120]
+        project.updated_at = utc_now()
+        return self.save(project)
+
+
+def validate_project_limits(project: Project) -> None:
+    if len(project.script) > MAX_SCRIPT_CHARS:
+        raise ValueError("Master script exceeds the project limit")
+    if any(len(block.text) > MAX_BLOCK_CHARS for block in project.blocks):
+        raise ValueError("A script block exceeds the block limit")
+
+
+def export_project(project: Project) -> str:
+    return json.dumps({"schema_version": PROJECT_EXPORT_SCHEMA, "exported_at": utc_now(), "project": project.to_dict()}, ensure_ascii=False, indent=2)
+
 
 def split_script_into_blocks(script: str) -> list[ScriptBlock]:
     paragraphs = [part.strip() for part in script.replace("\r\n", "\n").split("\n\n") if part.strip()]
@@ -63,3 +90,8 @@ def move_block(blocks: list[ScriptBlock], index: int, direction: int) -> list[Sc
         return blocks
     blocks[index], blocks[target] = blocks[target], blocks[index]
     return blocks
+
+
+def set_all_blocks_enabled(blocks: list[ScriptBlock], enabled: bool) -> None:
+    for block in blocks:
+        block.enabled = enabled
