@@ -10,7 +10,7 @@ from peabox_voice_studio.services.files import safe_filename
 TERMINAL_ITEM_STATES = {"rendered", "failed", "cancelled"}
 
 
-def create_job(project: Project, rates: dict[str, float], configured_providers: set[str]) -> dict[str, Any]:
+def create_job(project: Project, rates: dict[str, float], configured_providers: set[str], text_processor: Callable[[str, str], str] | None = None) -> dict[str, Any]:
     validation = validate_batch(project, configured_providers)
     if not validation["ready"]:
         raise ValueError("Batch validation must pass before creating a job")
@@ -19,9 +19,10 @@ def create_job(project: Project, rates: dict[str, float], configured_providers: 
         if not block.enabled:
             continue
         estimate = estimate_block(block, rates)
+        processed_text = text_processor(block.text, block.provider) if text_processor else block.text
         items.append({
             "id": uuid4().hex, "block_id": block.id, "position": index, "title": block.title,
-            "text": block.text, "provider": block.provider, "language": block.language, "voice": block.voice,
+            "text": block.text, "processed_text": processed_text, "provider": block.provider, "language": block.language, "voice": block.voice,
             "speed": block.speed, "status": "queued", "attempts": 0, "file": None, "error": None,
             "estimated_cost_usd": estimate["estimated_cost_usd"], "actual_cost_usd": None,
         })
@@ -81,7 +82,9 @@ def run_job(job: dict, renderers: dict[str, Callable[..., Path]]) -> tuple[list[
         item["status"] = "running"; item["attempts"] += 1; item["error"] = None
         output_name = f"{item['position']:03}_{safe_filename(item['title'])}"
         try:
-            path = renderer(item, output_name)
+            render_item = dict(item)
+            render_item["text"] = item.get("processed_text", item["text"])
+            path = renderer(render_item, output_name)
             item["status"] = "rendered"; item["file"] = str(path)
             item["actual_cost_usd"] = item["estimated_cost_usd"]
             files.append(path)

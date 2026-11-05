@@ -4,6 +4,7 @@ from pathlib import Path
 
 from peabox_voice_studio.config import OUTPUTS_DIR
 from peabox_voice_studio.services.files import atomic_write_bytes, safe_filename
+from peabox_voice_studio.services.quality import compile_ssml_text
 
 
 def generate_azure(text: str, profile: dict, voice: str, speed: float, output_name: str) -> Path:
@@ -14,7 +15,7 @@ def generate_azure(text: str, profile: dict, voice: str, speed: float, output_na
     ssml = (
         "<speak version='1.0' xml:lang='en-US'>"
         f"<voice name='{html.escape(voice, quote=True)}'>"
-        f"<prosody rate='{rate}%'>{html.escape(text)}</prosody>"
+        f"<prosody rate='{rate}%'>{compile_ssml_text(text)}</prosody>"
         "</voice></speak>"
     )
     response = requests.post(
@@ -32,7 +33,8 @@ def generate_polly(text: str, profile: dict, voice: str, engine: str, output_nam
         "polly", region_name=profile["region"], aws_access_key_id=profile["access_key"],
         aws_secret_access_key=profile["secret_key"], aws_session_token=profile.get("session_token") or None,
     )
-    data = client.synthesize_speech(Text=text, OutputFormat="mp3", VoiceId=voice, Engine=engine)["AudioStream"].read()
+    ssml = f"<speak>{compile_ssml_text(text)}</speak>"
+    data = client.synthesize_speech(Text=ssml, TextType="ssml", OutputFormat="mp3", VoiceId=voice, Engine=engine)["AudioStream"].read()
     return atomic_write_bytes(OUTPUTS_DIR / f"{safe_filename(output_name)}.mp3", data)
 
 
@@ -43,7 +45,7 @@ def generate_google(text: str, profile: dict, voice: str, language: str, output_
     credentials = service_account.Credentials.from_service_account_info(info, scopes=["https://www.googleapis.com/auth/cloud-platform"])
     client = texttospeech.TextToSpeechClient(credentials=credentials)
     data = client.synthesize_speech(
-        input=texttospeech.SynthesisInput(text=text),
+        input=texttospeech.SynthesisInput(ssml=f"<speak>{compile_ssml_text(text)}</speak>"),
         voice=texttospeech.VoiceSelectionParams(language_code=language, name=voice),
         audio_config=texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3),
     ).audio_content

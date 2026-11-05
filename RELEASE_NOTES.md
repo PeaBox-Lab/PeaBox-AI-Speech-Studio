@@ -1,7 +1,7 @@
-# PeaBox Voice Studio v0.03.12 Release Notes
+# PeaBox Voice Studio v0.04.00 Release Notes
 
-This patch fixes the interface failure shown in the supplied screenshot. A conditional Streamlit expression returned an internal `DeltaGenerator` object. Streamlit's automatic expression rendering then displayed framework API documentation in the main page, obscuring the real project interface and making the application appear frozen.
+This release begins the Quality & Transcription Studio phase described in the supplied development plan. Projects can maintain pronunciation replacements and use controlled pause markers without editing raw SSML. Cloud providers receive compiled SSML breaks, while local Kokoro generation receives a safe punctuation-based approximation. Batch jobs store processed text alongside original text so later retries remain reproducible.
 
-The sidebar project-status code now uses an explicit statement-based `if/else`, so no internal UI object is emitted as page content. The sidebar also displays the running PeaBox version, and the Windows launcher prints both the version and launch folder to make stale or older running copies easy to identify.
+Transcription results are now editable as timestamped segments. Users can search the working transcript, add speaker labels, export TXT/SRT/VTT, and save transcript sessions inside a project for later editing.
 
-All v0.03.11 voice catalogs, presets, provider setup, projects, jobs, transcription, and rendering features are preserved.
+The v0.03.12 UI fix remains protected by regression and page-smoke tests.

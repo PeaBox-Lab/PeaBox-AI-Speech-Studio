@@ -1,55 +1,57 @@
-# PeaBox Voice Studio v0.03.12
+# PeaBox Voice Studio v0.04.00
 
-A local-first Streamlit workspace for discoverable multi-provider voices, reusable voice presets, resumable production jobs, Kokoro generation, and Faster-Whisper transcription.
+A local-first multi-provider voice production and transcription workspace with project pronunciation rules, safe pause controls, editable transcripts, resumable jobs, reusable voice presets, and session-only cloud credentials.
 
-## v0.03.12 critical UI fix
+## v0.04.00 highlights
 
-- Fixed internal `DeltaGenerator` documentation replacing the normal project screen
-- Restored unobstructed sidebar navigation and page content
-- Added a visible sidebar version marker
-- Added launcher output identifying the exact version and folder being started
-- Added regression tests for Streamlit expression leaks and every navigation page
+### Quality Studio
 
-## Preserved v0.03.11 features
+- Project pronunciation dictionary with case-sensitive and whole-word matching
+- Rule ordering preserved in project JSON and exports
+- Safe `[[pause:seconds]]` markers limited to 0.1–10 seconds
+- Pause markers compile to SSML breaks for Azure, Polly, and Google
+- Kokoro receives a punctuation-based local pause approximation
+- Processed-text previews before generation
+- Resumable jobs snapshot both original and processed text for repeatability
 
-- Discover Azure, Amazon Polly, and Google voices from configured session profiles
-- Cache normalized cloud voice catalogs only for the current Streamlit session
-- Search the combined Kokoro and cloud catalog by name, ID, provider, language, or gender
-- Filter the library by language and gender
-- View provider readiness, cached voice counts, output types, supported controls, and credential requirements
-- Select cached provider voices directly while editing cloud script blocks
-- Save reusable project presets containing provider, language, voice, speed, and direction notes
-- Apply or delete project presets without changing block text
-- Duplicate jobs as clean queued copies
-- Reopen cancelled job items, delete obsolete jobs, retry failures, and cancel queued work
+### Transcription Studio
 
-## Credential and catalog safety
+- Editable timestamped transcript segments
+- Optional speaker labels
+- Search across transcript text and speakers
+- TXT, standards-compatible SRT, and WebVTT export
+- Save, reload, and delete project transcript sessions
+- Up to 20 transcript sessions retained per project
 
-Cloud credentials and discovered voice catalogs exist only in Streamlit session state. They are not saved in project JSON, project exports, manifests, presets, or job history. Presets contain only non-secret generation choices.
+### Preserved
 
-A saved cloud job can be reopened later, but the provider must be configured again for the new session before it can run.
+- Corrected v0.03.12 navigation and Streamlit rendering behavior
+- Session-cached provider voice discovery and Voice Library
+- Project voice presets
+- Resumable cloud and local jobs with retry, cancellation, reopen, duplicate, delete, and downloads
+- Portable project JSON import/export
+
+## Pause syntax
+
+Use a marker such as:
+
+```text
+Welcome to PeaBox. [[pause:1.5]] Let us begin.
+```
+
+Malformed or out-of-range pause markers are reported before use.
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
-2. Extract the ZIP.
-3. Run `start_windows.bat`.
-4. Install FFmpeg and add it to PATH for compressed audio/video transcription.
+2. Extract the ZIP into a new folder.
+3. Run `start_windows.bat` from that folder.
+4. Install FFmpeg and add it to PATH for compressed media transcription.
 
-## Recommended workflow
-
-1. Configure the required provider for the current session.
-2. Discover its voices and inspect them in Voice Library.
-3. Assign catalog voices to script blocks.
-4. Save frequently used combinations as project presets.
-5. Validate and create a resumable batch job.
-6. Run, retry, cancel, reopen, duplicate, clean up, or download job results.
+The sidebar must display `PeaBox v0.04.00`. If it shows an older version, stop older Streamlit terminals and use the Local URL printed by the new launcher.
 
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
-
-
-See `TROUBLESHOOTING.md` if an older process or browser tab is still showing the broken screen.

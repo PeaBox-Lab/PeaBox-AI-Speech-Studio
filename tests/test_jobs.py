@@ -66,5 +66,10 @@ class JobTests(unittest.TestCase):
         self.assertTrue(delete_job(project, job["id"]))
         self.assertEqual(project.settings["batch_jobs"], [])
 
+    def test_job_snapshots_processed_text(self):
+        job = create_job(self.project(), {"Kokoro local": 0, "Azure Speech": 15}, {"Kokoro local", "Azure Speech"}, lambda text, provider: f"{provider}:{text}")
+        self.assertEqual(job["items"][0]["processed_text"], "Kokoro local:hello")
+        self.assertEqual(job["items"][1]["processed_text"], "Azure Speech:world")
+
 
 if __name__ == "__main__": unittest.main()

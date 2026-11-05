@@ -41,12 +41,13 @@ Dynamic voice discovery, capability catalogs, reusable presets, and expanded job
 - Job duplicate, reopen, retry, cancellation, deletion, and output recovery controls
 
 
-## v0.04.00: Quality and transcription studio
+## Delivered — v0.04.00: Quality and transcription studio
 
 - Pronunciation dictionary and provider-aware SSML controls
 - Reusable voice/direction presets and searchable voice filters
 - Audio normalization and silence controls
-- Optional speaker diarization with explicit model setup
+- Editable transcript sessions with TXT, SRT, and VTT export
+- Optional speaker diarization with explicit model setup remains next
 - Speaker-labelled TXT, SRT, and VTT exports
 
 ## v0.05.00: Non-destructive timeline

@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.04.00 — 2026-11-05
+
+### Added
+
+- Project pronunciation dictionary with whole-word and case controls
+- Safe pause markers and processed-text previews
+- Cloud SSML break compilation and local Kokoro pause approximations
+- Original and processed text snapshots in batch jobs
+- Editable transcript segments with speaker fields and search
+- TXT, SRT, and WebVTT exports
+- Saved project transcript sessions
+- Quality, transcript, cloud-SSML, migration, navigation, and UI regression tests
+
+### Preserved
+
+- v0.03.12 Streamlit navigation fix and visible version diagnostics
+- v0.03.11 voice catalogs and presets
+- v0.03.10 multi-provider resumable jobs
+
 ## v0.03.12 — 2026-11-05
 
 ### Fixed

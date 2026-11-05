@@ -12,7 +12,9 @@ from peabox_voice_studio.services.catalogs import capability_rows, catalog_facet
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
 from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
-from peabox_voice_studio.services.subtitles import to_srt
+from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, validate_pause_markers
+from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, save_transcript_session
+from peabox_voice_studio.services.subtitles import to_srt, to_vtt
 
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide")
 store = ProjectStore()
@@ -65,6 +67,14 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
                 block.voice = c.text_input("Provider voice ID", default_voice, key=f"voice_{block.id}")
         block.speed = d.slider("Speed", 0.6, 1.6, float(block.speed), 0.05, key=f"speed_{block.id}")
         block.notes = st.text_input("Direction notes", block.notes, placeholder="Optional pacing, pronunciation, or performance note", key=f"notes_{block.id}")
+        pause_seconds = st.slider("Pause marker seconds", 0.1, 5.0, 1.0, 0.1, key=f"pause_seconds_{block.id}")
+        if st.button("Append pause marker", key=f"append_pause_{block.id}"):
+            block.text = insert_pause(block.text, pause_seconds); save_project(project); st.rerun()
+        pause_issues = validate_pause_markers(block.text)
+        if pause_issues:
+            st.error("; ".join(pause_issues))
+        with st.expander("Processed text preview"):
+            st.code(prepare_text(block.text, project, block.provider))
         presets = list_presets(project)
         if presets:
             preset = st.selectbox("Apply project preset", [None] + presets, format_func=lambda item: "Choose a preset" if item is None else item["name"], key=f"preset_{block.id}")
@@ -85,8 +95,8 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
 
 
 st.title(f"🎙️ {APP_NAME}")
-st.caption(f"Version {VERSION} · Interactive multi-provider voice production")
-page = st.sidebar.radio("Studio", ["Projects", "Provider Setup", "Voice Library", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
+st.caption(f"Version {VERSION} · Quality and transcription studio")
+page = st.sidebar.radio("Studio", ["Projects", "Provider Setup", "Voice Library", "Quality Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"])
 project = current_project()
 st.sidebar.caption(f"PeaBox v{VERSION}")
 if project:
@@ -222,6 +232,43 @@ elif page == "Voice Library":
                 delete_preset(project, preset_to_delete["id"]); save_project(project); st.rerun()
         else: st.info("Save a preset from any script block to reuse its provider, voice, speed, and direction notes.")
 
+elif page == "Quality Studio":
+    st.header("Quality Studio")
+    if not project:
+        st.info("Open a project to manage pronunciation and direction rules.")
+    else:
+        st.subheader("Project pronunciation dictionary")
+        st.caption("Rules are applied in order before a job is created. They are stored with the project and contain no credentials.")
+        a, b = st.columns(2)
+        source_word = a.text_input("Written text", placeholder="Example: PeaBox")
+        spoken_form = b.text_input("Spoken replacement", placeholder="Example: pea box")
+        c, d = st.columns(2)
+        case_sensitive = c.checkbox("Case-sensitive match")
+        whole_word = d.checkbox("Whole-word match", value=True)
+        if st.button("Add pronunciation rule", type="primary", disabled=not (source_word.strip() and spoken_form.strip())):
+            try:
+                add_pronunciation(project, source_word, spoken_form, case_sensitive, whole_word); save_project(project); st.rerun()
+            except Exception as exc: st.error(f"Could not add rule: {exc}")
+        entries = list_pronunciations(project)
+        if entries:
+            st.dataframe(entries, use_container_width=True, hide_index=True)
+            selected_rule = st.selectbox("Delete pronunciation rule", entries, format_func=lambda item: f"{item['source']} → {item['replacement']}")
+            if st.button("Delete selected rule"):
+                delete_pronunciation(project, selected_rule["id"]); save_project(project); st.rerun()
+        else:
+            st.info("No pronunciation rules have been added.")
+        st.subheader("Text preparation preview")
+        preview_provider = st.selectbox("Preview provider", ["Kokoro local", "Azure Speech", "Amazon Polly standard", "Amazon Polly neural", "Google Cloud TTS"])
+        preview_text = st.text_area("Preview text", project.script, height=180)
+        pause_seconds = st.slider("Pause duration", 0.1, 5.0, 1.0, 0.1, key="quality_pause")
+        if st.button("Append pause to preview"):
+            st.session_state.quality_preview_text = insert_pause(preview_text, pause_seconds); st.rerun()
+        preview_text = st.session_state.get("quality_preview_text", preview_text)
+        issues = validate_pause_markers(preview_text)
+        if issues: st.error("; ".join(issues))
+        st.code(prepare_text(preview_text, project, preview_provider))
+        st.caption("Cloud providers compile valid pause markers to SSML breaks. Kokoro receives punctuation-based pause approximations.")
+
 elif page == "Script Blocks":
     st.header("Script Blocks")
     if not project: st.info("Open a project first.")
@@ -263,7 +310,7 @@ elif page == "Batch Production":
         st.download_button("Download render manifest", json.dumps(manifest, ensure_ascii=False, indent=2), f"{safe_filename(project.name)}_manifest.json", "application/json")
         if st.button("Create resumable job", type="primary", disabled=not validation["ready"]):
             try:
-                job = create_job(project, PROVIDER_RATES, ready_providers); add_job(project, job); save_project(project); st.success("Batch job created")
+                job = create_job(project, PROVIDER_RATES, ready_providers, lambda text, provider: prepare_text(text, project, provider)); add_job(project, job); save_project(project); st.success("Batch job created")
             except Exception as exc: st.error(f"Job creation failed: {exc}")
         jobs = project.settings.get("batch_jobs", [])
         if jobs:
@@ -317,27 +364,56 @@ elif page == "Create Speech":
     if st.button("Generate local speech", type="primary", disabled=not text.strip()):
         try:
             from peabox_voice_studio.providers.kokoro import generate
-            with st.spinner("Generating speech..."): path = generate(text, voice, KOKORO_LANGS[language], speed, output_name)
+            generation_text = prepare_text(text, project, "Kokoro local") if project else text
+            with st.spinner("Generating speech..."): path = generate(generation_text, voice, KOKORO_LANGS[language], speed, output_name)
             data = path.read_bytes(); st.audio(data); st.download_button("Download WAV", data, path.name)
             if project:
                 record_render(project, "Kokoro local", path, len(text), {"language": language, "voice": voice, "speed": speed}); save_project(project)
         except Exception as exc: st.error(f"Generation failed: {exc}")
 
 elif page == "Transcription":
-    st.header("Local Transcription")
+    st.header("Transcription Studio")
     upload = st.file_uploader("Audio or video", type=["wav", "mp3", "m4a", "flac", "ogg", "mp4", "mov", "mkv", "webm"])
     a, b = st.columns(2)
     model_size = a.selectbox("Model", ["tiny", "base", "small", "medium", "large-v3"], index=1)
     language = b.selectbox("Language", ["Auto", "en", "hi", "de", "fr", "es", "it", "pt", "ja", "zh"])
     if upload and upload.size > MAX_UPLOAD_BYTES: st.error("File exceeds the 500 MB limit")
-    if st.button("Transcribe", type="primary", disabled=not upload or (upload and upload.size > MAX_UPLOAD_BYTES)):
+    if st.button("Transcribe locally", type="primary", disabled=not upload or (upload and upload.size > MAX_UPLOAD_BYTES)):
         try:
             from peabox_voice_studio.services.transcription import transcribe
-            with st.spinner("Transcribing locally..."): rows, detected = transcribe(upload.getvalue(), upload.name, model_size, language)
-            transcript = " ".join(row["text"] for row in rows); srt = to_srt(rows); stem = safe_filename(Path(upload.name).stem)
-            st.success(f"Detected language: {detected}"); st.text_area("Transcript", transcript, height=260)
-            st.download_button("Download TXT", transcript, f"{stem}.txt"); st.download_button("Download SRT", srt, f"{stem}.srt"); st.dataframe(rows, use_container_width=True)
+            with st.spinner("Transcribing locally..."):
+                rows, detected = transcribe(upload.getvalue(), upload.name, model_size, language)
+            st.session_state.transcript_working = {"source_name": upload.name, "language": detected, "segments": normalize_segments(rows)}
+            st.success(f"Detected language: {detected}")
         except Exception as exc: st.error(f"Transcription failed: {exc}")
+    working = st.session_state.get("transcript_working")
+    if working:
+        st.subheader("Edit transcript segments")
+        search = st.text_input("Search current transcript", placeholder="Text or speaker")
+        if search:
+            st.dataframe(filter_segments(working["segments"], search), use_container_width=True, hide_index=True)
+        edited = st.data_editor(working["segments"], use_container_width=True, hide_index=True, num_rows="dynamic", disabled=["index"], key="transcript_editor")
+        if edited is not None:
+            working["segments"] = normalize_segments(edited.to_dict("records") if hasattr(edited, "to_dict") else edited)
+        bundle = export_transcript_bundle(working["segments"])
+        stem = safe_filename(Path(working.get("source_name") or "transcript").stem)
+        x, y, z = st.columns(3)
+        x.download_button("Download TXT", bundle["txt"], f"{stem}.txt")
+        y.download_button("Download SRT", bundle["srt"], f"{stem}.srt")
+        z.download_button("Download VTT", bundle["vtt"], f"{stem}.vtt")
+        if project:
+            session_name = st.text_input("Saved transcript name", value=stem)
+            if st.button("Save transcript to project"):
+                save_transcript_session(project, session_name, working["segments"], working.get("source_name", ""), working.get("language", "")); save_project(project); st.success("Transcript saved to project")
+            sessions = project.settings.get("transcript_sessions", [])
+            if sessions:
+                st.subheader("Saved transcript sessions")
+                selected_session = st.selectbox("Load saved transcript", sessions, format_func=lambda item: f"{item['name']} · {item['created_at']}")
+                l1, l2 = st.columns(2)
+                if l1.button("Load selected transcript"):
+                    st.session_state.transcript_working = {"source_name": selected_session.get("source_name", ""), "language": selected_session.get("language", ""), "segments": selected_session["segments"]}; st.rerun()
+                if l2.button("Delete selected transcript"):
+                    delete_transcript_session(project, selected_session["id"]); save_project(project); st.rerun()
 
 elif page == "Render History":
     st.header("Render History")
@@ -349,18 +425,17 @@ else:
     st.header("Roadmap & Help")
     st.markdown("""
 ### Current release
-- Session-cached voice discovery for Azure, Polly, and Google with a searchable cross-provider library
-- Provider capability/readiness matrix and catalog-aware block voice selection
-- Reusable project voice presets with provider, language, voice, speed, and direction notes
-- Persistent jobs with resume, retry, cancellation, reopen, duplicate, delete, and output download controls
-- Session-only credentials excluded from project files and exports
+- Project pronunciation dictionary with case and whole-word controls
+- Safe pause markers compiled to cloud SSML or local pause approximations
+- Quality previews and processed-text snapshots in resumable jobs
+- Editable transcript segments with search and TXT, SRT, and VTT exports
+- Saved project transcript sessions plus all v0.03.12 provider, catalog, preset, and job features
 
 ### Planned next
-1. Pronunciation dictionary and provider-aware SSML controls
-2. Transcript editing, VTT export, and optional diarization
-3. Audio normalization, silence controls, and A/B renders
-4. Waveform metadata and non-destructive clip timeline
-5. Separate worker process and SQLite repository before hosted multi-user use
+1. Optional speaker diarization and speaker alignment
+2. Audio normalization, silence trimming, and A/B comparison renders
+3. Waveform metadata and non-destructive clip timeline
+4. Separate worker process and SQLite repository before hosted multi-user use
 
 ### Setup
 Run `start_windows.bat`. The launcher accepts installed Python 3.10, 3.11, or 3.12 and creates or reuses `.venv`. Install FFmpeg for compressed media transcription.
