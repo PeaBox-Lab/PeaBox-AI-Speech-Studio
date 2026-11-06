@@ -17,3 +17,5 @@ models/*.sha256
 data/backups/
 data/quarantine/
 data/support/
+
+data/worker/

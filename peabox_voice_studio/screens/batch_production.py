@@ -1,5 +1,5 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.facades.batch import add_job, build_manifest, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
+from peabox_voice_studio.facades.batch import add_job, build_manifest, create_job, delete_job, duplicate_job, enqueue, list_queue, load_queue, queue_progress, read_events, recover_stale, reopen_cancelled, replace_job, request_cancel, request_worker_cancel, retry_failed, run_job, sync_to_project
 import json
 import streamlit as st
 from pathlib import Path
@@ -56,6 +56,22 @@ def render(ctx: AppContext) -> None:
                 add_job(project, duplicate_job(selected_job)); save_project(project); st.rerun()
             if delete_clicked:
                 delete_job(project, selected_job["id"]); save_project(project); st.rerun()
+            st.subheader("Local worker queue")
+            eligible = all(item.get("provider") == "Kokoro local" for item in selected_job.get("items", []) if item.get("status") == "queued")
+            worker_cols = st.columns(4)
+            if worker_cols[0].button("Queue for local worker", disabled=not eligible or selected_job.get("status") in {"completed", "cancelled"}):
+                try: enqueue(selected_job); st.success("Queued. Run worker_local.py in a separate terminal."); st.rerun()
+                except Exception as exc: st.error("Queue failed: " + user_safe_error(exc))
+            related = [item for item in list_queue() if item.get("job_id") == selected_job.get("id")]
+            worker_item = related[0] if related else None
+            if worker_cols[1].button("Recover stale leases"): recover_stale(); st.rerun()
+            if worker_item and worker_cols[2].button("Sync worker progress"):
+                sync_to_project(project, load_queue(worker_item["queue_id"])); save_project(project); st.rerun()
+            if worker_item and worker_cols[3].button("Cancel worker job", disabled=worker_item.get("state") in {"completed", "cancelled"}): request_worker_cancel(worker_item["queue_id"]); st.rerun()
+            if worker_item:
+                fresh = load_queue(worker_item["queue_id"]); st.progress(queue_progress(fresh)); st.caption(f"Worker state: {fresh['state']} · Queue {fresh['queue_id'][:8]}")
+                events = read_events(fresh["queue_id"], 25)
+                if events: st.dataframe(list(reversed(events)), use_container_width=True, hide_index=True)
             if run_clicked:
                 from peabox_voice_studio.providers.kokoro import generate as kokoro_generate
                 from peabox_voice_studio.providers.cloud import generate_azure, generate_google, generate_polly

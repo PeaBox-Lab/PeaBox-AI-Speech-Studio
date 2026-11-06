@@ -1,3 +1,24 @@
+# v0.10.3 Additions and Improvements
+
+## Worker architecture
+- Durable local queue
+- Separate Kokoro worker process
+- Exclusive leases and heartbeat
+- Stale-worker recovery
+- Append-only progress events
+
+## Batch Production
+- Queue for local worker
+- Live progress bar
+- Recent event table
+- Cancel queued worker job
+- Recover stale leases
+- Sync results into project
+
+## Security
+- Cloud jobs rejected from persistent queue
+- No session credentials stored in worker files
+
 # v0.10.2 Additions and Improvements
 
 ## New workflow APIs

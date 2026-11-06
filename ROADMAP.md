@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.10.3
+- Durable local worker queue
+- Exclusive leases and heartbeat
+- Stale-worker recovery
+- Live item-level progress events
+- Cancellation and explicit project synchronization
+- Session-only cloud credential boundary
+
+## Recommended next release
+- Cloud-provider sandbox integration tests
+- Browser-driven screenshot regression suite
+- Long-running worker daemon with explicit install and shutdown controls
+- Object-storage abstraction and local quotas
+
+# Roadmap
+
 ## Delivered in v0.10.2
 - Project portfolio workflow facade
 - Governance and approval workflow facade

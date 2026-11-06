@@ -1,3 +1,26 @@
+# PeaBox Voice Studio v0.10.3 Detailed Release Notes
+
+## Durable worker queue
+Queueing creates a standalone envelope containing a copy of the resumable job, queue identity, project and job links, state, progress, lease metadata, and error state. Queue data is stored in the local worker directory rather than in credentials or UI session state.
+
+## Local worker process
+Run `python worker_local.py --once` from the application environment to process queued Kokoro jobs. The process acquires an exclusive lease, emits item-started and item-finished events, updates durable progress after each item, and releases the lease at completion.
+
+## Leases and recovery
+A second worker cannot acquire an unexpired lease. Heartbeats extend ownership. If a worker stops, stale-lease recovery clears the expired lease and requeues any item left in `running`, recording the recovery in the event stream.
+
+## Live progress and synchronization
+Batch Production shows queue state, progress percentage, and recent events. Worker results remain isolated until **Sync worker progress** is selected, which replaces the matching project job only after project identity validation.
+
+## Security boundary
+Only Kokoro local queued items are accepted. Azure, Polly, and Google jobs remain inline because their credentials are intentionally stored only in the active Streamlit session and are not persisted into queue files.
+
+## Compatibility
+Inline execution, retries, cancellation, reopening, duplication, deletion, output ZIPs, and all cumulative portfolio, governance, recovery, and maintenance workflows remain available.
+
+## Verification
+155 tests cover queue persistence, events, cloud rejection, exclusive leases, heartbeat, release, stale recovery, successful processing, renderer failure, cancellation, progress, project synchronization, and UI controls.
+
 # PeaBox Voice Studio v0.10.2 Detailed Release Notes
 
 ## Project portfolio API

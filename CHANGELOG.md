@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.10.3 — Local Worker & Live Progress
+- Added durable local worker queue envelopes and progress event logs.
+- Added exclusive leases, heartbeat renewal, release, and stale-lease recovery.
+- Added `worker_local.py` for separate-process Kokoro local execution.
+- Added queue, sync, cancel, stale recovery, live progress, and event controls to Batch Production.
+- Blocked cloud-provider jobs from the worker queue because cloud credentials remain session-only.
+- Retained inline Run/resume for compatibility.
+- Validation: 155 tests passed.
+
+# Changelog
+
 ## v0.10.2 — Portfolio & Governance Facades
 - Added `facades.portfolio` for project lifecycle, favorites/recents, imports, exports, and portfolio summaries.
 - Added `facades.governance` for project governance, comments, decisions, workflow transitions, approvals, readiness, and portfolio rows.

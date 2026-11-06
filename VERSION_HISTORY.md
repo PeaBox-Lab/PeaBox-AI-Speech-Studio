@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.3
+Added a durable local Kokoro worker queue with leases, heartbeat, stale recovery, progress events, cancellation, and explicit project synchronization, validated by 155 tests.
+
+# Version History
+
 ## v0.10.2
 Added bounded Project Portfolio and Governance workflow facades, composed cross-project readiness and approval APIs, and consolidated Portfolio Operations with 143-test validation.
 

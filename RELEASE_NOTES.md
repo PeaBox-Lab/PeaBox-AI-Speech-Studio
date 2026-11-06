@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.3 Release Notes
+
+v0.10.3 introduces the roadmap’s local worker and live-progress foundation. Kokoro batch jobs can be queued durably, processed from a separate terminal, monitored through append-only events, cancelled, recovered after stale leases, and explicitly synchronized back into the project.
+
 # PeaBox Voice Studio v0.10.2 Release Notes
 
 v0.10.2 completes the roadmap’s portfolio and governance facade milestone. Project and governance screens now rely on stable workflow contracts, and Portfolio Operations provides a consolidated cross-project view of ownership, risk, review comments, approvals, and readiness.

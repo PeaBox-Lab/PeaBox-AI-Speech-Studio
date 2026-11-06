@@ -1,3 +1,8 @@
+# v0.10.3 Feature Additions
+
+## Local Worker & Live Progress
+Queue Kokoro batch jobs, process them outside the Streamlit request, monitor durable item-level progress, recover interrupted leases, and synchronize completed state back into the project.
+
 # v0.10.2 Feature Additions
 
 ## Portfolio Operations

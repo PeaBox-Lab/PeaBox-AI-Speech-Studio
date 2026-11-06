@@ -1,3 +1,11 @@
+# v0.10.3 Help Update
+
+- **No queued jobs:** create and queue a Kokoro local batch first.
+- **Cloud job rejected:** cloud credentials are session-only; use inline Run/resume.
+- **Worker interrupted:** click Recover stale leases, then run the worker again.
+- **Project not updated:** click Sync worker progress after the worker finishes.
+- **Queue leased:** another worker owns the job until its lease expires or is released.
+
 # v0.10.2 Help Update
 
 Portfolio Operations is a local summary derived from project JSON. It does not authenticate owners or reviewers. Approval records remain local attestations rather than digital signatures. Project data and export formats remain compatible.
