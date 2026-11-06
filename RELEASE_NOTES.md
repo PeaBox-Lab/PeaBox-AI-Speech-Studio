@@ -1,18 +1,6 @@
-# PeaBox Voice Studio v0.10.1 Release Notes
+# PeaBox Voice Studio v0.10.2 Release Notes
 
-v0.10.1 completes the roadmap’s maintenance and retention milestone. Operations Center can now track recurring local review checklists and preview safe cleanup candidates before any file is permanently removed.
-
-# PeaBox Voice Studio v0.10.0 Release Notes
-
-v0.10.0 delivers the roadmap’s consolidated recovery milestone. Operations Center now provides storage inventory, reversible quarantine, repository backups and restores, project metadata snapshots, sanitized support evidence, and clear confirmation gates for every mutating recovery action.
-
-# PeaBox Voice Studio v0.09.4 Release Notes
-
-v0.09.4 fixes the screenshot-reported sidebar and navigation failures. Quick Access labels now remain readable against the dark corporate sidebar, programmatic navigation no longer mutates instantiated Streamlit widget keys, and Project Workspace uses the shared application context instead of an unavailable bootstrap helper.
-
-# PeaBox Voice Studio v0.09.3 Release Notes
-
-v0.09.3 introduces bounded workflow APIs for Timeline Studio, Batch Production, and Transcription Studio. These complex screens now depend on stable facade modules rather than the implementation details of multiple underlying services, improving maintainability without changing user workflows or project formats.
+v0.10.2 completes the roadmap’s portfolio and governance facade milestone. Project and governance screens now rely on stable workflow contracts, and Portfolio Operations provides a consolidated cross-project view of ownership, risk, review comments, approvals, and readiness.
 
 # PeaBox Voice Studio v0.07.4 Release Notes
 This release implements the highest-priority findings from the v0.07.3 audit. Generated outputs no longer silently replace files with the same name. Timeline readiness now checks the stored audio content hash, not only file existence and script-block state.

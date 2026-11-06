@@ -1,63 +1,17 @@
 # Roadmap
 
-## Delivered in v0.10.1
-- Local maintenance plans and completion history
-- Due, overdue, pause, and resume states
-- Preview-first retention policies
-- Safe-root and exact-candidate cleanup enforcement
-- Operations Center Maintenance tab
+## Delivered in v0.10.2
+- Project portfolio workflow facade
+- Governance and approval workflow facade
+- Cross-project governance and readiness rows
+- Pending-first approval queue API
+- Consolidated Portfolio Operations view
 
 ## Recommended next release
 - Browser-driven screenshot regression suite
 - Cloud-provider sandbox integration tests
-- Governance and project portfolio workflow facades
-- Optional operating-system scheduling integration with explicit user setup
-
-# Roadmap
-
-## Delivered in v0.10.0
-- Storage inventory and orphan detection
-- Reversible quarantine and restore
-- Database backup, validation, atomic restore, and rollback
-- Metadata-only project snapshots
-- Sanitized support bundles
-- Historical migration fixture matrix
-
-## Recommended next release
-- Browser-driven screenshot regression suite
-- Cloud-provider sandbox integration tests
-- Retention policies and maintenance-plan automation
-- Governance and project portfolio workflow facades
-
-# Roadmap
-
-## Delivered in v0.09.4
-- Sidebar Quick Access contrast repair
-- Deferred Streamlit navigation lifecycle
-- Project Workspace context repair
-- Screenshot-driven visual and runtime regression tests
-
-## Recommended next release
-- Browser-driven screenshot regression suite
-- Backup, restore, storage inventory, and support-bundle consolidation
-- Historical project migration fixture matrix
-- Cloud-provider sandbox integration tests
-
-# Roadmap
-
-## Delivered in v0.09.3
-- Timeline workflow facade
-- Batch production workflow facade
-- Transcription workflow facade
-- Hidden-service import enforcement
-- Facade behavioral parity tests
-
-## Recommended next release
-- Backup, restore, storage inventory, and support-bundle consolidation
-- Historical project migration fixture matrix
-- Browser-driven navigation and visual regression suite
-- Cloud-provider sandbox integration tests
-- Additional facades for governance and project portfolio workflows
+- Optional operating-system maintenance scheduling
+- Background worker and live job progress architecture
 
 # Evidence-Based Product Roadmap
 ## Roadmap basis

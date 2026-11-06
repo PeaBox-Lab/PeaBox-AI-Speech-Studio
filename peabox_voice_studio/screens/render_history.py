@@ -1,6 +1,6 @@
 from peabox_voice_studio.context import AppContext
+from peabox_voice_studio.facades.governance import governance, governance_summary
 import streamlit as st
-from peabox_voice_studio.services.governance import governance, governance_summary
 from peabox_voice_studio.ui import section
 
 def render(ctx: AppContext) -> None:

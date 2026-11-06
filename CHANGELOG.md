@@ -1,47 +1,12 @@
 # Changelog
 
-## v0.10.1 — Maintenance & Retention
-- Added local maintenance plans with frequency, due state, pause/resume, completion notes, and history.
-- Added retention-policy previews for database backups, restored quarantine records, and support artifacts.
-- Added exact reclaimable file and byte totals.
-- Added confirmation-gated retention application.
-- Enforced approved recovery-directory boundaries and exact preview candidate deletion.
-- Added Maintenance tab to Operations Center.
-- Validation: 178 tests passed.
-
-# Changelog
-
-## v0.10.0 — Operations Recovery Toolkit
-- Added storage inventory and category summaries.
-- Added unreferenced output detection, reversible quarantine, and restore.
-- Added SQLite integrity validation, database backups, transactional restore, and rollback copies.
-- Added metadata-only project snapshots.
-- Added sanitized support bundles with explicit data exclusions.
-- Consolidated recovery workflows into Operations Center.
-- Added schema 1/schema 2/future-schema migration fixtures and path-rewrite tests.
-- Validation: 167 tests passed.
-
-# Changelog
-
-## v0.09.4 — UI & Navigation Reliability
-- Fixed near-invisible labels on the four sidebar Quick Access buttons.
-- Added explicit high-contrast normal, hover, focus, and disabled button styling in the sidebar.
-- Changed `navigate_to()` to queue a pending destination instead of mutating Streamlit widget keys after instantiation.
-- Applied pending navigation before the sidebar selectbox and radio widgets are created.
-- Removed the stale `current_project()` call from the modular Project Workspace screen.
-- Added six focused regression tests for contrast, navigation lifecycle, and project context.
-- Validation: 151 tests passed.
-
-# Changelog
-
-## v0.09.3 — Production Service Facades
-- Added `facades.timeline`, `facades.batch`, and `facades.transcription`.
-- Routed the three largest production workflows through bounded APIs.
-- Blocked direct imports of hidden timeline, bundle, batch, job, transcript, and readiness services from their screens.
-- Added explicit facade export contracts and behavioral parity tests.
-- Kept facades independent of Streamlit and peer screens.
-- Preserved the registry-driven interface and cumulative Operations Center.
-- Validation: 145 tests passed.
+## v0.10.2 — Portfolio & Governance Facades
+- Added `facades.portfolio` for project lifecycle, favorites/recents, imports, exports, and portfolio summaries.
+- Added `facades.governance` for project governance, comments, decisions, workflow transitions, approvals, readiness, and portfolio rows.
+- Added composed pending-first approval queues and portfolio governance reports.
+- Routed Project Workspace, Governance Center, Approval Queue, Activity History, and Portfolio Operations through bounded APIs.
+- Retained cumulative recovery, snapshots, maintenance plans, and retention previews.
+- Validation: 143 tests passed.
 
 # Changelog
 ## v0.07.4 — 2026-11-05

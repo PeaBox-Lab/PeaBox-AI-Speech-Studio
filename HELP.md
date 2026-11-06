@@ -1,24 +1,6 @@
-# v0.10.1 Help Update
+# v0.10.2 Help Update
 
-- Maintenance plans are reminders and evidence records inside the application, not scheduled background jobs.
-- Retention previews are read-only.
-- Applying retention is permanent for the displayed backup, restored-record, and support-artifact candidates.
-- Authoritative project JSON, active outputs, and models are excluded from retention cleanup.
-
-# v0.10.0 Help Update
-
-- **Quarantine is not deletion:** files can be restored unless their quarantine copy is manually removed.
-- **SQLite is secondary:** database backup and restore affects the project index, not authoritative project JSON.
-- **Snapshots exclude media:** use timeline bundles for projects that must travel with WAV assets.
-- **Support bundles are sanitized:** review the included JSON before sharing if your organization requires additional controls.
-
-# v0.09.4 Help Update
-
-If upgrading from v0.09.2 or v0.09.3, replace the extracted application folder with v0.09.4. Existing project JSON, timeline bundles, transcript sessions, batch jobs, and preferences remain compatible. The release specifically resolves blank-looking Quick Access controls and navigation exceptions.
-
-# v0.09.3 Help Update
-
-No project conversion is required. Existing project JSON, timeline bundles, batch jobs, transcript sessions, governance records, and preferences remain compatible with v0.09.3.
+Portfolio Operations is a local summary derived from project JSON. It does not authenticate owners or reviewers. Approval records remain local attestations rather than digital signatures. Project data and export formats remain compatible.
 
 # Help Articles
 ## A timeline clip says the audio changed

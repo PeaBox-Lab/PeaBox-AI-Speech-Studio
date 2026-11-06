@@ -1,1 +1,1 @@
-"""Bounded workflow APIs for complex screens."""
+"""Bounded workflow APIs."""

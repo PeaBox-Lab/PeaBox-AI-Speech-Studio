@@ -1,22 +1,7 @@
 # Version History
 
-## v0.10.1
-Added local maintenance plans and preview-first retention policies with strict safe-root enforcement, completion history, and 178-test cumulative validation.
-
-# Version History
-
-## v0.10.0
-Introduced the consolidated Operations Recovery Toolkit: storage inventory, reversible quarantine, database backups and rollback-safe restores, metadata snapshots, sanitized support bundles, and historical migration fixtures.
-
-# Version History
-
-## v0.09.4
-Fixed the four low-contrast sidebar Quick Access controls, eliminated Streamlit navigation-key mutation errors, repaired Project Workspace context resolution, and expanded cumulative validation to 151 tests.
-
-# Version History
-
-## v0.09.3
-Introduced bounded service facades for Timeline Studio, Batch Production, and Transcription Studio, with enforced isolation and behavioral parity validation across 145 tests.
+## v0.10.2
+Added bounded Project Portfolio and Governance workflow facades, composed cross-project readiness and approval APIs, and consolidated Portfolio Operations with 143-test validation.
 
 # Cumulative Version History
 - **v0.02.01** — Modular project workspace foundation

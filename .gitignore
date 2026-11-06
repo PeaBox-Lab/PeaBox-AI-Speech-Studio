@@ -7,10 +7,13 @@ data/*.db
 data/*.jsonl
 data/*.json
 data/backups/
+data/quarantine/
+data/support/
 outputs/*
 models/*.onnx
 models/*.bin
 models/*.sha256
 
+data/backups/
 data/quarantine/
 data/support/

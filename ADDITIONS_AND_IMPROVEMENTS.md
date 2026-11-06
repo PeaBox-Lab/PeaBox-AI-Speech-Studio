@@ -1,75 +1,18 @@
-# v0.10.1 Additions and Improvements
-
-## Maintenance planning
-- Four plan frequencies
-- Due, overdue, and paused states
-- Completion notes and history
-- Pause and resume controls
-
-## Retention
-- Keep-latest backup policy
-- Restored quarantine record age policy
-- Support artifact age policy
-- Preview file count and reclaimable bytes
-- Confirmation-gated exact cleanup
-- Approved-directory enforcement
-
-# v0.10.0 Additions and Improvements
-
-## Recovery
-- Reversible output quarantine
-- Collision-safe quarantine restore
-- SQLite backup and atomic restore
-- Automatic rollback copy before restore
-- Metadata-only project snapshots
-
-## Operations visibility
-- Storage inventory
-- Category file and size summaries
-- Orphan output detection
-- Database integrity status
-- Backup inventory
-
-## Support and compatibility
-- Sanitized support ZIP
-- Explicit exclusion disclosure
-- Historical migration fixture matrix
-- 167 passing tests
-
-# v0.09.4 Additions and Improvements
-
-## Visual fixes
-- Readable Quick Access button labels
-- Dark sidebar-specific button surfaces
-- Visible hover, keyboard-focus, and disabled states
-
-## Runtime fixes
-- Deferred programmatic navigation
-- Navigation defaults applied before widget creation
-- Project Workspace uses `AppContext.project`
-
-## Regression protection
-- Contrast contract tests
-- Session-state lifecycle tests
-- Modular Project Workspace dependency tests
-
-# v0.09.3 Additions and Improvements
+# v0.10.2 Additions and Improvements
 
 ## New workflow APIs
-- Timeline workflow facade
-- Batch job workflow facade
-- Transcription workflow facade
+- Project portfolio facade
+- Governance and approvals facade
+- Portfolio summary and quick-access composition
+- Cross-project governance readiness rows
+- Pending-first approval queue
 
-## Architecture controls
-- Direct hidden-service imports blocked in facaded screens
-- Explicit and unique facade export lists
-- Streamlit-free facade modules
-- Behavioral parity validation
-
-## Compatibility
-- No project migration required
-- No navigation or workflow changes
-- Cumulative Operations Center retained
+## Operations
+- Consolidated portfolio KPI view
+- Ownership and risk visibility
+- Review and approval totals
+- Readiness status by project
+- Cumulative recovery and maintenance controls
 
 # v0.07.4 Additions and Improvements
 ## Integrity

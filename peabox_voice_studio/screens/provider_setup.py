@@ -1,5 +1,6 @@
 from peabox_voice_studio.context import AppContext
-import json, streamlit as st
+import json
+import streamlit as st
 from peabox_voice_studio.services.catalogs import capability_rows
 from peabox_voice_studio.services.files import user_safe_error
 

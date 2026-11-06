@@ -1,6 +1,6 @@
 from peabox_voice_studio.context import AppContext
+from peabox_voice_studio.facades.governance import approval_queue, decide_approval, governance, governance_summary, request_approval
 import streamlit as st
-from peabox_voice_studio.services.governance import decide_approval, governance, governance_summary, request_approval
 from peabox_voice_studio.ui import callout, empty_state, kpi_card, section
 
 def render(ctx: AppContext) -> None:
@@ -32,7 +32,7 @@ def render(ctx: AppContext) -> None:
         approvals = data.get("approvals", [])
         if approvals:
             section("Approval queue", "Pending requests appear first; completed records remain as project history.")
-            ordered = sorted(approvals, key=lambda item: (item.get("status") != "Pending", item.get("created_at", "")))
+            ordered = approval_queue(project)
             for item in ordered:
                 with st.expander(f"{item.get('status')} · {item.get('scope')} · reviewer {item.get('reviewer')}", expanded=item.get("status") == "Pending"):
                     st.caption(f"Requested by {item.get('requester')} at {item.get('created_at')}")

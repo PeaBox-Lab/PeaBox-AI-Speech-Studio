@@ -1,25 +1,10 @@
-# v0.10.1 Feature Additions
+# v0.10.2 Feature Additions
 
-## Maintenance & Retention
-Create operational review plans, track completion evidence, preview retention candidates, and apply cleanup only after reviewing the exact files and confirming permanent removal.
+## Portfolio Operations
+Review ownership, workflow stage, risk, comments, approvals, and readiness across every local project.
 
-# v0.10.0 Feature Additions
-
-## Operations Recovery Toolkit
-Review local storage, identify unreferenced generated files, quarantine and restore outputs safely, create database recovery points, restore validated backups, download project metadata snapshots, and generate sanitized support evidence from one Operations Center.
-
-# v0.09.4 Reliability Improvements
-
-## Accessible quick navigation
-Sidebar Quick Access controls now use explicit readable colors in every interaction state.
-
-## Deferred navigation
-Dashboard actions, Command Center actions, empty-state links, and sidebar shortcuts queue navigation safely for the next rerun instead of mutating live widget state.
-
-# v0.09.3 Feature Additions
-
-## Stable production workflow APIs
-Timeline, batch jobs, and transcription now expose cohesive public workflow surfaces to the interface. This hides implementation detail and creates reusable boundaries for future browser, CLI, or automation clients.
+## Stable portfolio and governance APIs
+Project and governance screens now share bounded public workflows instead of coupling to implementation modules.
 
 # Features Guide
 ## Workspace productivity

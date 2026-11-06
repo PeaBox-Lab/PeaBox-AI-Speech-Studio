@@ -7,7 +7,7 @@ NAVIGATION = {
         ("Project Workspace", "Projects", "▣"),
         ("Command Center", "Command Center", "⌕"),
         ("Interface Preferences", "Preferences", "◐"),
-        ("Operations Center", "Operations", "⚙"),
+        ("Portfolio Operations", "Operations", "⚙"),
     ],
     "Production": [
         ("Script Editor", "Script Blocks", "✎"),
@@ -37,7 +37,7 @@ PAGE_META = {
     "Projects": ("Project Workspace", "Create, open, import, export, and maintain portable production projects.", "Overview"),
     "Command Center": ("Workspace Command Center", "Search screens, discover project-aware actions, and reopen recent commands.", "Overview"),
     "Preferences": ("Interface Preferences", "Personalize navigation density, startup area, motion, and dashboard detail on this device.", "Overview"),
-    "Operations": ("Operations Center", "Review project health, repairs, and repository integrity.", "Overview"),
+    "Operations": ("Portfolio Operations", "Review ownership, workflow, comments, approvals, and readiness across local projects.", "Overview"),
     "Script Blocks": ("Script Editor", "Structure the master script into reusable, provider-aware production blocks.", "Production"),
     "Create Speech": ("Speech Generator", "Generate and review individual local voice outputs.", "Production"),
     "Batch Production": ("Batch Jobs", "Validate, queue, resume, retry, cancel, and package multi-provider production jobs.", "Production"),
@@ -126,15 +126,6 @@ div[data-baseweb="popover"] li[role="option"]:hover { background:#edf4fc!importa
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p { color:#ffffff!important; font-weight:720; }
 [data-testid="stSidebar"] div[role="radiogroup"] input { accent-color:#72d4e5; }
 [data-testid="stSidebar"] hr { border-color:#385374; margin:.85rem 0; }
-[data-testid="stSidebar"] .stButton > button {
-  background:#203b64!important; color:#ffffff!important; -webkit-text-fill-color:#ffffff!important;
-  border:1px solid #5f82aa!important; box-shadow:none!important; opacity:1!important;
-}
-[data-testid="stSidebar"] .stButton > button p,
-[data-testid="stSidebar"] .stButton > button span { color:#ffffff!important; -webkit-text-fill-color:#ffffff!important; opacity:1!important; }
-[data-testid="stSidebar"] .stButton > button:hover { background:#2b578a!important; border-color:#82bedc!important; }
-[data-testid="stSidebar"] .stButton > button:focus { outline:2px solid #7fd7e8!important; outline-offset:1px; }
-[data-testid="stSidebar"] .stButton > button:disabled { background:#294360!important; color:#dbe8f7!important; -webkit-text-fill-color:#dbe8f7!important; opacity:1!important; }
 .block-container {
   width:100%; max-width:1440px; box-sizing:border-box;
   padding:3.35rem 2.25rem 4rem!important;

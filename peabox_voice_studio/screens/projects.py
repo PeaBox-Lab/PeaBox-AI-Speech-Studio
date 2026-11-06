@@ -1,10 +1,8 @@
 from peabox_voice_studio.context import AppContext
+from peabox_voice_studio.facades.portfolio import export_project, import_timeline_bundle, resolve_projects, save_preferences, split_script_into_blocks, toggle_favorite
 import streamlit as st
 from peabox_voice_studio.config import MAX_SCRIPT_CHARS, OUTPUTS_DIR
-from peabox_voice_studio.services.bundles import import_timeline_bundle
 from peabox_voice_studio.services.files import safe_filename, user_safe_error
-from peabox_voice_studio.services.preferences import resolve_projects, save_preferences, toggle_favorite
-from peabox_voice_studio.services.projects import export_project, split_script_into_blocks
 from peabox_voice_studio.ui import section
 
 def render(ctx: AppContext) -> None:
