@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.09.4 Release Notes
+
+v0.09.4 fixes the screenshot-reported sidebar and navigation failures. Quick Access labels now remain readable against the dark corporate sidebar, programmatic navigation no longer mutates instantiated Streamlit widget keys, and Project Workspace uses the shared application context instead of an unavailable bootstrap helper.
+
 # PeaBox Voice Studio v0.09.3 Release Notes
 
 v0.09.3 introduces bounded workflow APIs for Timeline Studio, Batch Production, and Transcription Studio. These complex screens now depend on stable facade modules rather than the implementation details of multiple underlying services, improving maintainability without changing user workflows or project formats.

@@ -1,5 +1,10 @@
 # Version History
 
+## v0.09.4
+Fixed the four low-contrast sidebar Quick Access controls, eliminated Streamlit navigation-key mutation errors, repaired Project Workspace context resolution, and expanded cumulative validation to 151 tests.
+
+# Version History
+
 ## v0.09.3
 Introduced bounded service facades for Timeline Studio, Batch Production, and Transcription Studio, with enforced isolation and behavioral parity validation across 145 tests.
 

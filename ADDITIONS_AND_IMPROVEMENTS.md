@@ -1,3 +1,20 @@
+# v0.09.4 Additions and Improvements
+
+## Visual fixes
+- Readable Quick Access button labels
+- Dark sidebar-specific button surfaces
+- Visible hover, keyboard-focus, and disabled states
+
+## Runtime fixes
+- Deferred programmatic navigation
+- Navigation defaults applied before widget creation
+- Project Workspace uses `AppContext.project`
+
+## Regression protection
+- Contrast contract tests
+- Session-state lifecycle tests
+- Modular Project Workspace dependency tests
+
 # v0.09.3 Additions and Improvements
 
 ## New workflow APIs

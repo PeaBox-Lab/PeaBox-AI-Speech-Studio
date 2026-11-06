@@ -126,6 +126,15 @@ div[data-baseweb="popover"] li[role="option"]:hover { background:#edf4fc!importa
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p { color:#ffffff!important; font-weight:720; }
 [data-testid="stSidebar"] div[role="radiogroup"] input { accent-color:#72d4e5; }
 [data-testid="stSidebar"] hr { border-color:#385374; margin:.85rem 0; }
+[data-testid="stSidebar"] .stButton > button {
+  background:#203b64!important; color:#ffffff!important; -webkit-text-fill-color:#ffffff!important;
+  border:1px solid #5f82aa!important; box-shadow:none!important; opacity:1!important;
+}
+[data-testid="stSidebar"] .stButton > button p,
+[data-testid="stSidebar"] .stButton > button span { color:#ffffff!important; -webkit-text-fill-color:#ffffff!important; opacity:1!important; }
+[data-testid="stSidebar"] .stButton > button:hover { background:#2b578a!important; border-color:#82bedc!important; }
+[data-testid="stSidebar"] .stButton > button:focus { outline:2px solid #7fd7e8!important; outline-offset:1px; }
+[data-testid="stSidebar"] .stButton > button:disabled { background:#294360!important; color:#dbe8f7!important; -webkit-text-fill-color:#dbe8f7!important; opacity:1!important; }
 .block-container {
   width:100%; max-width:1440px; box-sizing:border-box;
   padding:3.35rem 2.25rem 4rem!important;
@@ -193,10 +202,14 @@ def page_entry(page: str) -> tuple[str, str, str, str]:
                 return group, label, internal, icon
     raise ValueError(f"Unknown page: {page}")
 def navigate_to(page: str) -> None:
-    group, label, _, icon = page_entry(page)
-    st.session_state.nav_group = group
-    st.session_state[f"nav_page_{group}"] = f"{icon}  {label}"
+    page_entry(page)
+    st.session_state["pending_navigation"] = page
 def sidebar_navigation(version: str, project: Any = None, preferences: dict | None = None) -> str:
+    pending_page = st.session_state.pop("pending_navigation", None)
+    if pending_page:
+        pending_group, pending_label, _, pending_icon = page_entry(pending_page)
+        st.session_state["nav_group"] = pending_group
+        st.session_state[f"nav_page_{pending_group}"] = f"{pending_icon}  {pending_label}"
     st.sidebar.markdown('<div style="font-size:1.12rem;font-weight:750;margin:.2rem 0 .1rem">PeaBox Voice Studio</div>', unsafe_allow_html=True)
     st.sidebar.caption(f"Enterprise workspace · v{version}")
     group_names = list(NAVIGATION)

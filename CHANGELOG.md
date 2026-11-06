@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.09.4 — UI & Navigation Reliability
+- Fixed near-invisible labels on the four sidebar Quick Access buttons.
+- Added explicit high-contrast normal, hover, focus, and disabled button styling in the sidebar.
+- Changed `navigate_to()` to queue a pending destination instead of mutating Streamlit widget keys after instantiation.
+- Applied pending navigation before the sidebar selectbox and radio widgets are created.
+- Removed the stale `current_project()` call from the modular Project Workspace screen.
+- Added six focused regression tests for contrast, navigation lifecycle, and project context.
+- Validation: 151 tests passed.
+
+# Changelog
+
 ## v0.09.3 — Production Service Facades
 - Added `facades.timeline`, `facades.batch`, and `facades.transcription`.
 - Routed the three largest production workflows through bounded APIs.

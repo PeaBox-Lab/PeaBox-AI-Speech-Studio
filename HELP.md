@@ -1,3 +1,7 @@
+# v0.09.4 Help Update
+
+If upgrading from v0.09.2 or v0.09.3, replace the extracted application folder with v0.09.4. Existing project JSON, timeline bundles, transcript sessions, batch jobs, and preferences remain compatible. The release specifically resolves blank-looking Quick Access controls and navigation exceptions.
+
 # v0.09.3 Help Update
 
 No project conversion is required. Existing project JSON, timeline bundles, batch jobs, transcript sessions, governance records, and preferences remain compatible with v0.09.3.

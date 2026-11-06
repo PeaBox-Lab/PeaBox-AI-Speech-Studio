@@ -53,7 +53,7 @@ def render(ctx: AppContext) -> None:
             except Exception as exc:
                 st.error("Bundle import failed: " + user_safe_error(exc))
     with right:
-        project = current_project()
+        project = ctx.project
         if not project: st.info("Create or open a project to begin.")
         else:
             project.name = st.text_input("Project name", project.name)

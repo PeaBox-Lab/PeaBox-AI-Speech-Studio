@@ -1,3 +1,11 @@
+# v0.09.4 Reliability Improvements
+
+## Accessible quick navigation
+Sidebar Quick Access controls now use explicit readable colors in every interaction state.
+
+## Deferred navigation
+Dashboard actions, Command Center actions, empty-state links, and sidebar shortcuts queue navigation safely for the next rerun instead of mutating live widget state.
+
 # v0.09.3 Feature Additions
 
 ## Stable production workflow APIs

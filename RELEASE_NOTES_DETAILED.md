@@ -1,3 +1,20 @@
+# PeaBox Voice Studio v0.09.4 Detailed Release Notes
+
+## Sidebar contrast
+The Dashboard, Script, Generate, and Timeline Quick Access buttons previously inherited light-page button styling, producing pale text on near-white boxes. Sidebar buttons now use an explicit dark-blue background, white text, visible border, and defined hover, focus, and disabled states.
+
+## Safe navigation lifecycle
+Streamlit prevents a widget-owned session key from being changed after the widget is created in the same run. `navigate_to()` now writes only a neutral pending destination. On the next rerun, `sidebar_navigation()` resolves that destination and sets the navigation widget defaults before either widget is instantiated.
+
+## Project Workspace context
+The modular Projects screen retained a call to the old app-local `current_project()` helper. It now reads `ctx.project`, matching the renderer contract used by all modular screens.
+
+## Compatibility
+Project data, workflow facades, navigation labels, governance, approvals, timelines, batch jobs, transcription sessions, exports, and provider behavior remain unchanged.
+
+## Verification
+151 tests cover cumulative features plus explicit sidebar contrast selectors, deferred navigation ordering, widget-key isolation, context-based Project Workspace state, page smoke execution, and facade boundaries.
+
 # PeaBox Voice Studio v0.09.3 Detailed Release Notes
 
 ## Workflow facades

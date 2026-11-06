@@ -1,5 +1,19 @@
 # Roadmap
 
+## Delivered in v0.09.4
+- Sidebar Quick Access contrast repair
+- Deferred Streamlit navigation lifecycle
+- Project Workspace context repair
+- Screenshot-driven visual and runtime regression tests
+
+## Recommended next release
+- Browser-driven screenshot regression suite
+- Backup, restore, storage inventory, and support-bundle consolidation
+- Historical project migration fixture matrix
+- Cloud-provider sandbox integration tests
+
+# Roadmap
+
 ## Delivered in v0.09.3
 - Timeline workflow facade
 - Batch production workflow facade
