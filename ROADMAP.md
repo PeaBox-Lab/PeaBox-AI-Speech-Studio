@@ -1,5 +1,20 @@
 # Roadmap
 
+## Delivered in v0.10.7
+- Formal storage backend contract
+- Local backend adapter
+- In-memory validation backend
+- Backend registry and contract reports
+- Cross-backend migration validation
+
+## Recommended next release
+- Cloud-provider sandbox integration tests
+- Browser-driven screenshot regression suite
+- Optional remote backend with explicit credentials, approval, and rollback
+- Backend health, retry, and circuit-breaker contract
+
+# Roadmap
+
 ## Delivered in v0.10.6
 - Local object-storage abstraction
 - Safe logical keys and namespaces

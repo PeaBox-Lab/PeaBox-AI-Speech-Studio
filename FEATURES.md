@@ -1,3 +1,8 @@
+# v0.10.7 Feature Additions
+
+## Pluggable Storage Backends
+Validate storage implementations through a stable contract and test cross-backend migration with a non-persistent in-memory backend while retaining the local backend as the durable default.
+
 # v0.10.6 Feature Additions
 
 ## Local Object Storage

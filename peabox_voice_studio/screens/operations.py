@@ -5,6 +5,7 @@ from peabox_voice_studio.facades.governance import portfolio_governance
 from peabox_voice_studio.services.object_storage import audit_manifest, copy_object, delete_object, list_objects, move_object, rebuild_manifest
 from peabox_voice_studio.services.maintenance import apply_retention,complete,create,load,retention_preview,save,status
 from peabox_voice_studio.services.recovery import backup_database,inventory,snapshot,validate_database
+from peabox_voice_studio.services.storage_backends import MemoryBackend, contract_report, migration_preview as backend_migration_preview, migrate as migrate_backend, registry as backend_registry
 from peabox_voice_studio.services.storage_policy import active_reservations,load_policy,policy_status,release_reservation,reserve,save_policy
 from peabox_voice_studio.ui import empty_state,kpi_card,section
 def render(ctx:AppContext)->None:
@@ -15,7 +16,7 @@ def render(ctx:AppContext)->None:
  with cols[2]:kpi_card('Pending approvals',str(sum(x['pending_approvals'] for x in rows)),'Awaiting decisions')
  with cols[3]:kpi_card('Unassigned',str(sum(x['owner']=='Unassigned' for x in rows)),'Projects without owner')
  with cols[4]:kpi_card('Storage',f'{len(files)} files',f"{sum(x['bytes'] for x in files)/1048576:.1f} MB")
- tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects'])
+ tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects','Backends'])
  with tabs[0]:
   if rows:st.dataframe(rows,use_container_width=True,hide_index=True)
   else:empty_state('No projects','Create a project to begin portfolio monitoring.','Open Project Workspace','Projects')
@@ -38,6 +39,8 @@ def render(ctx:AppContext)->None:
   _render_capacity_tab()
  with tabs[4]:
   _render_object_storage_tab()
+ with tabs[5]:
+  _render_storage_backends_tab()
 
 # Capacity policy is rendered as the fourth Operations tab.
 def _render_capacity_tab():
@@ -87,3 +90,15 @@ def _render_object_storage_tab():
     try:delete_object(selected['namespace'],selected['key']);st.rerun()
     except Exception as exc:st.error(str(exc))
  else:st.info('Rebuild the manifest to register existing managed files.')
+
+def _render_storage_backends_tab():
+ st.caption('Local is the active durable backend. Memory is a non-persistent validation backend for contract and migration testing.')
+ local=backend_registry.create('local');memory=MemoryBackend();st.write({'Registered backends':backend_registry.names(),'Local contract':contract_report(local),'Memory contract':contract_report(memory)})
+ local_objects=local.list();st.write({'Local objects':len(local_objects),'Local audit healthy':local.audit()['healthy']})
+ namespace=st.selectbox('Migration namespace',['All','outputs','models','backups','quarantine','support','worker'],key='backend_namespace')
+ preview=backend_migration_preview(local,memory,None if namespace=='All' else namespace);st.write({'Preview files':preview['files'],'Preview MB':round(preview['bytes']/1048576,3),'Source':preview['source'],'Target':preview['target']})
+ if preview['items']:st.dataframe(preview['items'],use_container_width=True,hide_index=True)
+ confirm=st.checkbox('Run non-persistent migration test into memory backend',disabled=not preview['items'])
+ if st.button('Validate backend migration',disabled=not confirm):
+  result=migrate_backend(preview,local,memory);st.write({'Migrated':result['files'],'Failed':len(result['failed']),'Memory audit healthy':memory.audit()['healthy']})
+ st.info('Backend selection is not persisted. Remote backends require a future explicit credential and approval workflow.')

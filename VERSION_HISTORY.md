@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.7
+Added a formal pluggable storage contract, durable local adapter, in-memory backend, registry, cross-backend migrations, contract validation, and 205-test verification.
+
+# Version History
+
 ## v0.10.6
 Added a local object-storage abstraction with safe keys, namespaces, quota-aware writes, verified operations, durable manifests, integrity audits, migrations, and 191-test validation.
 

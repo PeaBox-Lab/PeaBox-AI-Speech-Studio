@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.7 Release Notes
+
+v0.10.7 formalizes the object-storage layer behind a pluggable backend contract. The current local backend remains authoritative, while a non-persistent in-memory backend verifies behavioral parity and cross-backend migration without introducing remote credentials.
+
 # PeaBox Voice Studio v0.10.6 Release Notes
 
 v0.10.6 delivers the roadmap’s object-storage abstraction milestone as a local backend. Managed files can now be addressed by safe namespace/key pairs, indexed in a durable manifest, audited for drift, and migrated without exposing absolute paths to higher-level workflows.

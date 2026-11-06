@@ -1,3 +1,27 @@
+# v0.10.7 Additions and Improvements
+
+## Backend contract
+- Put and get
+- Exists and delete
+- List
+- Copy and move
+- Audit
+
+## Built-in backends
+- Local durable backend
+- In-memory validation backend
+
+## Migration
+- Namespace filtering
+- File and byte preview
+- Hash verification
+- Conflict and failure reporting
+
+## Registry
+- Named factories
+- Unknown-backend rejection
+- Contract type validation
+
 # v0.10.6 Additions and Improvements
 
 ## Object API

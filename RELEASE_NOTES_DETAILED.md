@@ -1,3 +1,29 @@
+# PeaBox Voice Studio v0.10.7 Detailed Release Notes
+
+## Backend contract
+`StorageBackend` defines put, get, exists, delete, list, copy, move, and audit operations. Higher-level code can validate a backend through a contract report rather than depending on local filesystem implementation details.
+
+## Local backend
+`LocalBackend` adapts the existing safe-key, namespace, manifest, quota, copy/move/delete, and integrity-audit behavior. Existing object identities and files are unchanged.
+
+## Memory backend
+`MemoryBackend` implements the same public operations and metadata fields entirely in memory. It is intended for tests, migration validation, and future integration development. Its contents disappear when the process ends.
+
+## Registry
+The backend registry maps names to factories, validates registration input, rejects unknown names, and verifies that created objects implement the formal contract. Built-in names are `local` and `memory`.
+
+## Cross-backend migration
+A migration preview lists source backend, target backend, optional namespace filter, object identities, hashes, file count, and bytes. Application copies each object, verifies the target hash, and records completed or failed items. Existing targets fail unless overwrite is explicitly requested by code.
+
+## Operations interface
+The Backends tab displays registered backends, contract validity, local object count, audit status, namespace-filtered migration previews, and confirmation-gated non-persistent migration tests into memory.
+
+## Remote boundary
+No remote backend, endpoint, credential, or persistent backend selection is configured. Those require a future explicit credential and migration approval workflow.
+
+## Verification
+205 tests cover backend parity, metadata fields, overwrite behavior, audit tampering, registry validation, unknown backends, custom implementation rejection, namespace-filtered migration, conflict reporting, and UI disclosures.
+
 # PeaBox Voice Studio v0.10.6 Detailed Release Notes
 
 ## Logical keys and namespaces

@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.10.7 — Pluggable Storage Backends
+- Added formal storage backend abstract contract.
+- Added local backend adapter over v0.10.6 object storage.
+- Added non-persistent in-memory backend.
+- Added backend registry and factory type validation.
+- Added backend contract reports.
+- Added cross-backend migration preview and hash-verified application.
+- Added backend validation controls to Operations Center.
+- Kept remote credentials and backend selection out of persistent configuration.
+- Validation: 205 tests passed.
+
+# Changelog
+
 ## v0.10.6 — Local Object Storage Layer
 - Added safe logical object keys and six local namespaces.
 - Added atomic put, verified import, get, copy, move, delete, register, and unregister operations.

@@ -1,3 +1,10 @@
+# v0.10.7 Help Update
+
+- **Memory backend:** temporary validation only; never treat it as durable storage.
+- **Migration conflict:** the target already contains that key; use a different destination or an explicit overwrite workflow.
+- **Unknown backend:** only local and memory are built in.
+- **Remote storage:** not configured; no remote credentials are accepted or stored in this release.
+
 # v0.10.6 Help Update
 
 - **Invalid object key:** use letters, numbers, underscores, periods, and hyphens in relative path segments.

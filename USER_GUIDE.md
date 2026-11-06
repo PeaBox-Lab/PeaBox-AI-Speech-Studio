@@ -1,3 +1,7 @@
+# v0.10.7 User Guide Update
+
+Open **Portfolio Operations → Backends** to view registered backends and contract status. You can preview local objects by namespace and run a confirmed migration validation into temporary memory. The memory backend is erased when the application reruns or exits and is not a backup.
+
 # v0.10.6 User Guide Update
 
 Open **Portfolio Operations → Objects**. Select **Rebuild object manifest** to register existing managed files, then audit or browse them. Copy creates a verified second object. Move requires confirmation and removes the source only after the copy verifies. Delete is permanent and requires a separate confirmation.

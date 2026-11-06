@@ -26,3 +26,5 @@ data/storage_policy.lock
 
 data/object_manifest.json
 data/object_storage.lock
+
+# Storage backend selection remains runtime-only in v0.10.7.
