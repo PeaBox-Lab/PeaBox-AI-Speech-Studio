@@ -11,21 +11,20 @@ from peabox_voice_studio.services.comparisons import create_comparison_record, d
 from peabox_voice_studio.services.bundles import export_timeline_bundle, import_timeline_bundle
 from peabox_voice_studio.services.files import atomic_write_bytes, build_render_zip, safe_filename, user_safe_error
 from peabox_voice_studio.services.governance import ALLOWED_TRANSITIONS, APPROVAL_STATES, RISK_LEVELS, WORKFLOW_STATES, add_comment, add_decision, decide_approval, governance, governance_readiness, governance_summary, reopen_comment, request_approval, resolve_comment, supersede_decision, transition_status, update_project_governance
-from peabox_voice_studio.services.backups import create_snapshot, list_snapshots
+from peabox_voice_studio.services.health import apply_repairs, check_project, repair_preview
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
-from peabox_voice_studio.services.maintenance_plans import complete_plan, create_plan, load_plans, maintenance_health, plan_status, retention_preview, save_plans
-from peabox_voice_studio.services.operations import read_operations, record_operation
+from peabox_voice_studio.services.maintenance_plans import complete as complete_plan, create as create_plan, load as load_plans, save as save_plans, status as plan_status
+from peabox_voice_studio.services.operations import read as read_operations, record as record_operation
 from peabox_voice_studio.services.preferences import load_preferences, mark_project_opened, resolve_projects, save_preferences, toggle_favorite
 from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
-from peabox_voice_studio.services.repository import create_database_backup, list_database_backups, list_indexed_projects, rebuild_index, repository_health
+from peabox_voice_studio.services.repository import health as repository_health, list_projects as list_indexed_projects, rebuild as rebuild_index
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
 from peabox_voice_studio.services.diagnostics import system_diagnostics, transcription_readiness
 from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, pronunciation_conflicts, pronunciation_preview, validate_pause_markers
 from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
-from peabox_voice_studio.services.support import create_support_bundle
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
 from peabox_voice_studio.ui import callout, empty_state, inject_corporate_theme, kpi_card, navigate_to, page_header, section, sidebar_navigation, status_badge, workflow_step
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide", initial_sidebar_state="expanded")
@@ -298,41 +297,45 @@ elif page == "Projects":
                 confirm = st.checkbox("I understand this permanently deletes the project")
                 if st.button("Delete permanently", disabled=not confirm): store.delete(project.id); st.session_state.pop("project", None); st.rerun()
 elif page == "Operations":
-    section("Operations and maintenance", "JSON projects remain portable source-of-truth; the local index and maintenance plans are rebuildable.")
-    projects=store.list();health=repository_health();plans=load_plans();mhealth=maintenance_health(plans)
+    projects=store.list();reports=[check_project(p) for p in projects];repo=repository_health();plans=load_plans()
+    section("Operational health", "Run project checks, preview safe repairs, maintain the project index, and record maintenance evidence.")
     c1,c2,c3,c4=st.columns(4)
-    with c1:kpi_card("Repository","Ready" if health["ready"] else "Repair",f"{health['indexed_projects']} projects")
-    with c2:kpi_card("Plans",str(mhealth["enabled"]),f"{mhealth['overdue']} overdue")
-    with c3:kpi_card("Snapshots",str(len(list_snapshots(project.id)) if project else 0),"Active project")
-    with c4:kpi_card("Events",str(len(read_operations(2000))),"Operational log")
-    tabs=st.tabs(["Maintenance plans","Repository & backup","Support bundle"])
+    with c1:kpi_card("Repository","Ready" if repo["ready"] else "Repair",f"{repo['projects']} indexed")
+    with c2:kpi_card("Projects checked",str(len(reports)),f"{sum(not r['healthy'] for r in reports)} need repair")
+    with c3:kpi_card("Health errors",str(sum(r['errors'] for r in reports)),"Across all projects")
+    with c4:kpi_card("Maintenance plans",str(len(plans)),f"{sum(plan_status(x)=='Overdue' for x in plans)} overdue")
+    tabs=st.tabs(["Project health","Repository","Maintenance plans","Events"])
     with tabs[0]:
-        name=st.text_input("Plan name",value="Weekly maintenance");frequency=st.selectbox("Frequency",["Daily","Weekly","Monthly","Quarterly"]);owner=st.text_input("Owner label",value="Local User")
-        if st.button("Create maintenance plan",type="primary"):
-            plans.append(create_plan(name,frequency,owner=owner));save_plans(plans);record_operation("maintenance.plan_created",details={"name":name});st.rerun()
-        if plans:
-            selected=st.selectbox("Maintenance plans",plans,format_func=lambda x:f"{x['name']} · {plan_status(x)} · due {x['next_due_at']}")
-            st.dataframe([{"Task":t,"Complete":False} for t in selected['tasks']],use_container_width=True,hide_index=True)
-            notes=st.text_area("Completion notes",key=f"plan_notes_{selected['id']}")
-            if st.button("Complete selected plan"):
-                complete_plan(selected,owner,{t:"Complete" for t in selected['tasks']},notes);save_plans(plans);record_operation("maintenance.plan_completed",details={"plan":selected['name']});st.rerun()
-            st.json(maintenance_health(plans))
-        preview=retention_preview(len(list_snapshots(project.id)) if project else 0,len(list_database_backups()),0,{"snapshots_keep":20,"database_backups_keep":10,"quarantine_batches_keep":20})
-        st.caption("Retention preview (no automatic deletion)");st.json(preview)
+        if reports:st.dataframe([{"Project":next((p.name for p in projects if p.id==r['project_id']),r['project_id']),"Healthy":r['healthy'],"Errors":r['errors'],"Warnings":r['warnings'],"Checked":r['checked_at']} for r in reports],use_container_width=True,hide_index=True)
+        if project:
+            report=check_project(project)
+            if report['issues']:
+                st.dataframe(report['issues'],use_container_width=True,hide_index=True)
+            else:
+                st.success("Active project passed health checks.")
+            actions=repair_preview(project,report)
+            if actions:
+                st.dataframe(actions,use_container_width=True,hide_index=True);confirm=st.checkbox("Apply all previewed safe repairs")
+                if st.button("Apply repair plan",disabled=not confirm):
+                    applied=apply_repairs(project,actions);save_project(project);record_operation("health.repairs_applied",project_id=project.id,details={"actions":applied});st.rerun()
+        else:empty_state("No active project","Open a project to preview and apply its repair plan.","Open Project Workspace","Projects")
     with tabs[1]:
         if st.button("Rebuild project index"):
-            rebuild_index([(x,store._path(x.id)) for x in projects]);st.rerun()
-        if st.button("Create database backup"):
-            create_database_backup();st.rerun()
-        st.dataframe(list_indexed_projects(),use_container_width=True,hide_index=True)
-        st.dataframe(list_database_backups(),use_container_width=True,hide_index=True)
-        if project and st.button("Create project snapshot"):
-            create_snapshot(project,"Operations snapshot");st.rerun()
+            rebuild_index([(p,store._path(p.id),next((r['errors']+r['warnings'] for r in reports if r['project_id']==p.id),0)) for p in projects]);record_operation("repository.rebuilt",details={"projects":len(projects)});st.rerun()
+        st.json(repository_health());st.dataframe(list_indexed_projects(),use_container_width=True,hide_index=True)
     with tabs[2]:
-        summary={"name":project.name,"id":project.id} if project else {}
-        bundle=create_support_bundle(repository_health(),[],read_operations(500),system_diagnostics(),VERSION,summary)
-        st.download_button("Download sanitized support bundle",bundle,f"peabox_support_{VERSION}.zip","application/zip")
-        callout("Support bundles exclude project scripts, transcripts, audio, and cloud credentials.")
+        name=st.text_input("Plan name",value="Weekly health review");freq=st.selectbox("Frequency",["Daily","Weekly","Monthly","Quarterly"])
+        if st.button("Create maintenance plan"):plans.append(create_plan(name,freq));save_plans(plans);st.rerun()
+        if plans:
+            selected=st.selectbox("Plans",plans,format_func=lambda x:f"{x['name']} · {plan_status(x)}")
+            st.dataframe([{"Task":x,"Complete":False} for x in selected['tasks']],use_container_width=True,hide_index=True);notes=st.text_area("Completion notes")
+            if st.button("Complete plan"):complete_plan(selected,{x:"Complete" for x in selected['tasks']},notes);save_plans(plans);st.rerun()
+    with tabs[3]:
+        events=read_operations(500)
+        if events:
+            st.dataframe(events,use_container_width=True,hide_index=True)
+        else:
+            st.info("No operational events.")
 
 elif page == "Governance":
     if not project:

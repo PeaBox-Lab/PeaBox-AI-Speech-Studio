@@ -1,15 +1,15 @@
 # User Guide
 
-## Create a maintenance plan
+## Run a project health check
 
-1. Open **Administration → Operations Center**.
-2. Choose Maintenance plans.
-3. Enter a name, frequency, and owner label.
-4. Create the plan.
-5. Complete it after performing the listed tasks.
+1. Open the project.
+2. Go to Administration → Operations Center.
+3. Review issue severity and details.
+4. Review the repair preview.
+5. Confirm and apply safe repairs.
 
-PeaBox stores run history and calculates the next due date.
+PeaBox does not apply repairs without confirmation.
 
-## Retention policy
+## Maintenance plans
 
-Retention preview reports how many snapshots, database backups, or quarantine batches exceed configured targets. v0.08.2 does not automatically delete them.
+Create a plan, complete the checklist when due, and record notes. Plans update their next due date but do not execute in the background.

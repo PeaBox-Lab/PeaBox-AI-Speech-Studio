@@ -1,13 +1,13 @@
 # Help Articles
 
+## What does a repair plan change?
+
+Repairs can regenerate duplicate/missing IDs, set blank block titles, fix job project references, mark invalid jobs failed, clear missing job output paths, and disable clips with missing files.
+
+## Why is a repair not offered?
+
+Warnings such as governance ownership may require a human decision rather than an automatic repair.
+
 ## Will maintenance plans run automatically?
 
-No. They are local checklists and due-date reminders evaluated when PeaBox is running.
-
-## A plan is overdue
-
-Open Operations Center, perform the listed checks, add notes, and complete the plan. The next due date is calculated from the selected frequency.
-
-## What does retention preview do?
-
-It calculates excess records against policy targets. It does not delete anything.
+No. They are local checklists evaluated while the app is open.

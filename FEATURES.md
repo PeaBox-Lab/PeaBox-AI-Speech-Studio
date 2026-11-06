@@ -1,21 +1,18 @@
 # Features Guide
 
 ## Operations
-- SQLite project index and health
-- Project snapshots
-- Database backups
-- Structured operational logs
-- Maintenance plans and run history
-- Retention previews
-- Sanitized support bundle
+- Project health reports
+- Previewed repair plans
+- SQLite metadata index and rebuild
+- Maintenance checklists and run history
+- Operational event log
 
-## Production
-- Projects, master scripts, blocks, providers, presets, quality rules
-- Individual and batch speech generation
-- Transcription and subtitle export
-- Audio quality and A/B comparison
-- Timeline mixing and portable bundles
+## Production and quality
+- Projects, scripts, blocks, providers, voices, presets
+- Individual and batch generation
+- Transcription and subtitles
+- Audio analysis, processing, and timeline mixing
 
 ## Governance and UX
-- Governance, review comments, decisions, approvals, audit
-- Executive Dashboard, Command Center, onboarding, preferences, favorites and recents
+- Governance, approvals, comments, decisions, audit
+- Executive Dashboard, Command Center, onboarding, preferences

@@ -1,5 +1,5 @@
-# PeaBox Voice Studio v0.08.2 Release Notes
+# PeaBox Voice Studio v0.08.3 Release Notes
 
-This release adds local maintenance planning to Operations Center. Teams can define recurring operational checklists, see due state, record completion evidence, and retain up to fifty run records per plan.
+This release adds portfolio and active-project health checks to Operations Center. PeaBox detects structural and reference issues, ranks them by severity, and generates a preview of safe repairs.
 
-Retention preview calculates excess snapshots, database backups, and quarantine batches without deleting them. Maintenance plans are not background schedules; they require PeaBox to be open and the user to complete them.
+Repairs are never applied automatically. Users must review and confirm the plan. Maintenance plans provide recurring local checklists and run history without claiming background scheduling.

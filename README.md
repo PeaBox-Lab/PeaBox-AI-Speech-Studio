@@ -1,21 +1,23 @@
-# PeaBox Voice Studio v0.08.2
+# PeaBox Voice Studio v0.08.3
 
-A local-first enterprise voice-production workspace with maintenance planning, repository operations, project snapshots, operational logs, governance, multi-provider speech, transcription, audio quality, and portable timelines.
+A local-first enterprise voice-production workspace with project health checks, preview-only repair plans, maintenance checklists, a rebuildable SQLite metadata index, governance, multi-provider speech, transcription, audio quality, and portable timelines.
 
-## v0.08.2 Maintenance Planning
+## v0.08.3 Project Health & Repair
 
-- Daily, weekly, monthly, and quarterly local maintenance plans
-- Due, due-soon, overdue, and disabled status calculation
-- Default operational checklist tasks
-- Completion records with actor, results, notes, and next due date
-- Maintenance health summary
-- Preview-only retention policy calculation
-- Operations Center integration
+- Health checks for duplicate or missing IDs, invalid job states, stale project references, missing files, and governance gaps
+- Severity-ranked issue reports
+- Preview-only repair plans
+- Explicit confirmation before safe repairs
+- Repair audit metadata in the project
+- Portfolio health summary in Operations Center
 
-## Important scope
+## Maintenance planning
 
-Plans are local records and reminders evaluated when PeaBox is open. They are not background operating-system schedules and do not run maintenance automatically.
+- Daily, weekly, monthly, and quarterly local plans
+- Due, due-soon, overdue, and disabled states
+- Checklist run history and next due date
+- Plans are local reminders, not background schedulers
 
-## Cumulative capabilities
+## Cumulative platform
 
-The release retains the v0.08.x repository and recovery foundation, v0.07.x governance and corporate workspace, multi-provider generation, transcription, quality tools, Timeline Studio, portable bundles, and integrity hardening.
+The release retains all v0.07.4 reliability controls plus the corporate workspace, governance, cloud/local generation, transcription, quality tools, Timeline Studio, portable bundles, and complete documentation.

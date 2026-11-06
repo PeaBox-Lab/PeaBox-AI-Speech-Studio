@@ -1,17 +1,19 @@
 # Changelog
 
-## v0.08.2 — 2026-11-06
+## v0.08.3 — 2026-11-06
 
 ### Added
-- Recurring local maintenance plans
-- Due-state calculation and completion history
-- Maintenance health scoring
-- Preview-only retention policy calculations
-- Operations Center maintenance-plan UI
-- Maintenance-plan and cumulative regression tests
+- Project and portfolio health checks
+- Severity-ranked issue reports
+- Preview-only safe repair plans
+- Explicit confirmation and repair metadata
+- Maintenance plans with due state and run history
+- Operations Center health and repair UI
+- Health, maintenance, UI, and cumulative regression tests
 
-### Clarification
-- Plans do not run in the background or delete records automatically
+### Safety
+- Repairs are never automatic
+- Human-decision warnings are not auto-repaired
 
 # Changelog
 ## v0.07.4 — 2026-11-05

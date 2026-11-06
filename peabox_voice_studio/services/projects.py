@@ -1,17 +1,15 @@
 import json
 from pathlib import Path
 from uuid import uuid4
-from peabox_voice_studio.config import DATABASE_PATH, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, PROJECTS_DIR
+from peabox_voice_studio.config import MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, PROJECTS_DIR
 from peabox_voice_studio.models import Project, ScriptBlock, utc_now
 from peabox_voice_studio.services.files import FileLock, atomic_write_bytes
-from peabox_voice_studio.services.repository import remove_project as remove_index, upsert_project
 from peabox_voice_studio.services.migrations import CURRENT_PROJECT_SCHEMA, migrate_project_payload, rewrite_import_references
 PROJECT_EXPORT_SCHEMA = CURRENT_PROJECT_SCHEMA
 class ProjectStore:
     def __init__(self, root: Path = PROJECTS_DIR):
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
-        self.index_path = DATABASE_PATH if self.root.resolve() == PROJECTS_DIR.resolve() else self.root.parent / "peabox.db"
     def _path(self, project_id: str) -> Path:
         if not project_id or not project_id.isalnum():
             raise ValueError("Invalid project identifier")
@@ -29,8 +27,6 @@ class ProjectStore:
         path = self._path(project.id)
         with FileLock(path.with_suffix(".lock")):
             atomic_write_bytes(path, json.dumps(project.to_dict(), ensure_ascii=False, indent=2).encode("utf-8"))
-        try: upsert_project(project, path, self.index_path)
-        except Exception: pass
         return project
     def load(self, project_id: str) -> Project:
         path = self._path(project_id)
@@ -47,8 +43,6 @@ class ProjectStore:
         return sorted(result, key=lambda item: item.updated_at, reverse=True)
     def delete(self, project_id: str) -> None:
         self._path(project_id).unlink(missing_ok=False)
-        try: remove_index(project_id, self.index_path)
-        except Exception: pass
     def import_project(self, raw: bytes | str, preserve_identity: bool = False) -> Project:
         text = raw.decode("utf-8-sig") if isinstance(raw, bytes) else raw
         payload = json.loads(text)

@@ -1,6 +1,6 @@
 from pathlib import Path
 APP_NAME = "PeaBox Voice Studio"
-VERSION = "0.08.2"
+VERSION = "0.08.3"
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 PROJECTS_DIR = DATA_DIR / "projects"
@@ -17,11 +17,5 @@ MAX_BUNDLE_INPUT_BYTES = 600 * 1024 * 1024
 DATABASE_PATH = DATA_DIR / "peabox.db"
 BACKUPS_DIR = DATA_DIR / "backups"
 OPERATIONS_LOG_PATH = DATA_DIR / "operations.jsonl"
-QUARANTINE_DIR = DATA_DIR / "quarantine"
-DATABASE_BACKUPS_DIR = DATA_DIR / "database_backups"
 MAINTENANCE_PATH = DATA_DIR / "maintenance.json"
-MAX_PROJECT_SNAPSHOTS = 20
-MAX_DATABASE_BACKUPS = 10
-MAX_OPERATION_LOG_BYTES = 5 * 1024 * 1024
-MAX_SUPPORT_BUNDLE_BYTES = 50 * 1024 * 1024
-for folder in (BACKUPS_DIR, QUARANTINE_DIR, DATABASE_BACKUPS_DIR): folder.mkdir(parents=True, exist_ok=True)
+for folder in (BACKUPS_DIR,): folder.mkdir(parents=True, exist_ok=True)

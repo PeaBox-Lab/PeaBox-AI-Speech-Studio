@@ -1,8 +1,8 @@
-# v0.08.2 Additions and Improvements
+# v0.08.3 Additions and Improvements
 
-- Recurring local maintenance plans
-- Due and overdue status
-- Checklist completion history
-- Maintenance health scoring
-- Preview-only retention policies
+- Project health engine
+- Severity and issue codes
+- Preview-only safe repair plans
+- Portfolio health summary
+- Maintenance plan due states and run history
 - Operations Center integration

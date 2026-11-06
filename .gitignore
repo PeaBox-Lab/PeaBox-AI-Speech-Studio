@@ -9,10 +9,10 @@ outputs/*
 data/projects/*.json
 !data/projects/.gitkeep
 data/ui_preferences.json
-*.log
-data/peabox.db
-data/peabox.db-*
+data/peabox.db*
 data/operations*.jsonl
 data/backups/
 data/quarantine/
 data/database_backups/
+data/maintenance.json
+*.log
