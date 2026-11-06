@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "version": "0.11.1",
-  "baseline_hash": "c0234c3b86446b7b08c8307065b9cf4f1cd1e4514c7d15d35bc0adc5ad7050cc",
+  "version": "0.11.2",
+  "baseline_hash": "897f1a2fa3541c02e9692b099d9101f4b498153dfdd44a1150281a8add6836ca",
   "viewports": [
     {
       "name": "desktop",

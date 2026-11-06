@@ -1,3 +1,8 @@
+# v0.11.2 Feature Additions
+
+## PNG Pixel-Diff Reports
+Compare approved browser captures against reviewed baselines with strict dimensions, configurable pixel thresholds, highlighted diff images, and machine-readable reports.
+
 # v0.11.1 Feature Additions
 
 ## Deterministic Visual QA

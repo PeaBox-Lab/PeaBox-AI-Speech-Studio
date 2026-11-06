@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.11.2 — PNG Pixel-Diff Reports
+- Added baseline and candidate PNG capture inventories.
+- Added signature, decode, and expected-dimension validation.
+- Added exact and threshold-based pixel comparison.
+- Added changed-pixel, percentage, maximum-delta, and mean-delta metrics.
+- Added highlighted diff PNG generation.
+- Added JSON report and ZIP diff bundle.
+- Added comparison CLI with exit codes 0, 1, and 2.
+- Added Visual QA capture readiness and comparison controls.
+- Validation: 278 tests passed.
+
+# Changelog
+
 ## v0.11.1 — Deterministic UI Baselines
 - Added deterministic navigation, metadata, theme, and screen-source snapshots.
 - Added baseline hashing and structural drift comparison.

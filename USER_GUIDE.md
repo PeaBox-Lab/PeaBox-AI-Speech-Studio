@@ -1,3 +1,7 @@
+# v0.11.2 User Guide Update
+
+Copy reviewed PNGs into `visual_baselines/captures/baseline/` and new captures into `visual_baselines/captures/candidate/`. Filenames and dimensions must match `visual_baselines/screenshot_manifest.json`. Run `python compare_visual_captures.py`, or use **Portfolio Operations → Visual QA**. Review every failed capture and its diff before accepting a new baseline.
+
 # v0.11.1 User Guide Update
 
 Open **Portfolio Operations → Visual QA** to review the current structural baseline and download JSON artifacts. Developers can regenerate checked-in files with:

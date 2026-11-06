@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.11.2 Release Notes
+
+v0.11.2 completes the pixel-comparison half of the visual-regression roadmap. Approved browser-generated baseline and candidate PNG sets can now be validated, compared with configurable tolerances, and packaged into machine-readable reports and highlighted diff artifacts.
+
 # PeaBox Voice Studio v0.11.1 Release Notes
 
 v0.11.1 delivers the roadmap’s visual regression foundation without requiring a browser package. It creates deterministic structural baselines for navigation, theme, screens, labels, widget calls, responsive rules, and contrast, plus a screenshot-ready capture manifest.

@@ -7,6 +7,7 @@ from peabox_voice_studio.services.maintenance import apply_retention,complete,cr
 from peabox_voice_studio.services.recovery import backup_database,inventory,snapshot,validate_database
 from peabox_voice_studio.services.backend_resilience import CircuitBreaker, ResilientBackend, RetryPolicy, resilience_report
 from peabox_voice_studio.services.resilience_profiles import active_profile, audit_log as resilience_audit, clone_profile, create_profile, delete_draft, instantiate, list_profiles, profile_diff, transition, update_profile
+from peabox_voice_studio.services.visual_pixels import capture_inventory, compare_capture_set, diff_bundle, write_report
 from peabox_voice_studio.services.visual_baselines import baseline_document, collect_screen_snapshots, screenshot_manifest, validate_baseline
 from peabox_voice_studio.services.storage_backends import MemoryBackend, contract_report, migration_preview as backend_migration_preview, migrate as migrate_backend, registry as backend_registry
 from peabox_voice_studio.services.storage_policy import active_reservations,load_policy,policy_status,release_reservation,reserve,save_policy
@@ -172,5 +173,17 @@ def _render_visual_qa_tab():
  st.write({'Baseline hash':document['hash'],'Sidebar contrast':document['contrast']['sidebar_text_on_control'],'Card contrast':document['contrast']['ink_on_card'],'Viewports':[x['name'] for x in manifest['viewports']]})
  if issues:st.error('Visual contract issues: '+', '.join(issues))
  else:st.success('Deterministic visual contracts passed.')
+ from peabox_voice_studio.config import VISUAL_CAPTURE_BASELINE_DIR,VISUAL_CAPTURE_CANDIDATE_DIR,VISUAL_DIFF_DIR,VISUAL_REPORT_PATH
+ baseline_inventory=capture_inventory(VISUAL_CAPTURE_BASELINE_DIR,manifest);candidate_inventory=capture_inventory(VISUAL_CAPTURE_CANDIDATE_DIR,manifest)
+ st.subheader('PNG capture readiness');st.dataframe([{'Set':'Baseline','Expected':baseline_inventory['expected'],'Present':baseline_inventory['present'],'Valid':baseline_inventory['valid'],'Missing':len(baseline_inventory['missing']),'Invalid':len(baseline_inventory['invalid']),'Ready':baseline_inventory['ready']},{'Set':'Candidate','Expected':candidate_inventory['expected'],'Present':candidate_inventory['present'],'Valid':candidate_inventory['valid'],'Missing':len(candidate_inventory['missing']),'Invalid':len(candidate_inventory['invalid']),'Ready':candidate_inventory['ready']}],use_container_width=True,hide_index=True)
+ pixel_threshold=st.slider('Per-channel pixel threshold',0,255,0);allowed_percent=st.number_input('Allowed changed pixels percent',min_value=0.0,max_value=100.0,value=0.0,step=0.01)
+ if st.button('Run PNG pixel comparison',disabled=not (baseline_inventory['ready'] and candidate_inventory['ready'])):
+  report=compare_capture_set(VISUAL_CAPTURE_BASELINE_DIR,VISUAL_CAPTURE_CANDIDATE_DIR,manifest,pixel_threshold,allowed_percent,VISUAL_DIFF_DIR);write_report(report,VISUAL_REPORT_PATH);st.session_state['pixel_diff_report']=report
+ pixel_report=st.session_state.get('pixel_diff_report')
+ if pixel_report:
+  st.write({'Compared':pixel_report['captures'],'Passed':pixel_report['passed'],'Failed':pixel_report['failed'],'Success':pixel_report['success']})
+  failed=[x for x in pixel_report['results'] if not x['passed']]
+  if failed:st.dataframe(failed,use_container_width=True,hide_index=True)
+  st.download_button('Download pixel diff report',json.dumps(pixel_report,indent=2),'pixel_diff_report.json','application/json');st.download_button('Download pixel diff bundle',diff_bundle(pixel_report),'pixel_diff_bundle.zip','application/zip')
  st.download_button('Download UI baseline JSON',json.dumps(document,ensure_ascii=False,indent=2),f"ui_baseline_{document['version']}.json",'application/json')
  st.download_button('Download screenshot manifest',json.dumps(manifest,ensure_ascii=False,indent=2),'screenshot_manifest.json','application/json')

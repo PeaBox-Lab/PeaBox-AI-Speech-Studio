@@ -1,3 +1,24 @@
+# v0.11.2 Additions and Improvements
+
+## Capture readiness
+- Expected filename and dimension validation
+- Missing, invalid, and extra capture detection
+- Baseline and candidate readiness summaries
+
+## Pixel reports
+- Changed pixels and percentage
+- Per-channel threshold
+- Allowed changed percentage
+- Maximum and mean deltas
+- Baseline and candidate hashes
+- Highlighted diff images
+
+## Delivery
+- JSON report
+- ZIP report and diff bundle
+- CLI exit codes
+- Visual QA controls
+
 # v0.11.1 Additions and Improvements
 
 ## Baselines

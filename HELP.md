@@ -1,3 +1,11 @@
+# v0.11.2 Help Update
+
+- **Exit 2:** capture set is incomplete, invalid, contains extras, or has wrong dimensions.
+- **Exit 1:** valid images differ beyond the selected threshold.
+- **Antialiasing noise:** use a reviewed channel threshold or changed-pixel allowance; do not hide meaningful layout changes.
+- **No screenshots:** use an approved browser runner; PeaBox does not generate browser PNGs itself.
+- **Diff ZIP:** contains the JSON report and available highlighted diff images.
+
 # v0.11.1 Help Update
 
 - **Baseline validation failed:** inspect the listed theme, component, breakpoint, or contrast contract.

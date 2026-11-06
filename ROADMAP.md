@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.11.2
+- PNG capture readiness validation
+- Manifest dimension checks
+- Pixel threshold and changed-percent policies
+- Highlighted diff PNGs
+- JSON and ZIP pixel-diff reports
+- CLI exit codes and Visual QA controls
+
+## Recommended next release
+- Approved browser runner for automated PNG capture
+- Live provider integration harness with explicit test credentials and cost guardrails
+- Optional remote backend with explicit credentials, approval, and rollback
+- Authenticated identity integration for governance actions
+
+# Roadmap
+
 ## Delivered in v0.11.1
 - Deterministic navigation and theme baselines
 - Screen label and widget-call snapshots

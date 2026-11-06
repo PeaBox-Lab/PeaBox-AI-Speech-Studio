@@ -1,5 +1,10 @@
 # Version History
 
+## v0.11.2
+Added validated PNG capture inventories, configurable pixel-diff analysis, highlighted diff artifacts, JSON/ZIP reports, CLI exit codes, Visual QA controls, Pillow dependency pinning, and 278-test verification.
+
+# Version History
+
 ## v0.11.1
 Added deterministic UI baselines, theme and screen snapshots, contrast and responsive contracts, 57-target screenshot manifests, drift comparison, Visual QA controls, and 261-test validation.
 

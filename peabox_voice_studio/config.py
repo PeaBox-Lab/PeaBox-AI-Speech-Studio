@@ -1,6 +1,6 @@
 from pathlib import Path
 APP_NAME = "PeaBox Voice Studio"
-VERSION = "0.11.1"
+VERSION = "0.11.2"
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 PROJECTS_DIR = DATA_DIR / "projects"
@@ -42,3 +42,9 @@ RESILIENCE_PROFILES_LOCK_PATH = DATA_DIR / "resilience_profiles.lock"
 
 VISUAL_BASELINES_DIR = BASE_DIR / "visual_baselines"
 VISUAL_BASELINES_DIR.mkdir(parents=True, exist_ok=True)
+
+VISUAL_CAPTURE_BASELINE_DIR = VISUAL_BASELINES_DIR / "captures" / "baseline"
+VISUAL_CAPTURE_CANDIDATE_DIR = VISUAL_BASELINES_DIR / "captures" / "candidate"
+VISUAL_DIFF_DIR = VISUAL_BASELINES_DIR / "diffs"
+VISUAL_REPORT_PATH = VISUAL_BASELINES_DIR / "pixel_diff_report.json"
+for folder in (VISUAL_CAPTURE_BASELINE_DIR, VISUAL_CAPTURE_CANDIDATE_DIR, VISUAL_DIFF_DIR): folder.mkdir(parents=True, exist_ok=True)

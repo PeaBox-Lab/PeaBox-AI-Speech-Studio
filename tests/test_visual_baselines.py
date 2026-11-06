@@ -19,7 +19,7 @@ class VisualBaselineTests(unittest.TestCase):
  def test_screenshot_manifest_has_three_viewports_per_page(self):
   manifest=screenshot_manifest(self.doc);self.assertEqual([x['name'] for x in manifest['viewports']],['desktop','tablet','mobile']);self.assertEqual(len(manifest['captures']),57);self.assertEqual(len({x['filename'] for x in manifest['captures']}),57)
  def test_checked_in_baseline_matches_generated(self):
-  checked=json.loads((ROOT/'visual_baselines/ui_baseline_0.11.1.json').read_text());self.assertEqual(compare_baselines(checked,self.doc)['matches'],True)
+  checked=json.loads((ROOT/'visual_baselines/ui_baseline_0.11.2.json').read_text());self.assertEqual(compare_baselines(checked,self.doc)['matches'],True)
  def test_checked_in_manifest_matches_hash(self):
   manifest=json.loads((ROOT/'visual_baselines/screenshot_manifest.json').read_text());self.assertEqual(manifest['baseline_hash'],self.doc['hash']);self.assertEqual(len(manifest['captures']),57)
 if __name__=='__main__':unittest.main()

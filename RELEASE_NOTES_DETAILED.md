@@ -1,3 +1,29 @@
+# PeaBox Voice Studio v0.11.2 Detailed Release Notes
+
+## Capture inventory
+The screenshot manifest defines the expected filename and viewport dimensions for all 57 captures. Baseline and candidate directories are inventoried independently. Missing, invalid, dimensionally incorrect, and extra PNG files prevent comparison.
+
+## PNG validation
+Files must have a valid PNG signature, decode successfully through Pillow, and match the manifest dimensions. Validation records bytes, width, height, mode, and SHA-256.
+
+## Pixel comparison
+Images are normalized to RGBA. A pixel is changed when its maximum channel delta exceeds the configurable per-channel threshold. Reports include total pixels, changed pixels, changed percentage, maximum channel delta, mean RGB delta, and both file hashes.
+
+## Acceptance thresholds
+The comparison passes when changed-pixel percentage is at or below the configured allowance. Defaults require exact equality. Small antialiasing differences may be handled deliberately through the channel threshold or allowed percentage.
+
+## Diff artifacts
+Every compared image can produce a contrast-enhanced PNG difference image. Reports can be downloaded as JSON or as a ZIP containing the report and diff PNGs.
+
+## CLI
+`python compare_visual_captures.py` uses the checked-in screenshot manifest and default capture directories. Exit 0 means success, exit 1 means a visual difference exceeded policy, and exit 2 means a capture set is not ready.
+
+## Browser boundary
+This release does not install a browser or fabricate screenshots. PNG files must be produced by an approved external browser runner using the manifest’s page and viewport targets.
+
+## Verification
+278 tests cover PNG validation, missing and invalid files, dimensions, inventory readiness, exact matches, pixel differences, thresholds, allowances, dimension mismatch, set comparison, diff bundles, JSON reports, CLI exits, UI controls, and all cumulative behavior.
+
 # PeaBox Voice Studio v0.11.1 Detailed Release Notes
 
 ## Navigation baseline

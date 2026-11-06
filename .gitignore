@@ -31,3 +31,8 @@ data/object_storage.lock
 
 data/resilience_profiles.json
 data/resilience_profiles.lock
+
+visual_baselines/captures/baseline/*.png
+visual_baselines/captures/candidate/*.png
+visual_baselines/diffs/*.png
+visual_baselines/pixel_diff_report.json

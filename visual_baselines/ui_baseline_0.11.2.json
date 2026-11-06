@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "version": "0.11.1",
+  "version": "0.11.2",
   "navigation": {
-    "version": "0.11.1",
+    "version": "0.11.2",
     "groups": [
       {
         "group": "Overview",
@@ -718,11 +718,11 @@
     },
     "operations": {
       "module": "operations",
-      "lines": 176,
+      "lines": 189,
       "streamlit_calls": [
         [
           "button",
-          10
+          11
         ],
         [
           "caption",
@@ -738,11 +738,11 @@
         ],
         [
           "dataframe",
-          9
+          11
         ],
         [
           "download_button",
-          3
+          5
         ],
         [
           "error",
@@ -762,7 +762,7 @@
         ],
         [
           "number_input",
-          4
+          5
         ],
         [
           "rerun",
@@ -774,11 +774,15 @@
         ],
         [
           "session_state.get",
-          3
+          4
         ],
         [
           "slider",
-          3
+          4
+        ],
+        [
+          "subheader",
+          1
         ],
         [
           "success",
@@ -798,11 +802,12 @@
         ],
         [
           "write",
-          8
+          9
         ]
       ],
       "labels": [
         "Active reservation",
+        "Allowed changed pixels percent",
         "Apply retention preview",
         "Backend selection is not persisted. Remote backends require a future explicit credential and approval workflow.",
         "Capacity reserved. Release it when the planned operation is cancelled or complete.",
@@ -818,6 +823,8 @@
         "Deterministic visual contracts passed.",
         "Download UI baseline JSON",
         "Download metadata snapshot",
+        "Download pixel diff bundle",
+        "Download pixel diff report",
         "Download screenshot manifest",
         "Enable local storage quotas",
         "Frequency",
@@ -830,6 +837,8 @@
         "New profile name",
         "Object namespace",
         "Operation timeout seconds",
+        "PNG capture readiness",
+        "Per-channel pixel threshold",
         "Permanently delete selected object",
         "Permanently remove every file in this preview",
         "Plan",
@@ -848,6 +857,7 @@
         "Resilience profile audit history",
         "Retry attempts",
         "Review or transition note",
+        "Run PNG pixel comparison",
         "Run backend health probes",
         "Run non-persistent migration test into memory backend",
         "Save storage policy",
@@ -860,7 +870,7 @@
         "Validate backend migration",
         "Warning threshold percent"
       ],
-      "source_hash": "cc0ce983330c6094e0610a106a8a3202640014ccb6417f80436fe74704beda36"
+      "source_hash": "4f0db8573d8acda2df4767cbe65fa166219e52a6678a2267c805858dff5c605f"
     },
     "preferences": {
       "module": "preferences",
@@ -1581,5 +1591,5 @@
     "sidebar_text_on_control": 11.22,
     "ink_on_card": 16.27
   },
-  "hash": "c0234c3b86446b7b08c8307065b9cf4f1cd1e4514c7d15d35bc0adc5ad7050cc"
+  "hash": "897f1a2fa3541c02e9692b099d9101f4b498153dfdd44a1150281a8add6836ca"
 }
