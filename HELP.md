@@ -1,21 +1,17 @@
 # Help Articles
 
-## The repository health check fails
+## What is an orphaned output?
 
-Choose **Rebuild project index**. JSON project files remain the source-of-truth. If integrity still fails, close PeaBox, back up `data/projects`, delete `data/peabox.db`, and restart.
+It is a file in the output folder that no current project record references. It may still be valuable, so PeaBox quarantines rather than deleting it immediately.
 
-## A project is missing from the index
+## A valid file is marked orphaned
 
-Open Project Workspace once or rebuild the index. Project JSON remains available even if it is not indexed.
+Ensure the project referencing it is present and readable, then rebuild the index and reload Operations Center. References use current project JSON, not only the SQLite index.
 
-## I need to undo a major change
+## Database restore does not restore a project
 
-Restore a project snapshot. Use restore-as-copy when you want to preserve the current version.
+The database is a metadata index. Restore project content from a project snapshot, project JSON, or timeline bundle.
 
-## My restored snapshot has missing audio
+## Support bundle privacy
 
-Snapshots do not copy audio. Relink the WAV file or restore/import a portable timeline bundle.
-
-## Operation logs are large
-
-PeaBox rotates the log automatically. Download it for support before removing old rotated files.
+The bundle excludes credentials, project scripts, transcripts, and audio. Operational event details and project counts are included.

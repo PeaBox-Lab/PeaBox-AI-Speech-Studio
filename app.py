@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 import streamlit as st
-from peabox_voice_studio.config import APP_NAME, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, OUTPUTS_DIR, VERSION
+from peabox_voice_studio.config import APP_NAME, DATABASE_BACKUPS_DIR, DATABASE_PATH, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, OUTPUTS_DIR, VERSION
 from peabox_voice_studio.models import Project, ScriptBlock
 from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, PROVIDER_RATES
 from peabox_voice_studio.services.audio import inspect_wav, normalize_wav, save_processed_wav, trim_silence_wav
@@ -15,16 +15,18 @@ from peabox_voice_studio.services.governance import ALLOWED_TRANSITIONS, APPROVA
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
+from peabox_voice_studio.services.maintenance import analyze_output_storage, delete_quarantine_batch, list_quarantine_batches, quarantine_files, restore_quarantine_batch, storage_inventory
 from peabox_voice_studio.services.operations import operation_log_health, read_operations, record_operation
 from peabox_voice_studio.services.preferences import load_preferences, mark_project_opened, resolve_projects, save_preferences, toggle_favorite
 from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
-from peabox_voice_studio.services.repository import list_indexed_projects, rebuild_index, repository_health
+from peabox_voice_studio.services.repository import create_database_backup, list_database_backups, list_indexed_projects, optimize_database, rebuild_index, repository_health, restore_database
 from peabox_voice_studio.services.diagnostics import system_diagnostics, transcription_readiness
 from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, pronunciation_conflicts, pronunciation_preview, validate_pause_markers
 from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
+from peabox_voice_studio.services.support import create_support_bundle
 from peabox_voice_studio.ui import callout, empty_state, inject_corporate_theme, kpi_card, navigate_to, page_header, section, sidebar_navigation, status_badge, workflow_step
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide", initial_sidebar_state="expanded")
 ui_preferences = st.session_state.setdefault("ui_preferences", load_preferences())
@@ -331,10 +333,55 @@ elif page == "Operations":
                 delete_snapshot(Path(selected_snapshot["path"]), project.id); record_operation("snapshot.deleted", project_id=project.id, details={"file": selected_snapshot["name"]}); st.rerun()
             st.dataframe(snapshots, use_container_width=True, hide_index=True)
         else: empty_state("No snapshots", "Create a recovery point before major script, timeline, or governance changes.")
-    section("Recent operational events")
-    operations = read_operations(200)
-    if operations: st.dataframe(operations, use_container_width=True, hide_index=True)
-    else: st.info("No operational events have been recorded.")
+    tabs_ops = st.tabs(["Storage maintenance", "Database maintenance", "Support bundle", "Recent events"])
+    with tabs_ops[0]:
+        inventory = storage_inventory()
+        st.dataframe(inventory, use_container_width=True, hide_index=True)
+        analysis = analyze_output_storage(projects)
+        m1,m2,m3,m4=st.columns(4)
+        with m1:kpi_card("Output files",str(analysis["files"]),f"{analysis['bytes']:,} bytes")
+        with m2:kpi_card("Referenced",str(analysis["referenced"]),"Used by project records")
+        with m3:kpi_card("Orphaned",str(analysis["orphaned"]),f"{analysis['orphaned_bytes']:,} bytes")
+        with m4:kpi_card("Missing refs",str(analysis["missing_references"]),"Referenced but unavailable")
+        if analysis["orphaned_files"]:
+            st.dataframe(analysis["orphaned_files"],use_container_width=True,hide_index=True)
+            confirm_quarantine=st.checkbox("I reviewed the orphan preview and want to quarantine all listed files")
+            if st.button("Quarantine orphaned outputs",disabled=not confirm_quarantine):
+                manifest=quarantine_files([Path(item["path"]) for item in analysis["orphaned_files"]]);record_operation("storage.quarantined",details={"batch_id":manifest["batch_id"],"files":len(manifest["files"])});st.rerun()
+        else:st.success("No orphaned output files were detected.")
+        batches=list_quarantine_batches()
+        if batches:
+            selected_batch=st.selectbox("Quarantine batches",batches,format_func=lambda item:f"{item['created_at']} · {item['files']} files · {item['bytes']:,} bytes")
+            q1,q2=st.columns(2)
+            if q1.button("Restore selected batch",use_container_width=True):
+                result=restore_quarantine_batch(Path(selected_batch["path"]));record_operation("storage.quarantine_restored",details=result);st.rerun()
+            delete_confirm=q2.checkbox("Permanently delete selected batch")
+            if q2.button("Delete batch permanently",disabled=not delete_confirm,use_container_width=True):
+                delete_quarantine_batch(Path(selected_batch["path"]));record_operation("storage.quarantine_deleted",details={"batch_id":selected_batch["batch_id"]});st.rerun()
+    with tabs_ops[1]:
+        DATABASE_BACKUPS_DIR.mkdir(parents=True,exist_ok=True)
+        db_backups=list_database_backups()
+        d1,d2=st.columns(2)
+        if d1.button("Create database backup",use_container_width=True):
+            backup=create_database_backup();record_operation("database.backup_created",details={"file":backup.name});st.rerun()
+        if d2.button("Optimize database",use_container_width=True):
+            result=optimize_database();record_operation("database.optimized",details=result);st.success("Database optimized");st.rerun()
+        if db_backups:
+            selected_db=st.selectbox("Database backups",db_backups,format_func=lambda item:f"{item['name']} · {item['bytes']:,} bytes")
+            restore_confirm=st.checkbox("I understand this replaces the current metadata index")
+            if st.button("Restore selected database backup",disabled=not restore_confirm):
+                result=restore_database(Path(selected_db["path"]));record_operation("database.backup_restored",details={"file":selected_db["name"],"health":result});st.rerun()
+            st.dataframe(db_backups,use_container_width=True,hide_index=True)
+        else:st.info("No database backups have been created.")
+    with tabs_ops[2]:
+        summary={"id":project.id,"name":project.name,"blocks":len(project.blocks),"clips":len(project.settings.get("audio_clips",[])),"jobs":len(project.settings.get("batch_jobs",[]))} if project else {}
+        support=create_support_bundle(repository_health(),storage_inventory(),read_operations(500),system_diagnostics(),VERSION,summary)
+        st.download_button("Download sanitized support bundle",support,f"peabox_support_{VERSION}.zip","application/zip",use_container_width=True)
+        callout("The support bundle contains diagnostics, metadata, and operation events. It does not include cloud credentials, scripts, project JSON, or audio files.")
+    with tabs_ops[3]:
+        operations = read_operations(200)
+        if operations: st.dataframe(operations, use_container_width=True, hide_index=True)
+        else: st.info("No operational events have been recorded.")
 
 elif page == "Governance":
     if not project:

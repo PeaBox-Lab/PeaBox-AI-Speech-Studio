@@ -1,20 +1,24 @@
 # User Guide
 
-## Daily workflow
+## Review storage
 
-1. Open a favorite or recent project from Dashboard.
-2. Prepare scripts and quality settings.
-3. Generate audio or run batch jobs.
-4. Assemble WAV clips in Timeline Studio.
-5. Review governance and approvals.
-6. Create a snapshot before major changes.
+1. Open **Administration → Operations Center**.
+2. Select **Storage maintenance**.
+3. Review totals, orphaned files, and missing references.
+4. Quarantine orphaned outputs only after reviewing the preview.
 
-## Operations Center
+## Restore quarantined files
 
-Use Operations Center to check repository health, rebuild the index, create/restore snapshots, download the operation log, and review recent operational events.
+Choose a quarantine batch and select **Restore selected batch**. Files return to the output folder with collision-safe names.
 
-## Backup choices
+## Back up the project index
 
-- Choose **Project JSON** for portable settings without media.
-- Choose **Timeline bundle** to include WAV assets.
-- Choose **Snapshot** for a quick local recovery point.
+Use **Database maintenance → Create database backup**. PeaBox retains the configured number of recent backups.
+
+## Restore the index
+
+Choose a backup, acknowledge replacement, and restore it. Project JSON is not replaced by this operation.
+
+## Create a support bundle
+
+Use **Support bundle → Download sanitized support bundle**. Review the bundle before sharing it with support.

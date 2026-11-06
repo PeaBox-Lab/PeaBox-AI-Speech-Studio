@@ -1,31 +1,26 @@
 # Features Guide
 
-## Operations and recovery
+## Operations and maintenance
 
 - Rebuildable SQLite project index
-- Repository integrity checks
-- Structured operational event log
-- Project snapshots and retention
-- Restore in place or as a copy
-- Indexed project catalog
+- Project snapshots and restore
+- Structured operation logs
+- Storage inventory and orphan analysis
+- Reversible quarantine
+- Database backup, restore, retention, and optimization
+- Sanitized support bundle
 
 ## Workspace productivity
 
-- Executive dashboard and Command Center
-- Grouped navigation and quick actions
-- Favorites, recent projects, and recent commands
-- First-run onboarding and interface preferences
+- Executive Dashboard and Command Center
+- Grouped corporate navigation and quick access
+- Favorites, recent projects, recent commands
+- Onboarding and interface preferences
 
-## Production and audio
+## Production, audio, and governance
 
-- Script blocks, local/cloud speech, and resumable batches
-- Voice Library, presets, pronunciation, and SSML pause controls
-- WAV quality lab and A/B comparisons
-- Timeline Studio and portable WAV bundles
-- Local transcription and subtitle export
-
-## Governance
-
-- Owners, contributors, risk, workflow states
-- Review comments and decisions
-- Approval Queue and application audit log
+- Project and script-block workflows
+- Local and cloud TTS, voice discovery, batch jobs
+- Audio Quality Lab and Timeline Studio
+- Local transcription and subtitle exports
+- Governance Center, approvals, decisions, and audit history

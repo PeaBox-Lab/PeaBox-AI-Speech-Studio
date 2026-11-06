@@ -1,38 +1,34 @@
-# PeaBox Voice Studio v0.08.0
+# PeaBox Voice Studio v0.08.1
 
-A local-first enterprise voice-production workspace with a rebuildable SQLite project index, project snapshots, structured operational logs, repository health, governed review, multi-provider speech, transcription, audio quality, portable timelines, and command-driven navigation.
+A local-first enterprise voice-production workspace with Operations Center maintenance, reversible storage cleanup, database backup and restore, sanitized support bundles, project snapshots, a rebuildable SQLite index, governance, multi-provider generation, transcription, audio quality, and portable timelines.
 
-## v0.08.0 Operations & Repository Foundation
+## v0.08.1 Operations Maintenance
 
-- SQLite metadata index while JSON remains portable source-of-truth
-- Automatic index updates on project save/list/delete
-- One-click project-index rebuild
-- Repository integrity and schema health
-- Project snapshots with retention
-- Restore over active project or restore as a new project
-- Structured JSONL operational events with rotation
-- Downloadable operation log
-- Operations Center dashboard and indexed project catalog
+- Storage inventory by area, file count, and bytes
+- Referenced, orphaned, and missing output analysis
+- Preview-first reversible quarantine
+- Quarantine restore and confirmed permanent deletion
+- SQLite backup with collision-safe names and retention
+- Database restore with integrity validation and WAL cleanup
+- SQLite optimization
+- Sanitized downloadable support bundle
+- Dedicated maintenance and support documentation
 
-## Recovery model
+## Safety model
 
-- **Project JSON:** portable project metadata and settings
-- **Timeline bundle:** portable project plus WAV assets
-- **Project snapshot:** local JSON recovery point
-- **SQLite index:** disposable, rebuildable local catalog
-- **Operation log:** local support and troubleshooting evidence
+Cleanup is non-destructive by default. Files move to quarantine and can be restored. Permanent deletion requires an explicit checkbox. Project JSON remains source-of-truth; the SQLite index is rebuildable.
 
 ## Cumulative capabilities
 
-The release retains v0.07.4 integrity hardening, Command Center, onboarding, preferences, corporate UI, governance and approvals, cloud/local speech, transcription, audio quality, resumable jobs, Timeline Studio, secure bundles, and all cumulative documentation.
+The release retains v0.08.0 Operations Center and snapshots, v0.07.4 integrity controls, corporate navigation, Command Center, preferences, governance and approvals, local/cloud speech, transcription, quality controls, resumable jobs, Timeline Studio, secure bundles, and complete activity history.
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the sidebar displays `Enterprise workspace · v0.08.0`.
-5. Open **Administration → Operations Center** to verify repository health.
+4. Confirm the sidebar displays `Enterprise workspace · v0.08.1`.
+5. Open **Administration → Operations Center** for health and maintenance.
 
 ## Validation
 

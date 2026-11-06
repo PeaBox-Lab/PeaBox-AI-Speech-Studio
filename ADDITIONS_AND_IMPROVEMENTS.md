@@ -1,23 +1,19 @@
-# v0.08.0 Additions and Improvements
+# v0.08.1 Additions and Improvements
 
-## Repository
-- SQLite metadata catalog
-- WAL mode and integrity checks
-- Project indexing and rebuild
-- JSON remains source-of-truth
+## Storage maintenance
+- Inventory and byte totals
+- Reference graph for output files
+- Orphan and missing-reference analysis
+- Reversible quarantine and restore
 
-## Recovery
-- Project snapshots
-- Snapshot retention
-- Restore in place or as new project
-- Collision-safe snapshot names
+## Database maintenance
+- Collision-safe backups
+- Backup retention
+- Integrity-checked restore
+- WAL/SHM cleanup
+- Optimize/VACUUM action
 
-## Operations
-- Structured JSONL event logging
-- Log rotation and health
-- Operations Center metrics and event view
-
-## Architecture
-- Secondary repository layer separated from project persistence
-- Standard-library SQLite with no new external dependency
-- Isolated repository paths for tests
+## Supportability
+- Sanitized support bundle
+- Maintenance event logging
+- Dedicated guides and tests

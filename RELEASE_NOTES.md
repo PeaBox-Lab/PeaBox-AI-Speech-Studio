@@ -1,5 +1,7 @@
-# PeaBox Voice Studio v0.08.0 Release Notes
+# PeaBox Voice Studio v0.08.1 Release Notes
 
-This release begins the operations and scale foundation without replacing portable JSON projects. A local SQLite database indexes project metadata and can be rebuilt from JSON at any time.
+This maintenance release expands Operations Center with storage analysis, reversible cleanup, database recovery, and support diagnostics.
 
-Operations Center provides repository health, index rebuild, project snapshots, restore workflows, operational-event history, and log download. Snapshots are local metadata recovery points; timeline bundles remain the correct choice when WAV portability is required.
+PeaBox identifies output files that are referenced, orphaned, or missing. Orphaned files can be moved into quarantine and later restored. Permanent quarantine deletion requires explicit confirmation.
+
+SQLite backups are collision-safe, retained to a configured count, integrity-checked before restore, and restored with stale WAL/SHM cleanup. A sanitized support bundle packages operational metadata without scripts, credentials, transcripts, or audio.

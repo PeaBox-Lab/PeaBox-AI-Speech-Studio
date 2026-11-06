@@ -69,6 +69,12 @@ Authenticated identities, permissions, and shared storage remain part of the fut
 - Project snapshots and restore workflows
 - Structured operation log and repository health dashboard
 
+## Delivered — v0.08.1: Operational maintenance and supportability
+
+- Storage inventory, reference analysis, and reversible quarantine
+- Database backup/restore/optimization
+- Sanitized support bundles and maintenance guidance
+
 ## v0.06.00: Scale and collaboration
 - SQLite repository migration followed by optional PostgreSQL
 - Background job queue and local worker process

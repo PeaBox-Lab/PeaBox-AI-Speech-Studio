@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.08.1 — 2026-11-06
+
+### Added
+
+- Storage inventory and output reference analysis
+- Orphaned-output preview and reversible quarantine
+- Quarantine restore and confirmation-gated deletion
+- SQLite backup retention, integrity restore, sidecar cleanup, and optimization
+- Sanitized support bundle
+- Maintenance, database recovery, support, UI, and cumulative regression tests
+
+### Safety
+
+- Cleanup is quarantine-first rather than direct deletion
+- Project JSON remains source-of-truth
+- Support bundles exclude content and credentials
+
 ## v0.08.0 — 2026-11-06
 
 ### Added

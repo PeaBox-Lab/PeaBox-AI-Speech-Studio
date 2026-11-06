@@ -14,3 +14,5 @@ data/peabox.db
 data/peabox.db-*
 data/operations*.jsonl
 data/backups/
+data/quarantine/
+data/database_backups/

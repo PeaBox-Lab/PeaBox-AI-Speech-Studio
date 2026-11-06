@@ -1,13 +1,13 @@
-# Detailed Release Notes — v0.08.0
+# Detailed Release Notes — v0.08.1
 
-## Why a secondary repository
+## Non-destructive cleanup
 
-JSON remains transparent and portable, but portfolio queries and operational checks should not require repeatedly scanning every project file. SQLite supplies a local rebuildable index without changing project ownership or portability.
+The release intentionally avoids direct orphan deletion. Quarantine batches retain a manifest with original paths, byte sizes, and SHA-256 hashes.
 
-## Recovery boundaries
+## Database recovery
 
-Snapshots copy project state only. They intentionally avoid duplicating potentially large audio media. Timeline bundles remain the media-inclusive transfer format.
+SQLite backup uses the database backup API rather than copying a live file. Restore validates the backup, stages a restored database, validates it again, removes stale sidecars, and then replaces the live index.
 
-## Failure behavior
+## Support bundle boundary
 
-A repository-index error does not invalidate a completed JSON save. Operations Center can rebuild the index from project files.
+Support bundles contain metadata and diagnostics only. They are designed for troubleshooting without disclosing voice content or provider secrets.
