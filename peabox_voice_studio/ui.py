@@ -126,6 +126,10 @@ div[data-baseweb="popover"] li[role="option"]:hover { background:#edf4fc!importa
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p { color:#ffffff!important; font-weight:720; }
 [data-testid="stSidebar"] div[role="radiogroup"] input { accent-color:#72d4e5; }
 [data-testid="stSidebar"] hr { border-color:#385374; margin:.85rem 0; }
+[data-testid="stSidebar"] .stButton > button { background:#203b64!important; color:#ffffff!important; -webkit-text-fill-color:#ffffff!important; border:1px solid #5f82aa!important; opacity:1!important; }
+[data-testid="stSidebar"] .stButton > button p, [data-testid="stSidebar"] .stButton > button span { color:#ffffff!important; -webkit-text-fill-color:#ffffff!important; opacity:1!important; }
+[data-testid="stSidebar"] .stButton > button:hover { background:#2b578a!important; border-color:#82bedc!important; }
+[data-testid="stSidebar"] .stButton > button:focus { outline:2px solid #7fd7e8!important; outline-offset:1px; }
 .block-container {
   width:100%; max-width:1440px; box-sizing:border-box;
   padding:3.35rem 2.25rem 4rem!important;

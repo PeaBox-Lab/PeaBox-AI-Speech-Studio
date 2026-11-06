@@ -1,3 +1,8 @@
+# v0.11.1 Feature Additions
+
+## Deterministic Visual QA
+Track navigation, theme, labels, widget structure, responsive rules, and contrast through stable JSON baselines and screenshot-ready viewport manifests.
+
 # v0.11.0 Feature Additions
 
 ## Governed Resilience Profiles

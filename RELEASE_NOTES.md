@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.11.1 Release Notes
+
+v0.11.1 delivers the roadmap’s visual regression foundation without requiring a browser package. It creates deterministic structural baselines for navigation, theme, screens, labels, widget calls, responsive rules, and contrast, plus a screenshot-ready capture manifest.
+
 # PeaBox Voice Studio v0.11.0 Release Notes
 
 v0.11.0 adds durable governance to backend resilience configuration. Retry, timeout, and circuit policies can now move through a local draft-review-approval-activation lifecycle before they are used to wrap a backend.

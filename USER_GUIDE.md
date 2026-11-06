@@ -1,3 +1,11 @@
+# v0.11.1 User Guide Update
+
+Open **Portfolio Operations → Visual QA** to review the current structural baseline and download JSON artifacts. Developers can regenerate checked-in files with:
+```bash
+python generate_visual_baselines.py
+```
+A validation failure must be fixed or deliberately reviewed before updating baselines.
+
 # v0.11.0 User Guide Update
 
 Open **Portfolio Operations → Profiles**. Create a Draft, submit it using **Advance profile**, and approve it with a different actor label. Advance the Approved profile again to make it Active. Only the Active profile can be probed. Clone an existing profile to propose changes without editing the approved version.

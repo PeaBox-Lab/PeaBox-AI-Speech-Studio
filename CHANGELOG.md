@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.11.1 — Deterministic UI Baselines
+- Added deterministic navigation, metadata, theme, and screen-source snapshots.
+- Added baseline hashing and structural drift comparison.
+- Added desktop, tablet, and mobile screenshot manifest with 57 captures.
+- Added contrast and responsive contract validation.
+- Added baseline generator and checked-in JSON artifacts.
+- Added Visual QA tab to Operations Center.
+- Visual validation caught and restored explicit Quick Access sidebar contrast styling.
+- Validation: 261 tests passed.
+
+# Changelog
+
 ## v0.11.0 — Governed Resilience Profiles
 - Added durable secret-free resilience profiles.
 - Added Draft, review, changes, approval, activation, deactivation, and archive lifecycle.

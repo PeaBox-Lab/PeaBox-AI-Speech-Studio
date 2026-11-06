@@ -1,3 +1,32 @@
+# PeaBox Voice Studio v0.11.1 Detailed Release Notes
+
+## Navigation baseline
+The baseline records all navigation groups, labels, internal page identities, icons, and page metadata. It verifies 19 unique pages and exact metadata coverage.
+
+## Theme baseline
+Theme extraction records corporate color tokens, required reusable component selectors, sidebar select/radio/button contracts, and responsive media queries. Validation requires the mobile breakpoint and key visual components.
+
+## Screen source snapshots
+Each modular screen records module name, source line count, unique labels, Streamlit call counts, and SHA-256 source hash. This catches structural UI changes without executing a browser.
+
+## Contrast
+The harness calculates relative-luminance contrast ratios. Sidebar white text against the dark control and primary ink against white cards must meet 4.5:1. During implementation, the check detected missing explicit Quick Access contrast styling and the rule was restored.
+
+## Screenshot manifest
+Every page is paired with desktop 1440×1000, tablet 1024×900, and mobile 390×844 capture targets. The manifest contains 57 unique PNG filenames linked to the baseline hash.
+
+## Drift comparison
+Baseline comparison separately identifies navigation, theme, and per-screen changes. The generator refuses to write artifacts when visual contracts fail.
+
+## Operations interface
+Visual QA reports page count, screen-module count, planned captures, contract issues, baseline hash, contrast values, and viewport names, with downloadable baseline and manifest JSON.
+
+## Browser boundary
+This release produces screenshot-ready deterministic baselines and manifests. Actual PNG capture and pixel comparison remain an external browser-runner step; no browser was silently installed.
+
+## Verification
+261 tests cover navigation uniqueness, theme contracts, contrast, screen coverage, determinism, round-trip serialization, drift detection, manifest uniqueness, checked-in artifact parity, generator gates, and interface disclosures.
+
 # PeaBox Voice Studio v0.11.0 Detailed Release Notes
 
 ## Durable profile contents

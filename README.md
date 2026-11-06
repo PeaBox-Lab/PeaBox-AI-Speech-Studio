@@ -1,22 +1,24 @@
-# PeaBox Voice Studio v0.11.0
-A local-first corporate voice-production workspace with modular screens, governed workflows, provider sandboxes, managed workers, storage backends, backend resilience, and durable reviewed resilience profiles.
+# PeaBox Voice Studio v0.11.1
+A local-first corporate voice-production workspace with modular screens, governed workflows, provider sandboxes, managed workers, resilient storage backends, and deterministic visual regression baselines.
 
-## v0.11.0 Governed Resilience Profiles
-- Durable retry, timeout, and circuit settings without credentials
-- Draft, In Review, Changes Requested, Approved, Active, and Archived states
-- Controlled transition rules
-- Reviewer must differ from profile creator for approval
-- One Active profile per backend
-- New activation automatically returns the previous Active profile to Approved
-- Draft/changes-only editing
-- Clone, compare, archive, reactivate, and Draft deletion
-- Append-only local profile audit history
-- Active profile instantiation and health probing
-- Operations Center Profiles tab
+## v0.11.1 Deterministic UI Baselines
+- Navigation and page-metadata snapshots for all 19 pages
+- Theme token and component contract snapshots
+- Static screen widget-call, label, line-count, and source-hash snapshots
+- WCAG-style contrast checks for sidebar controls and content cards
+- Responsive desktop, tablet, and mobile viewport manifest
+- 57 planned screenshot capture filenames
+- Stable baseline hashing and drift comparison
+- Checked-in JSON baseline and screenshot manifest
+- Regeneration command with validation gate
+- Operations Center Visual QA dashboard and downloads
+- Restored explicit sidebar Quick Access contrast styling detected by the new contract
 
 ## Validation
-- 247 automated tests passed
-- Validation bounds, transitions, reviewer separation, activation, cloning, deletion, diffs, audit, and instantiation verified
+- 261 automated tests passed
+- 19 page identities and screen modules verified
+- 57 unique viewport capture targets verified
+- Determinism, round-trip, drift detection, contrast, responsive rules, and checked-in baselines tested
 - All Python sources compile successfully
 - Every archive entry is verified against its source hash
 
@@ -24,7 +26,7 @@ A local-first corporate voice-production workspace with modular screens, governe
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the launcher and sidebar display v0.11.0.
+4. Confirm the launcher and sidebar display v0.11.1.
 5. Keep the `data`, `outputs`, and `models` folders writable.
 ## Validation
 ```bash

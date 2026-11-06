@@ -1,3 +1,10 @@
+# v0.11.1 Help Update
+
+- **Baseline validation failed:** inspect the listed theme, component, breakpoint, or contrast contract.
+- **Checked-in baseline differs:** review navigation/theme/screen changes before regenerating.
+- **No PNG files:** this release creates the capture manifest; use an approved browser runner for screenshots.
+- **Contrast issue:** ensure explicit foreground and background styles exist for the affected control.
+
 # v0.11.0 Help Update
 
 - **Approval rejected:** reviewer label must differ from creator.

@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.11.1
+- Deterministic navigation and theme baselines
+- Screen label and widget-call snapshots
+- Contrast and responsive validation
+- Desktop/tablet/mobile screenshot manifest
+- Baseline drift comparison
+- Operations Center Visual QA
+
+## Recommended next release
+- Approved browser runner for PNG capture and pixel-diff reports
+- Live provider integration harness with explicit test credentials and cost guardrails
+- Optional remote backend with explicit credentials, approval, and rollback
+- Authenticated identity integration for governance actions
+
+# Roadmap
+
 ## Delivered in v0.11.0
 - Durable resilience profiles
 - Draft/review/approval/activation lifecycle

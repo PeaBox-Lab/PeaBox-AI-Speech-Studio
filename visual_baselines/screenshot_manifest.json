@@ -1,0 +1,309 @@
+{
+  "schema": 1,
+  "version": "0.11.1",
+  "baseline_hash": "c0234c3b86446b7b08c8307065b9cf4f1cd1e4514c7d15d35bc0adc5ad7050cc",
+  "viewports": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "name": "tablet",
+      "width": 1024,
+      "height": 900
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "captures": [
+    {
+      "page": "Dashboard",
+      "viewport": "desktop",
+      "filename": "dashboard_desktop.png"
+    },
+    {
+      "page": "Dashboard",
+      "viewport": "tablet",
+      "filename": "dashboard_tablet.png"
+    },
+    {
+      "page": "Dashboard",
+      "viewport": "mobile",
+      "filename": "dashboard_mobile.png"
+    },
+    {
+      "page": "Projects",
+      "viewport": "desktop",
+      "filename": "projects_desktop.png"
+    },
+    {
+      "page": "Projects",
+      "viewport": "tablet",
+      "filename": "projects_tablet.png"
+    },
+    {
+      "page": "Projects",
+      "viewport": "mobile",
+      "filename": "projects_mobile.png"
+    },
+    {
+      "page": "Command Center",
+      "viewport": "desktop",
+      "filename": "command_center_desktop.png"
+    },
+    {
+      "page": "Command Center",
+      "viewport": "tablet",
+      "filename": "command_center_tablet.png"
+    },
+    {
+      "page": "Command Center",
+      "viewport": "mobile",
+      "filename": "command_center_mobile.png"
+    },
+    {
+      "page": "Preferences",
+      "viewport": "desktop",
+      "filename": "preferences_desktop.png"
+    },
+    {
+      "page": "Preferences",
+      "viewport": "tablet",
+      "filename": "preferences_tablet.png"
+    },
+    {
+      "page": "Preferences",
+      "viewport": "mobile",
+      "filename": "preferences_mobile.png"
+    },
+    {
+      "page": "Operations",
+      "viewport": "desktop",
+      "filename": "operations_desktop.png"
+    },
+    {
+      "page": "Operations",
+      "viewport": "tablet",
+      "filename": "operations_tablet.png"
+    },
+    {
+      "page": "Operations",
+      "viewport": "mobile",
+      "filename": "operations_mobile.png"
+    },
+    {
+      "page": "Script Blocks",
+      "viewport": "desktop",
+      "filename": "script_blocks_desktop.png"
+    },
+    {
+      "page": "Script Blocks",
+      "viewport": "tablet",
+      "filename": "script_blocks_tablet.png"
+    },
+    {
+      "page": "Script Blocks",
+      "viewport": "mobile",
+      "filename": "script_blocks_mobile.png"
+    },
+    {
+      "page": "Create Speech",
+      "viewport": "desktop",
+      "filename": "create_speech_desktop.png"
+    },
+    {
+      "page": "Create Speech",
+      "viewport": "tablet",
+      "filename": "create_speech_tablet.png"
+    },
+    {
+      "page": "Create Speech",
+      "viewport": "mobile",
+      "filename": "create_speech_mobile.png"
+    },
+    {
+      "page": "Batch Production",
+      "viewport": "desktop",
+      "filename": "batch_production_desktop.png"
+    },
+    {
+      "page": "Batch Production",
+      "viewport": "tablet",
+      "filename": "batch_production_tablet.png"
+    },
+    {
+      "page": "Batch Production",
+      "viewport": "mobile",
+      "filename": "batch_production_mobile.png"
+    },
+    {
+      "page": "Timeline Studio",
+      "viewport": "desktop",
+      "filename": "timeline_studio_desktop.png"
+    },
+    {
+      "page": "Timeline Studio",
+      "viewport": "tablet",
+      "filename": "timeline_studio_tablet.png"
+    },
+    {
+      "page": "Timeline Studio",
+      "viewport": "mobile",
+      "filename": "timeline_studio_mobile.png"
+    },
+    {
+      "page": "Voice Library",
+      "viewport": "desktop",
+      "filename": "voice_library_desktop.png"
+    },
+    {
+      "page": "Voice Library",
+      "viewport": "tablet",
+      "filename": "voice_library_tablet.png"
+    },
+    {
+      "page": "Voice Library",
+      "viewport": "mobile",
+      "filename": "voice_library_mobile.png"
+    },
+    {
+      "page": "Quality Studio",
+      "viewport": "desktop",
+      "filename": "quality_studio_desktop.png"
+    },
+    {
+      "page": "Quality Studio",
+      "viewport": "tablet",
+      "filename": "quality_studio_tablet.png"
+    },
+    {
+      "page": "Quality Studio",
+      "viewport": "mobile",
+      "filename": "quality_studio_mobile.png"
+    },
+    {
+      "page": "Audio Quality Lab",
+      "viewport": "desktop",
+      "filename": "audio_quality_lab_desktop.png"
+    },
+    {
+      "page": "Audio Quality Lab",
+      "viewport": "tablet",
+      "filename": "audio_quality_lab_tablet.png"
+    },
+    {
+      "page": "Audio Quality Lab",
+      "viewport": "mobile",
+      "filename": "audio_quality_lab_mobile.png"
+    },
+    {
+      "page": "Transcription",
+      "viewport": "desktop",
+      "filename": "transcription_desktop.png"
+    },
+    {
+      "page": "Transcription",
+      "viewport": "tablet",
+      "filename": "transcription_tablet.png"
+    },
+    {
+      "page": "Transcription",
+      "viewport": "mobile",
+      "filename": "transcription_mobile.png"
+    },
+    {
+      "page": "Governance",
+      "viewport": "desktop",
+      "filename": "governance_desktop.png"
+    },
+    {
+      "page": "Governance",
+      "viewport": "tablet",
+      "filename": "governance_tablet.png"
+    },
+    {
+      "page": "Governance",
+      "viewport": "mobile",
+      "filename": "governance_mobile.png"
+    },
+    {
+      "page": "Approvals",
+      "viewport": "desktop",
+      "filename": "approvals_desktop.png"
+    },
+    {
+      "page": "Approvals",
+      "viewport": "tablet",
+      "filename": "approvals_tablet.png"
+    },
+    {
+      "page": "Approvals",
+      "viewport": "mobile",
+      "filename": "approvals_mobile.png"
+    },
+    {
+      "page": "Provider Setup",
+      "viewport": "desktop",
+      "filename": "provider_setup_desktop.png"
+    },
+    {
+      "page": "Provider Setup",
+      "viewport": "tablet",
+      "filename": "provider_setup_tablet.png"
+    },
+    {
+      "page": "Provider Setup",
+      "viewport": "mobile",
+      "filename": "provider_setup_mobile.png"
+    },
+    {
+      "page": "System Check",
+      "viewport": "desktop",
+      "filename": "system_check_desktop.png"
+    },
+    {
+      "page": "System Check",
+      "viewport": "tablet",
+      "filename": "system_check_tablet.png"
+    },
+    {
+      "page": "System Check",
+      "viewport": "mobile",
+      "filename": "system_check_mobile.png"
+    },
+    {
+      "page": "Render History",
+      "viewport": "desktop",
+      "filename": "render_history_desktop.png"
+    },
+    {
+      "page": "Render History",
+      "viewport": "tablet",
+      "filename": "render_history_tablet.png"
+    },
+    {
+      "page": "Render History",
+      "viewport": "mobile",
+      "filename": "render_history_mobile.png"
+    },
+    {
+      "page": "Roadmap & Help",
+      "viewport": "desktop",
+      "filename": "roadmap_and_help_desktop.png"
+    },
+    {
+      "page": "Roadmap & Help",
+      "viewport": "tablet",
+      "filename": "roadmap_and_help_tablet.png"
+    },
+    {
+      "page": "Roadmap & Help",
+      "viewport": "mobile",
+      "filename": "roadmap_and_help_mobile.png"
+    }
+  ]
+}

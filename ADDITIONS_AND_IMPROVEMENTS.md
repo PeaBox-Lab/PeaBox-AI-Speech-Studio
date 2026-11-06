@@ -1,3 +1,30 @@
+# v0.11.1 Additions and Improvements
+
+## Baselines
+- Navigation snapshot
+- Page metadata snapshot
+- Theme tokens and components
+- Screen labels and widget-call counts
+- Source hashes
+
+## Visual contracts
+- Sidebar control styling
+- Reusable component selectors
+- Mobile breakpoint
+- Contrast ratios
+
+## Capture planning
+- Desktop viewport
+- Tablet viewport
+- Mobile viewport
+- 57 unique PNG targets
+
+## Tooling
+- Baseline generator
+- Validation gate
+- Drift comparison
+- Operations Center Visual QA
+
 # v0.11.0 Additions and Improvements
 
 ## Profile governance

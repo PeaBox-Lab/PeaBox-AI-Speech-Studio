@@ -1,0 +1,1585 @@
+{
+  "schema": 1,
+  "version": "0.11.1",
+  "navigation": {
+    "version": "0.11.1",
+    "groups": [
+      {
+        "group": "Overview",
+        "pages": [
+          {
+            "label": "Executive Dashboard",
+            "page": "Dashboard",
+            "icon": "▦"
+          },
+          {
+            "label": "Project Workspace",
+            "page": "Projects",
+            "icon": "▣"
+          },
+          {
+            "label": "Command Center",
+            "page": "Command Center",
+            "icon": "⌕"
+          },
+          {
+            "label": "Interface Preferences",
+            "page": "Preferences",
+            "icon": "◐"
+          },
+          {
+            "label": "Portfolio Operations",
+            "page": "Operations",
+            "icon": "⚙"
+          }
+        ]
+      },
+      {
+        "group": "Production",
+        "pages": [
+          {
+            "label": "Script Editor",
+            "page": "Script Blocks",
+            "icon": "✎"
+          },
+          {
+            "label": "Speech Generator",
+            "page": "Create Speech",
+            "icon": "◉"
+          },
+          {
+            "label": "Batch Jobs",
+            "page": "Batch Production",
+            "icon": "⇄"
+          },
+          {
+            "label": "Timeline Studio",
+            "page": "Timeline Studio",
+            "icon": "≡"
+          }
+        ]
+      },
+      {
+        "group": "Audio & Quality",
+        "pages": [
+          {
+            "label": "Voice Library",
+            "page": "Voice Library",
+            "icon": "◫"
+          },
+          {
+            "label": "Quality Studio",
+            "page": "Quality Studio",
+            "icon": "✓"
+          },
+          {
+            "label": "Audio Quality Lab",
+            "page": "Audio Quality Lab",
+            "icon": "∿"
+          },
+          {
+            "label": "Transcription Studio",
+            "page": "Transcription",
+            "icon": "▤"
+          }
+        ]
+      },
+      {
+        "group": "Administration",
+        "pages": [
+          {
+            "label": "Governance Center",
+            "page": "Governance",
+            "icon": "◆"
+          },
+          {
+            "label": "Approval Queue",
+            "page": "Approvals",
+            "icon": "✓"
+          },
+          {
+            "label": "Provider Setup",
+            "page": "Provider Setup",
+            "icon": "⚙"
+          },
+          {
+            "label": "System Check",
+            "page": "System Check",
+            "icon": "◇"
+          },
+          {
+            "label": "Activity & History",
+            "page": "Render History",
+            "icon": "◷"
+          }
+        ]
+      },
+      {
+        "group": "Support",
+        "pages": [
+          {
+            "label": "Roadmap & Help",
+            "page": "Roadmap & Help",
+            "icon": "?"
+          }
+        ]
+      }
+    ],
+    "page_meta": {
+      "Approvals": {
+        "title": "Approval Queue",
+        "subtitle": "Request, decide, and review local approval attestations and workflow gates.",
+        "group": "Administration"
+      },
+      "Audio Quality Lab": {
+        "title": "Audio Quality Lab",
+        "subtitle": "Analyze WAV files, create normalized or trimmed copies, and compare voices.",
+        "group": "Audio & Quality"
+      },
+      "Batch Production": {
+        "title": "Batch Jobs",
+        "subtitle": "Validate, queue, resume, retry, cancel, and package multi-provider production jobs.",
+        "group": "Production"
+      },
+      "Command Center": {
+        "title": "Workspace Command Center",
+        "subtitle": "Search screens, discover project-aware actions, and reopen recent commands.",
+        "group": "Overview"
+      },
+      "Create Speech": {
+        "title": "Speech Generator",
+        "subtitle": "Generate and review individual local voice outputs.",
+        "group": "Production"
+      },
+      "Dashboard": {
+        "title": "Executive Dashboard",
+        "subtitle": "Portfolio status, production readiness, and recommended next actions.",
+        "group": "Overview"
+      },
+      "Governance": {
+        "title": "Governance Center",
+        "subtitle": "Manage ownership, workflow state, review comments, decisions, and project risk.",
+        "group": "Administration"
+      },
+      "Operations": {
+        "title": "Portfolio Operations",
+        "subtitle": "Review ownership, workflow, comments, approvals, and readiness across local projects.",
+        "group": "Overview"
+      },
+      "Preferences": {
+        "title": "Interface Preferences",
+        "subtitle": "Personalize navigation density, startup area, motion, and dashboard detail on this device.",
+        "group": "Overview"
+      },
+      "Projects": {
+        "title": "Project Workspace",
+        "subtitle": "Create, open, import, export, and maintain portable production projects.",
+        "group": "Overview"
+      },
+      "Provider Setup": {
+        "title": "Provider Setup",
+        "subtitle": "Configure session-only cloud credentials and discover provider voices.",
+        "group": "Administration"
+      },
+      "Quality Studio": {
+        "title": "Quality Studio",
+        "subtitle": "Manage pronunciation rules, pause controls, and processed-text previews.",
+        "group": "Audio & Quality"
+      },
+      "Render History": {
+        "title": "Activity & History",
+        "subtitle": "Review project renders, timeline exports, jobs, comparisons, and saved transcripts.",
+        "group": "Administration"
+      },
+      "Roadmap & Help": {
+        "title": "Roadmap & Help",
+        "subtitle": "Review delivered capabilities, planned architecture, and operating guidance.",
+        "group": "Support"
+      },
+      "Script Blocks": {
+        "title": "Script Editor",
+        "subtitle": "Structure the master script into reusable, provider-aware production blocks.",
+        "group": "Production"
+      },
+      "System Check": {
+        "title": "System Check",
+        "subtitle": "Review runtime, media, model, and storage readiness.",
+        "group": "Administration"
+      },
+      "Timeline Studio": {
+        "title": "Timeline Studio",
+        "subtitle": "Arrange durable WAV clips non-destructively and export a mixed production master.",
+        "group": "Production"
+      },
+      "Transcription": {
+        "title": "Transcription Studio",
+        "subtitle": "Transcribe, edit, validate, save, and export timestamped media text.",
+        "group": "Audio & Quality"
+      },
+      "Voice Library": {
+        "title": "Voice Library",
+        "subtitle": "Search available local and session-discovered cloud voices.",
+        "group": "Audio & Quality"
+      }
+    }
+  },
+  "theme": {
+    "tokens": {
+      "--pb-navy": "#13213c",
+      "--pb-navy-2": "#1b3155",
+      "--pb-blue": "#2f6fbb",
+      "--pb-blue-active": "#316da8",
+      "--pb-cyan": "#55bed6",
+      "--pb-ink": "#172033",
+      "--pb-muted": "#667085",
+      "--pb-bg": "#f3f6fa",
+      "--pb-card": "#ffffff",
+      "--pb-border": "#d6e0ec",
+      "--pb-sidebar-text": "#edf5ff",
+      "--pb-sidebar-muted": "#b9c8dc",
+      "--pb-sidebar-control": "#203b64",
+      "--pb-sidebar-border": "#49698f",
+      "--pb-good": "#147d64",
+      "--pb-warn": "#b54708",
+      "--pb-bad": "#b42318"
+    },
+    "media_queries": [
+      "max-width:1100px",
+      "max-width:760px"
+    ],
+    "components": {
+      ".pb-topbar": true,
+      ".pb-card": true,
+      ".pb-section": true,
+      ".pb-empty": true,
+      ".pb-status": true,
+      ".pb-step": true
+    },
+    "sidebar": {
+      "select_dark": true,
+      "radio_selected": true,
+      "quick_button_contrast": true
+    }
+  },
+  "screens": {
+    "approvals": {
+      "module": "approvals",
+      "lines": 52,
+      "streamlit_calls": [
+        [
+          "button",
+          1
+        ],
+        [
+          "caption",
+          1
+        ],
+        [
+          "columns",
+          3
+        ],
+        [
+          "expander",
+          1
+        ],
+        [
+          "info",
+          1
+        ],
+        [
+          "rerun",
+          4
+        ],
+        [
+          "session_state.get",
+          1
+        ],
+        [
+          "text_area",
+          2
+        ],
+        [
+          "text_input",
+          2
+        ],
+        [
+          "write",
+          2
+        ]
+      ],
+      "labels": [
+        "Approval scope",
+        "Create approval request",
+        "Current local actor label",
+        "Decision note",
+        "No approval requests have been created.",
+        "Requester attestation"
+      ],
+      "source_hash": "8bbd1c254b13c272e6b30f7f28b950a81bd3275a465628888da7c9dd32d94bab"
+    },
+    "audio_quality_lab": {
+      "module": "audio_quality_lab",
+      "lines": 98,
+      "streamlit_calls": [
+        [
+          "audio",
+          3
+        ],
+        [
+          "button",
+          1
+        ],
+        [
+          "caption",
+          2
+        ],
+        [
+          "columns",
+          5
+        ],
+        [
+          "dataframe",
+          3
+        ],
+        [
+          "download_button",
+          2
+        ],
+        [
+          "error",
+          2
+        ],
+        [
+          "file_uploader",
+          1
+        ],
+        [
+          "json",
+          1
+        ],
+        [
+          "radio",
+          2
+        ],
+        [
+          "rerun",
+          1
+        ],
+        [
+          "selectbox",
+          5
+        ],
+        [
+          "session_state.get",
+          2
+        ],
+        [
+          "slider",
+          2
+        ],
+        [
+          "spinner",
+          1
+        ],
+        [
+          "subheader",
+          6
+        ],
+        [
+          "success",
+          1
+        ],
+        [
+          "text_area",
+          2
+        ]
+      ],
+      "labels": [
+        "16-bit PCM WAV file",
+        "Comparison notes",
+        "Comparison preference saved",
+        "Comparison text",
+        "Generate A/B comparison",
+        "Generate the same prepared text twice with independent Kokoro voice and speed settings.",
+        "Generating both variants...",
+        "Language A",
+        "Language B",
+        "Preferred result",
+        "Project comparison history",
+        "Saved comparison",
+        "Source metrics",
+        "Speed A",
+        "Speed B",
+        "Variant A",
+        "Variant B",
+        "Voice A",
+        "Voice B",
+        "Workflow"
+      ],
+      "source_hash": "eef5f63a33b9acb8805c1db3d4b9efed9f86e46ebce418a8908cedfcf24858a3"
+    },
+    "batch_production": {
+      "module": "batch_production",
+      "lines": 102,
+      "streamlit_calls": [
+        [
+          "button",
+          1
+        ],
+        [
+          "caption",
+          3
+        ],
+        [
+          "code",
+          1
+        ],
+        [
+          "columns",
+          4
+        ],
+        [
+          "dataframe",
+          4
+        ],
+        [
+          "download_button",
+          2
+        ],
+        [
+          "error",
+          3
+        ],
+        [
+          "progress",
+          1
+        ],
+        [
+          "rerun",
+          14
+        ],
+        [
+          "selectbox",
+          1
+        ],
+        [
+          "spinner",
+          1
+        ],
+        [
+          "subheader",
+          2
+        ],
+        [
+          "success",
+          3
+        ]
+      ],
+      "labels": [
+        "Batch job created",
+        "Create resumable job",
+        "Download job outputs",
+        "Download render manifest",
+        "Local worker queue",
+        "Managed local worker",
+        "Queued. Run worker_local.py in a separate terminal.",
+        "Running queued job items...",
+        "Saved batch jobs",
+        "python worker_local.py --daemon"
+      ],
+      "source_hash": "93941c7f29df1de7090f14c73e81a0734e0c90b5c8af25af600941556b207cd4"
+    },
+    "command_center": {
+      "module": "command_center",
+      "lines": 31,
+      "streamlit_calls": [
+        [
+          "button",
+          1
+        ],
+        [
+          "caption",
+          1
+        ],
+        [
+          "columns",
+          1
+        ],
+        [
+          "rerun",
+          2
+        ],
+        [
+          "selectbox",
+          1
+        ],
+        [
+          "text_input",
+          1
+        ]
+      ],
+      "labels": [
+        "Command results",
+        "Open selected command",
+        "Search screens and workflows"
+      ],
+      "source_hash": "d7f4f6a0019a33a706c27b059a482e82f49e653f760290512149ea04d075d4a2"
+    },
+    "create_speech": {
+      "module": "create_speech",
+      "lines": 28,
+      "streamlit_calls": [
+        [
+          "audio",
+          1
+        ],
+        [
+          "button",
+          1
+        ],
+        [
+          "columns",
+          1
+        ],
+        [
+          "download_button",
+          1
+        ],
+        [
+          "error",
+          1
+        ],
+        [
+          "spinner",
+          1
+        ],
+        [
+          "text_area",
+          1
+        ],
+        [
+          "text_input",
+          1
+        ]
+      ],
+      "labels": [
+        "Download WAV",
+        "Generate local speech",
+        "Generating speech...",
+        "Output name",
+        "Text"
+      ],
+      "source_hash": "56d75a0771da945e8166ce15f21914fa5882f570aba28c5fe9fb68490146f930"
+    },
+    "dashboard": {
+      "module": "dashboard",
+      "lines": 96,
+      "streamlit_calls": [
+        [
+          "columns",
+          7
+        ],
+        [
+          "dataframe",
+          2
+        ],
+        [
+          "markdown",
+          1
+        ],
+        [
+          "progress",
+          1
+        ],
+        [
+          "rerun",
+          3
+        ]
+      ],
+      "labels": [],
+      "source_hash": "f4a9edf174e7ebc8f2512e11f75c6dac6608f1379ad22ec3d9c6f50d68742a80"
+    },
+    "governance": {
+      "module": "governance",
+      "lines": 101,
+      "streamlit_calls": [
+        [
+          "button",
+          7
+        ],
+        [
+          "caption",
+          1
+        ],
+        [
+          "checkbox",
+          1
+        ],
+        [
+          "columns",
+          4
+        ],
+        [
+          "dataframe",
+          3
+        ],
+        [
+          "error",
+          1
+        ],
+        [
+          "expander",
+          1
+        ],
+        [
+          "info",
+          1
+        ],
+        [
+          "markdown",
+          1
+        ],
+        [
+          "rerun",
+          6
+        ],
+        [
+          "selectbox",
+          4
+        ],
+        [
+          "session_state.get",
+          1
+        ],
+        [
+          "success",
+          1
+        ],
+        [
+          "tabs",
+          1
+        ],
+        [
+          "text_area",
+          4
+        ],
+        [
+          "text_input",
+          8
+        ],
+        [
+          "write",
+          1
+        ]
+      ],
+      "labels": [
+        "Add review comment",
+        "Apply workflow transition",
+        "Comment target",
+        "Contributors, one per line",
+        "Current local actor label",
+        "Decision or proposed outcome",
+        "Decision status",
+        "Decision title",
+        "Filter audit entries",
+        "Governance settings saved",
+        "Mark selected decision superseded",
+        "Move to",
+        "No governance actions have been recorded.",
+        "Project owner",
+        "Rationale",
+        "Record decision",
+        "Reopen comment",
+        "Resolution note",
+        "Resolve comment",
+        "Review comment",
+        "Save governance settings",
+        "Show resolved comments",
+        "Supersede decision",
+        "Supersede reason",
+        "Target reference",
+        "Transition note"
+      ],
+      "source_hash": "cfb24a10675d6e354baaa0ac0333ffb0d80aec9a67423f712314fab2f8772d3c"
+    },
+    "help": {
+      "module": "help",
+      "lines": 26,
+      "streamlit_calls": [
+        [
+          "markdown",
+          1
+        ]
+      ],
+      "labels": [
+        "\n    ### Current release\n    - Governance Center with ownership, contributors, risk, due dates, and controlled workflow status\n    - Persistent review comments with priority, targets, resolution, and reopening\n    - Decision register with rationale and supersession history\n    - Approval Queue with local attestations and workflow gates\n    - Append-only application audit entries included in project exports\n    - Corporate dashboard governance readiness and consolidated activity history\n    ### Planned next\n    1. Authenticated identity, role-based permissions, and shared projects\n    2. SQLite repository and background worker process\n    3. Interactive waveform dragging in a React/Web Audio frontend\n    4. Optional speaker diarization and speaker alignment\n    ### Setup\n    Run `start_windows.bat`. The launcher accepts installed Python 3.10, 3.11, or 3.12 and creates or reuses `.venv`. Install FFmpeg for compressed media transcription.\n    "
+      ],
+      "source_hash": "ec852ac1e7181ad4c383b4a3486cf47ec2e9244925232c0c824a88f3bc294fa5"
+    },
+    "operations": {
+      "module": "operations",
+      "lines": 176,
+      "streamlit_calls": [
+        [
+          "button",
+          10
+        ],
+        [
+          "caption",
+          8
+        ],
+        [
+          "checkbox",
+          5
+        ],
+        [
+          "columns",
+          8
+        ],
+        [
+          "dataframe",
+          9
+        ],
+        [
+          "download_button",
+          3
+        ],
+        [
+          "error",
+          12
+        ],
+        [
+          "expander",
+          1
+        ],
+        [
+          "info",
+          3
+        ],
+        [
+          "json",
+          2
+        ],
+        [
+          "number_input",
+          4
+        ],
+        [
+          "rerun",
+          16
+        ],
+        [
+          "selectbox",
+          10
+        ],
+        [
+          "session_state.get",
+          3
+        ],
+        [
+          "slider",
+          3
+        ],
+        [
+          "success",
+          3
+        ],
+        [
+          "tabs",
+          1
+        ],
+        [
+          "text_area",
+          2
+        ],
+        [
+          "text_input",
+          6
+        ],
+        [
+          "write",
+          8
+        ]
+      ],
+      "labels": [
+        "Active reservation",
+        "Apply retention preview",
+        "Backend selection is not persisted. Remote backends require a future explicit credential and approval workflow.",
+        "Capacity reserved. Release it when the planned operation is cancelled or complete.",
+        "Circuit failure threshold",
+        "Circuit recovery seconds",
+        "Complete plan",
+        "Completion notes",
+        "Create Draft resilience profile",
+        "Create capacity reservation",
+        "Create database backup",
+        "Create maintenance plan",
+        "Deterministic source snapshots validate navigation, theme, labels, widget calls, responsive rules, and contrast. PNG capture remains an external browser step.",
+        "Deterministic visual contracts passed.",
+        "Download UI baseline JSON",
+        "Download metadata snapshot",
+        "Download screenshot manifest",
+        "Enable local storage quotas",
+        "Frequency",
+        "Initial retry delay seconds",
+        "Local is the active durable backend. Memory is a non-persistent validation backend for contract and migration testing.",
+        "Logical object keys map to the existing local managed directories. No remote storage is configured in this release.",
+        "Metadata only; external audio is excluded.",
+        "Migration namespace",
+        "Move removes the source after verified copy",
+        "New profile name",
+        "Object namespace",
+        "Operation timeout seconds",
+        "Permanently delete selected object",
+        "Permanently remove every file in this preview",
+        "Plan",
+        "Plan name",
+        "Plans are evaluated when this screen opens; no background scheduler runs.",
+        "Profile actor label",
+        "Profile backend",
+        "Profile description",
+        "Profiles persist resilience settings without credentials. Activation requires an approved profile and uses local actor labels, not authenticated identities.",
+        "Quotas apply to generated outputs, downloaded models, recovery artifacts, and worker state. Project JSON is excluded.",
+        "Rebuild the manifest to register existing managed files.",
+        "Release selected reservation",
+        "Reservation purpose",
+        "Reservation size (MB)",
+        "Resilience controls wrap a backend at runtime. They do not change stored objects or persist remote credentials.",
+        "Resilience profile audit history",
+        "Retry attempts",
+        "Review or transition note",
+        "Run backend health probes",
+        "Run non-persistent migration test into memory backend",
+        "Save storage policy",
+        "Saved resilience profile",
+        "Selected object",
+        "Target namespace",
+        "Target object key",
+        "Test reservation category",
+        "The local backend is fast and durable. These policies establish the contract required before any future remote backend is approved.",
+        "Validate backend migration",
+        "Warning threshold percent"
+      ],
+      "source_hash": "cc0ce983330c6094e0610a106a8a3202640014ccb6417f80436fe74704beda36"
+    },
+    "preferences": {
+      "module": "preferences",
+      "lines": 32,
+      "streamlit_calls": [
+        [
+          "button",
+          1
+        ],
+        [
+          "columns",
+          2
+        ],
+        [
+          "json",
+          1
+        ],
+        [
+          "radio",
+          1
+        ],
+        [
+          "rerun",
+          4
+        ],
+        [
+          "selectbox",
+          1
+        ],
+        [
+          "success",
+          1
+        ]
+      ],
+      "labels": [
+        "Dashboard detail",
+        "Default workspace area",
+        "Preferences saved. Layout preferences apply immediately after refresh.",
+        "Save interface preferences"
+      ],
+      "source_hash": "db5c163471522786ad1a86761f2057999c23b32ef1951bcd183a3c290dcde8ab"
+    },
+    "projects": {
+      "module": "projects",
+      "lines": 74,
+      "streamlit_calls": [
+        [
+          "button",
+          4
+        ],
+        [
+          "caption",
+          2
+        ],
+        [
+          "checkbox",
+          1
+        ],
+        [
+          "columns",
+          4
+        ],
+        [
+          "divider",
+          1
+        ],
+        [
+          "error",
+          2
+        ],
+        [
+          "expander",
+          1
+        ],
+        [
+          "file_uploader",
+          2
+        ],
+        [
+          "info",
+          1
+        ],
+        [
+          "radio",
+          1
+        ],
+        [
+          "rerun",
+          6
+        ],
+        [
+          "selectbox",
+          1
+        ],
+        [
+          "session_state.pop",
+          1
+        ],
+        [
+          "subheader",
+          2
+        ],
+        [
+          "success",
+          4
+        ],
+        [
+          "text_area",
+          3
+        ],
+        [
+          "text_input",
+          2
+        ]
+      ],
+      "labels": [
+        "Create and open",
+        "Create or open a project to begin.",
+        "Delete permanently",
+        "Delete project",
+        "Description",
+        "I understand this permanently deletes the project",
+        "Import and open",
+        "Import bundle and open",
+        "Import project",
+        "Import timeline bundle",
+        "Master Script",
+        "Master Script block import",
+        "New project name",
+        "PeaBox project JSON",
+        "PeaBox timeline bundle ZIP",
+        "Project imported with a new identity",
+        "Project name",
+        "Project saved",
+        "Saved projects",
+        "Timeline bundle imported with local asset copies"
+      ],
+      "source_hash": "bec0a4ccd0ac58ef5cb0691e43277ecee29609ae5fc1c4ce3508394d44e60a17"
+    },
+    "provider_setup": {
+      "module": "provider_setup",
+      "lines": 82,
+      "streamlit_calls": [
+        [
+          "button",
+          10
+        ],
+        [
+          "caption",
+          1
+        ],
+        [
+          "dataframe",
+          2
+        ],
+        [
+          "divider",
+          1
+        ],
+        [
+          "error",
+          7
+        ],
+        [
+          "file_uploader",
+          1
+        ],
+        [
+          "info",
+          1
+        ],
+        [
+          "radio",
+          1
+        ],
+        [
+          "rerun",
+          3
+        ],
+        [
+          "session_state.get",
+          1
+        ],
+        [
+          "spinner",
+          3
+        ],
+        [
+          "subheader",
+          2
+        ],
+        [
+          "success",
+          7
+        ],
+        [
+          "tabs",
+          1
+        ],
+        [
+          "text_input",
+          7
+        ],
+        [
+          "warning",
+          1
+        ]
+      ],
+      "labels": [
+        "API key and region are required",
+        "AWS access key ID",
+        "AWS region",
+        "AWS secret access key",
+        "AWS session token, optional",
+        "Access key, secret key, and region are required",
+        "All offline provider contracts passed.",
+        "Azure API key",
+        "Azure region",
+        "Azure session profile is ready",
+        "Clear Azure session profile",
+        "Clear Google session profile",
+        "Clear Polly session profiles",
+        "Credentials are held only in this Streamlit session. They are not saved in projects, exports, manifests, or logs.",
+        "Discover Azure voices",
+        "Discover Google voices",
+        "Discover Polly voices",
+        "Discovering Azure voices...",
+        "Discovering Google voices...",
+        "Discovering Polly voices...",
+        "Google service-account JSON",
+        "Google session profile is ready",
+        "Offline provider sandbox",
+        "One or more provider contracts failed. No live provider call was made.",
+        "Optional Google language filter",
+        "Polly catalog engine",
+        "Polly session profiles are ready",
+        "Provider capabilities and readiness",
+        "Run offline provider contract suite",
+        "Runs deterministic Azure, Polly, and Google request-contract tests without network access or real credentials.",
+        "Sandbox success validates application payloads and normalization only; it does not confirm live credentials, quotas, billing, regional availability, or service status.",
+        "The uploaded file is not valid JSON",
+        "Use Azure for this session",
+        "Use Google for this session",
+        "Use Polly for this session"
+      ],
+      "source_hash": "a03007b70a5e23e6d676a826eb341fcaf5000c1475af3b92e1123feefa9e4935"
+    },
+    "quality_studio": {
+      "module": "quality_studio",
+      "lines": 52,
+      "streamlit_calls": [
+        [
+          "button",
+          3
+        ],
+        [
+          "caption",
+          2
+        ],
+        [
+          "code",
+          1
+        ],
+        [
+          "columns",
+          2
+        ],
+        [
+          "dataframe",
+          2
+        ],
+        [
+          "error",
+          2
+        ],
+        [
+          "info",
+          3
+        ],
+        [
+          "rerun",
+          3
+        ],
+        [
+          "selectbox",
+          2
+        ],
+        [
+          "session_state.get",
+          1
+        ],
+        [
+          "slider",
+          1
+        ],
+        [
+          "subheader",
+          2
+        ],
+        [
+          "success",
+          1
+        ],
+        [
+          "text_area",
+          1
+        ],
+        [
+          "warning",
+          1
+        ]
+      ],
+      "labels": [
+        "Add pronunciation rule",
+        "Append pause to preview",
+        "Cloud providers compile valid pause markers to SSML breaks. Kokoro receives punctuation-based pause approximations.",
+        "Delete pronunciation rule",
+        "Delete selected rule",
+        "No pronunciation rule matched the preview text.",
+        "No pronunciation rules have been added.",
+        "Open a project to manage pronunciation and direction rules.",
+        "Pause duration",
+        "Preview provider",
+        "Preview text",
+        "Project pronunciation dictionary",
+        "Pronunciation rules changed the preview text.",
+        "Pronunciation rules contain duplicates or overlaps; review rule order.",
+        "Rules are applied in order before a job is created. They are stored with the project and contain no credentials.",
+        "Text preparation preview"
+      ],
+      "source_hash": "100221865f15af09c09cbd505760a354ab80b67dc4c3c54eb4f100feef8eba7a"
+    },
+    "render_history": {
+      "module": "render_history",
+      "lines": 47,
+      "streamlit_calls": [
+        [
+          "dataframe",
+          6
+        ],
+        [
+          "info",
+          7
+        ],
+        [
+          "json",
+          1
+        ],
+        [
+          "subheader",
+          2
+        ],
+        [
+          "tabs",
+          1
+        ]
+      ],
+      "labels": [
+        "No A/B comparisons have been recorded.",
+        "No batch jobs have been recorded.",
+        "No governance actions have been recorded.",
+        "No individual renders have been recorded.",
+        "No timeline exports have been recorded.",
+        "No transcript sessions have been saved.",
+        "Open a project to review activity and history.",
+        "Recent governance audit",
+        "Review and approval summary"
+      ],
+      "source_hash": "c2925b4e44fbee7871577a8ed96d1ea7740779c515d26afef46aed3ca8bc9992"
+    },
+    "script_blocks": {
+      "module": "script_blocks",
+      "lines": 89,
+      "streamlit_calls": [
+        [
+          "button",
+          3
+        ],
+        [
+          "caption",
+          1
+        ],
+        [
+          "checkbox",
+          1
+        ],
+        [
+          "code",
+          1
+        ],
+        [
+          "columns",
+          3
+        ],
+        [
+          "error",
+          1
+        ],
+        [
+          "expander",
+          2
+        ],
+        [
+          "info",
+          2
+        ],
+        [
+          "rerun",
+          10
+        ],
+        [
+          "selectbox",
+          1
+        ],
+        [
+          "session_state.get",
+          1
+        ],
+        [
+          "slider",
+          1
+        ],
+        [
+          "success",
+          2
+        ],
+        [
+          "text_area",
+          1
+        ],
+        [
+          "text_input",
+          4
+        ]
+      ],
+      "labels": [
+        "Add a block or import paragraphs from the Master Script.",
+        "Append pause marker",
+        "Apply project preset",
+        "Apply selected preset",
+        "Block title",
+        "Blocks saved",
+        "Direction notes",
+        "Divide a script into independently configurable voice blocks. Reorder, duplicate, disable, and batch-plan without changing the Master Script.",
+        "Filter blocks",
+        "Include in batch",
+        "No blocks match the filter.",
+        "Pause marker seconds",
+        "Preset saved",
+        "Processed text preview",
+        "Save current settings as preset",
+        "Save preset",
+        "Text"
+      ],
+      "source_hash": "191db1c3e3c441123e47f9db9fa420a4da9d535724be62db415ed755820cf541"
+    },
+    "system_check": {
+      "module": "system_check",
+      "lines": 23,
+      "streamlit_calls": [
+        [
+          "dataframe",
+          1
+        ],
+        [
+          "markdown",
+          1
+        ],
+        [
+          "subheader",
+          1
+        ],
+        [
+          "success",
+          1
+        ],
+        [
+          "warning",
+          1
+        ]
+      ],
+      "labels": [
+        "\n    - **Python:** Use 64-bit Python 3.10, 3.11, or 3.12.\n    - **FFmpeg:** Required for MP3, M4A, OGG, MP4, MOV, MKV, and WebM transcription.\n    - **Kokoro files:** Download automatically during the first local generation.\n    - **Storage:** Projects and generated audio must remain writable.\n    ",
+        "Core local requirements are ready.",
+        "Quick guidance",
+        "Resolve the listed setup items before using affected features. WAV transcription can work without FFmpeg; compressed media cannot."
+      ],
+      "source_hash": "7804571ed7fcd38ebd8c5bae73604730ba2956f8622b7b8b7b7b5f7c4f7f08d1"
+    },
+    "timeline_studio": {
+      "module": "timeline_studio",
+      "lines": 109,
+      "streamlit_calls": [
+        [
+          "audio",
+          2
+        ],
+        [
+          "bar_chart",
+          1
+        ],
+        [
+          "button",
+          4
+        ],
+        [
+          "caption",
+          2
+        ],
+        [
+          "checkbox",
+          2
+        ],
+        [
+          "columns",
+          6
+        ],
+        [
+          "dataframe",
+          1
+        ],
+        [
+          "download_button",
+          3
+        ],
+        [
+          "error",
+          5
+        ],
+        [
+          "expander",
+          1
+        ],
+        [
+          "file_uploader",
+          1
+        ],
+        [
+          "info",
+          2
+        ],
+        [
+          "rerun",
+          10
+        ],
+        [
+          "slider",
+          1
+        ],
+        [
+          "spinner",
+          1
+        ],
+        [
+          "subheader",
+          2
+        ],
+        [
+          "success",
+          4
+        ],
+        [
+          "text_input",
+          1
+        ],
+        [
+          "warning",
+          1
+        ]
+      ],
+      "labels": [
+        "Acknowledge current block version",
+        "Add WAV to timeline",
+        "Add at least one WAV clip to begin arranging the timeline.",
+        "Allow removal of missing clip records",
+        "Arrange existing 16-bit PCM WAV assets non-destructively. Original files are never modified.",
+        "Build merged WAV",
+        "Clean invalid and missing clips",
+        "Clip saved",
+        "Download export manifest",
+        "Download merged WAV",
+        "Download portable timeline bundle",
+        "Include in export",
+        "Mixing timeline...",
+        "No WAV files are available yet. Generate Kokoro audio or create a processed WAV in Audio Quality Lab.",
+        "Relink replacement WAV",
+        "Sequential gap seconds",
+        "The linked script block changed after this clip was rendered.",
+        "The referenced audio file is missing. Upload a replacement WAV below.",
+        "Timeline controls",
+        "Timeline export",
+        "Timeline output name"
+      ],
+      "source_hash": "b775b70b95e4bb9c55894251fb2c362a78070eb4212ced1ea2d4db5cd74b7344"
+    },
+    "transcription": {
+      "module": "transcription",
+      "lines": 75,
+      "streamlit_calls": [
+        [
+          "button",
+          3
+        ],
+        [
+          "columns",
+          4
+        ],
+        [
+          "data_editor",
+          1
+        ],
+        [
+          "dataframe",
+          2
+        ],
+        [
+          "error",
+          5
+        ],
+        [
+          "file_uploader",
+          1
+        ],
+        [
+          "rerun",
+          3
+        ],
+        [
+          "selectbox",
+          1
+        ],
+        [
+          "session_state.get",
+          1
+        ],
+        [
+          "spinner",
+          1
+        ],
+        [
+          "subheader",
+          2
+        ],
+        [
+          "success",
+          3
+        ],
+        [
+          "text_input",
+          2
+        ]
+      ],
+      "labels": [
+        "Audio or video",
+        "Edit transcript segments",
+        "File exceeds the 500 MB limit",
+        "Repair timing automatically",
+        "Repair transcript timing before export or saving.",
+        "Save transcript to project",
+        "Saved transcript",
+        "Saved transcript name",
+        "Saved transcript sessions",
+        "Saved transcript updated",
+        "Search current transcript",
+        "Transcribe locally",
+        "Transcribing locally...",
+        "Transcript saved to project"
+      ],
+      "source_hash": "d64c6041c0a88b3f87bee3ec7cf405ebba50919dacd2ef6232a3b2ff5d2b3a94"
+    },
+    "voice_library": {
+      "module": "voice_library",
+      "lines": 30,
+      "streamlit_calls": [
+        [
+          "button",
+          1
+        ],
+        [
+          "caption",
+          1
+        ],
+        [
+          "columns",
+          1
+        ],
+        [
+          "dataframe",
+          2
+        ],
+        [
+          "info",
+          1
+        ],
+        [
+          "rerun",
+          1
+        ],
+        [
+          "selectbox",
+          1
+        ],
+        [
+          "subheader",
+          1
+        ]
+      ],
+      "labels": [
+        "Delete preset",
+        "Delete selected preset",
+        "Project voice presets",
+        "Save a preset from any script block to reuse its provider, voice, speed, and direction notes."
+      ],
+      "source_hash": "c183c8fdd14bba0933317d7ed4932bfabc82ba4e954abc8adaac22fc7a1b7c63"
+    }
+  },
+  "contrast": {
+    "sidebar_text_on_control": 11.22,
+    "ink_on_card": 16.27
+  },
+  "hash": "c0234c3b86446b7b08c8307065b9cf4f1cd1e4514c7d15d35bc0adc5ad7050cc"
+}

@@ -7,6 +7,7 @@ from peabox_voice_studio.services.maintenance import apply_retention,complete,cr
 from peabox_voice_studio.services.recovery import backup_database,inventory,snapshot,validate_database
 from peabox_voice_studio.services.backend_resilience import CircuitBreaker, ResilientBackend, RetryPolicy, resilience_report
 from peabox_voice_studio.services.resilience_profiles import active_profile, audit_log as resilience_audit, clone_profile, create_profile, delete_draft, instantiate, list_profiles, profile_diff, transition, update_profile
+from peabox_voice_studio.services.visual_baselines import baseline_document, collect_screen_snapshots, screenshot_manifest, validate_baseline
 from peabox_voice_studio.services.storage_backends import MemoryBackend, contract_report, migration_preview as backend_migration_preview, migrate as migrate_backend, registry as backend_registry
 from peabox_voice_studio.services.storage_policy import active_reservations,load_policy,policy_status,release_reservation,reserve,save_policy
 from peabox_voice_studio.ui import empty_state,kpi_card,section
@@ -18,7 +19,7 @@ def render(ctx:AppContext)->None:
  with cols[2]:kpi_card('Pending approvals',str(sum(x['pending_approvals'] for x in rows)),'Awaiting decisions')
  with cols[3]:kpi_card('Unassigned',str(sum(x['owner']=='Unassigned' for x in rows)),'Projects without owner')
  with cols[4]:kpi_card('Storage',f'{len(files)} files',f"{sum(x['bytes'] for x in files)/1048576:.1f} MB")
- tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects','Backends','Resilience','Profiles'])
+ tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects','Backends','Resilience','Profiles','Visual QA'])
  with tabs[0]:
   if rows:st.dataframe(rows,use_container_width=True,hide_index=True)
   else:empty_state('No projects','Create a project to begin portfolio monitoring.','Open Project Workspace','Projects')
@@ -47,6 +48,8 @@ def render(ctx:AppContext)->None:
   _render_backend_resilience_tab()
  with tabs[7]:
   _render_resilience_profiles_tab()
+ with tabs[8]:
+  _render_visual_qa_tab()
 
 # Capacity policy is rendered as the fourth Operations tab.
 def _render_capacity_tab():
@@ -160,3 +163,14 @@ def _render_resilience_profiles_tab():
  audit=resilience_audit()
  if audit:
   with st.expander('Resilience profile audit history'):st.dataframe(list(reversed(audit[-100:])),use_container_width=True,hide_index=True)
+
+def _render_visual_qa_tab():
+ from peabox_voice_studio.config import BASE_DIR
+ ui_source=(BASE_DIR/'peabox_voice_studio/ui.py').read_text(encoding='utf-8');screens=collect_screen_snapshots(BASE_DIR/'peabox_voice_studio/screens');document=baseline_document(ui_source,screens);issues=validate_baseline(document);manifest=screenshot_manifest(document)
+ st.caption('Deterministic source snapshots validate navigation, theme, labels, widget calls, responsive rules, and contrast. PNG capture remains an external browser step.')
+ cols=st.columns(4);cols[0].metric('Pages',sum(len(x['pages']) for x in document['navigation']['groups']));cols[1].metric('Screen modules',len(screens));cols[2].metric('Planned captures',len(manifest['captures']));cols[3].metric('Contract issues',len(issues))
+ st.write({'Baseline hash':document['hash'],'Sidebar contrast':document['contrast']['sidebar_text_on_control'],'Card contrast':document['contrast']['ink_on_card'],'Viewports':[x['name'] for x in manifest['viewports']]})
+ if issues:st.error('Visual contract issues: '+', '.join(issues))
+ else:st.success('Deterministic visual contracts passed.')
+ st.download_button('Download UI baseline JSON',json.dumps(document,ensure_ascii=False,indent=2),f"ui_baseline_{document['version']}.json",'application/json')
+ st.download_button('Download screenshot manifest',json.dumps(manifest,ensure_ascii=False,indent=2),'screenshot_manifest.json','application/json')

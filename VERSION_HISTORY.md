@@ -1,5 +1,10 @@
 # Version History
 
+## v0.11.1
+Added deterministic UI baselines, theme and screen snapshots, contrast and responsive contracts, 57-target screenshot manifests, drift comparison, Visual QA controls, and 261-test validation.
+
+# Version History
+
 ## v0.11.0
 Added durable, secret-free, reviewed resilience profiles with controlled lifecycle, reviewer separation, single-active enforcement, audit history, runtime instantiation, and 247-test validation.
 
