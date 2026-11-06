@@ -1,3 +1,27 @@
+# v0.10.9 Additions and Improvements
+
+## Offline sandboxes
+- Azure Speech
+- Amazon Polly standard
+- Amazon Polly neural
+- Google Cloud TTS
+
+## Contract validation
+- Voice normalization
+- Required catalog fields
+- SSML structure
+- Pause markers
+- XML escaping
+- Speed and engine mapping
+- Deterministic audio fixtures
+
+## Failure and safety
+- Discovery failure injection
+- Synthesis failure injection
+- No network clients
+- No real credentials
+- No billing
+
 # v0.10.8 Additions and Improvements
 
 ## Retry

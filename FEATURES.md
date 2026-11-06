@@ -1,3 +1,8 @@
+# v0.10.9 Feature Additions
+
+## Offline Cloud Provider Sandbox
+Validate cloud voice discovery and synthesis payload contracts without external services, credentials, network access, or charges.
+
 # v0.10.8 Feature Additions
 
 ## Backend Resilience

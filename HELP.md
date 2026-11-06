@@ -1,3 +1,10 @@
+# v0.10.9 Help Update
+
+- **Sandbox passed, live failed:** check credentials, region, permissions, quota, billing, network, and provider status.
+- **Sandbox discovery failure:** inspect normalized fixture and provider contract code.
+- **Sandbox synthesis failure:** inspect SSML, voice, language, speed, and engine fields.
+- **No charges:** sandbox tests never call a live provider.
+
 # v0.10.8 Help Update
 
 - **Circuit open:** wait for the recovery duration before the half-open probe.

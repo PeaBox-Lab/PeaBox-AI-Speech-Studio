@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.9
+Added deterministic offline Azure, Polly, and Google sandboxes, provider contract validation, failure injection, sanitized evidence, UI controls, and 232-test verification.
+
+# Version History
+
 ## v0.10.8
 Added backend retries, timeouts, circuit breaking, cooldown recovery, runtime metrics, health reports, Operations Center probes, and 218-test validation.
 

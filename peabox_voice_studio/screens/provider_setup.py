@@ -67,3 +67,16 @@ def render(ctx: AppContext) -> None:
     counts = {name: len(items) for name, items in voice_catalogs.items()}
     st.subheader("Provider capabilities and readiness")
     st.dataframe(capability_rows(configured_providers(), counts), use_container_width=True, hide_index=True)
+    render_sandbox_panel()
+
+# Offline sandbox contract validation is appended to Provider Setup.
+def render_sandbox_panel():
+ st.divider();st.subheader('Offline provider sandbox');st.caption('Runs deterministic Azure, Polly, and Google request-contract tests without network access or real credentials.')
+ if st.button('Run offline provider contract suite'):
+  st.session_state['provider_sandbox_results']=run_suite(default_sandboxes())
+ results=st.session_state.get('provider_sandbox_results')
+ if results:
+  st.dataframe([{'Provider':x['provider'],'Passed':x['passed'],'Voices':x['voices'],'Audio fixture bytes':x['audio_bytes'],'Issues':', '.join(x['issues']) or 'None'} for x in results],use_container_width=True,hide_index=True)
+  if all(x['passed'] for x in results):st.success('All offline provider contracts passed.')
+  else:st.error('One or more provider contracts failed. No live provider call was made.')
+ st.info('Sandbox success validates application payloads and normalization only; it does not confirm live credentials, quotas, billing, regional availability, or service status.')

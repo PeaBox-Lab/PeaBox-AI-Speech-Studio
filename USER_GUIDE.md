@@ -1,3 +1,7 @@
+# v0.10.9 User Guide Update
+
+Open **Provider Setup → Offline provider sandbox** and select **Run offline provider contract suite**. Review each provider’s result, normalized voice count, fixture size, and issues. A passing result validates application payload construction only; configure a live session profile separately for real discovery or synthesis.
+
 # v0.10.8 User Guide Update
 
 Open **Portfolio Operations → Resilience**. Configure retry attempts, delay, timeout, failure threshold, and recovery duration, then select **Run backend health probes**. These settings apply only to the current probe and are not saved.

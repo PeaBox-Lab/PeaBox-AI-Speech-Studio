@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.9 — Cloud Provider Sandbox
+- Added deterministic offline sandboxes for Azure Speech, Polly standard/neural, and Google Cloud TTS.
+- Added normalized voice discovery fixtures.
+- Added provider-specific SSML, pause, escaping, voice, language, speed, and engine validation.
+- Added deterministic audio fixtures and failure injection.
+- Added sanitized call reports without credential values.
+- Added offline provider contract panel to Provider Setup.
+- Added explicit limitations for live credentials, quotas, billing, regions, and service status.
+- Validation: 232 tests passed.
+
+# Changelog
+
 ## v0.10.8 — Backend Resilience
 - Added retry policy with bounded attempts and exponential backoff.
 - Added per-operation timeout enforcement.

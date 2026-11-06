@@ -1,3 +1,29 @@
+# PeaBox Voice Studio v0.10.9 Detailed Release Notes
+
+## Azure sandbox
+Normalizes Azure-style voice records and validates the Azure SSML envelope, escaped voice name, percentage speed mapping, pause compilation, XML escaping, output format, and deterministic audio fixture.
+
+## Polly sandbox
+Normalizes standard and neural Polly voice fixtures separately, retains engine selection, validates SSML input, and returns deterministic MP3-like bytes.
+
+## Google sandbox
+Normalizes object-style Google voice responses, including multiple languages and enum-like gender values, validates language/voice selection fields, and returns deterministic fixture bytes.
+
+## Contract runner
+Each provider is tested for non-empty normalized catalogs, required voice fields, successful synthesis, compiled pause markers, escaped text, and valid fixture prefix. Results include provider, pass/fail, issues, voice count, audio fixture bytes, and sanitized call report.
+
+## Failure injection
+Discovery and synthesis failures can be triggered deterministically to verify user-facing failure paths without relying on provider outages.
+
+## Security and cost boundary
+The sandbox records only profile field names, not values. It does not import requests, boto3, or Google Cloud clients during contract execution. It makes no live calls and creates no provider billing.
+
+## Limitations
+Passing sandbox contracts does not confirm live credentials, account permissions, quotas, billing configuration, regional voice availability, network access, or current provider service status.
+
+## Verification
+232 tests cover every provider, normalization, SSML, speed, language, engine, deterministic bytes, input validation, injected failures, sanitized evidence, zero-network imports, call counts, and Provider Setup disclosures.
+
 # PeaBox Voice Studio v0.10.8 Detailed Release Notes
 
 ## Retry policy

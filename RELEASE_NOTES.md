@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.9 Release Notes
+
+v0.10.9 delivers the roadmap’s cloud-provider sandbox milestone. Azure, Polly, and Google application contracts can now be tested deterministically without network access, real credentials, provider charges, or external service dependencies.
+
 # PeaBox Voice Studio v0.10.8 Release Notes
 
 v0.10.8 adds the resilience contract required before future remote storage can be considered. Any storage backend can now be wrapped with retries, operation timeouts, circuit breaking, health probes, and operational metrics without changing its object semantics.

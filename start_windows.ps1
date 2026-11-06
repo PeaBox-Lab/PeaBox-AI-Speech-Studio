@@ -11,6 +11,6 @@ if(-not(Test-Path $venvPython)){$p=Find-CompatiblePython;if($null-eq $p){Write-H
 if($LASTEXITCODE-ne 0){exit $LASTEXITCODE}
 & $venvPython -m pip install -r "requirements.txt" -c "constraints.txt"
 if($LASTEXITCODE-ne 0){exit $LASTEXITCODE}
-Write-Host "Launching PeaBox Voice Studio v0.10.8 from $PSScriptRoot" -ForegroundColor Cyan
+Write-Host "Launching PeaBox Voice Studio v0.10.9 from $PSScriptRoot" -ForegroundColor Cyan
 & $venvPython -m streamlit run "app.py"
 exit $LASTEXITCODE

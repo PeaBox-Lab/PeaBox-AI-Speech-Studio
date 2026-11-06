@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.10.9
+- Azure offline sandbox
+- Polly standard and neural offline sandboxes
+- Google Cloud TTS offline sandbox
+- Voice discovery and synthesis contract runner
+- Failure injection and sanitized evidence
+- Provider Setup sandbox panel
+
+## Recommended next release
+- Browser-driven screenshot regression suite
+- Live provider integration harness with explicit test credentials and cost guardrails
+- Durable resilience profiles with review controls
+- Optional remote backend with explicit credentials, approval, and rollback
+
+# Roadmap
+
 ## Delivered in v0.10.8
 - Backend health contract
 - Bounded retries and backoff
