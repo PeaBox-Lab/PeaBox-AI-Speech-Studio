@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.10.1 — Maintenance & Retention
+- Added local maintenance plans with frequency, due state, pause/resume, completion notes, and history.
+- Added retention-policy previews for database backups, restored quarantine records, and support artifacts.
+- Added exact reclaimable file and byte totals.
+- Added confirmation-gated retention application.
+- Enforced approved recovery-directory boundaries and exact preview candidate deletion.
+- Added Maintenance tab to Operations Center.
+- Validation: 178 tests passed.
+
+# Changelog
+
 ## v0.10.0 — Operations Recovery Toolkit
 - Added storage inventory and category summaries.
 - Added unreferenced output detection, reversible quarantine, and restore.

@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.1
+Added local maintenance plans and preview-first retention policies with strict safe-root enforcement, completion history, and 178-test cumulative validation.
+
+# Version History
+
 ## v0.10.0
 Introduced the consolidated Operations Recovery Toolkit: storage inventory, reversible quarantine, database backups and rollback-safe restores, metadata snapshots, sanitized support bundles, and historical migration fixtures.
 

@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.1 Release Notes
+
+v0.10.1 completes the roadmap’s maintenance and retention milestone. Operations Center can now track recurring local review checklists and preview safe cleanup candidates before any file is permanently removed.
+
 # PeaBox Voice Studio v0.10.0 Release Notes
 
 v0.10.0 delivers the roadmap’s consolidated recovery milestone. Operations Center now provides storage inventory, reversible quarantine, repository backups and restores, project metadata snapshots, sanitized support evidence, and clear confirmation gates for every mutating recovery action.

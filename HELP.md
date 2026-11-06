@@ -1,3 +1,10 @@
+# v0.10.1 Help Update
+
+- Maintenance plans are reminders and evidence records inside the application, not scheduled background jobs.
+- Retention previews are read-only.
+- Applying retention is permanent for the displayed backup, restored-record, and support-artifact candidates.
+- Authoritative project JSON, active outputs, and models are excluded from retention cleanup.
+
 # v0.10.0 Help Update
 
 - **Quarantine is not deletion:** files can be restored unless their quarantine copy is manually removed.

@@ -1,3 +1,20 @@
+# PeaBox Voice Studio v0.10.1 Detailed Release Notes
+
+## Maintenance plans
+Users can create Daily, Weekly, Monthly, or Quarterly plans with standard operational tasks. Plans track due or overdue status, may be paused and resumed, and retain completion timestamps, per-task results, and notes. Plans are evaluated locally when Operations Center opens; this release does not install a background scheduler or operating-system task.
+
+## Retention previews
+Retention policy inputs control the number of database backups retained and the age thresholds for restored quarantine records and generated support artifacts. The preview lists every candidate, reason, size, total file count, and reclaimable bytes without changing the file system.
+
+## Safe cleanup boundary
+Retention application requires explicit confirmation. It processes only the exact preview candidates and only when their resolved paths remain inside the backups, quarantine, or support directories. Missing files and paths outside those roots are skipped and reported. Project JSON, active outputs, models, and arbitrary files are outside the retention boundary.
+
+## Compatibility
+Recovery backups, quarantine records, support bundles, project files, workflow facades, navigation, providers, timelines, transcripts, governance, and approvals remain cumulative.
+
+## Verification
+178 tests cover maintenance plan lifecycle, due calculations, completion history, pause/resume, persistence, preview immutability, backup retention, restored-record retention, support retention, exact-candidate deletion, outside-root rejection, and interface confirmation gates.
+
 # PeaBox Voice Studio v0.10.0 Detailed Release Notes
 
 ## Storage inventory and quarantine

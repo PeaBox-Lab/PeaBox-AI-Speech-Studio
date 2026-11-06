@@ -1,3 +1,8 @@
+# v0.10.1 Feature Additions
+
+## Maintenance & Retention
+Create operational review plans, track completion evidence, preview retention candidates, and apply cleanup only after reviewing the exact files and confirming permanent removal.
+
 # v0.10.0 Feature Additions
 
 ## Operations Recovery Toolkit

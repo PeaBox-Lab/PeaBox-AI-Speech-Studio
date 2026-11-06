@@ -1,3 +1,19 @@
+# v0.10.1 Additions and Improvements
+
+## Maintenance planning
+- Four plan frequencies
+- Due, overdue, and paused states
+- Completion notes and history
+- Pause and resume controls
+
+## Retention
+- Keep-latest backup policy
+- Restored quarantine record age policy
+- Support artifact age policy
+- Preview file count and reclaimable bytes
+- Confirmation-gated exact cleanup
+- Approved-directory enforcement
+
 # v0.10.0 Additions and Improvements
 
 ## Recovery

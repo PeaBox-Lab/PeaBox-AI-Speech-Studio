@@ -1,28 +1,28 @@
-# PeaBox Voice Studio v0.10.0
-A local-first corporate voice-production workspace with modular screens, bounded workflow APIs, governance, multi-provider speech generation, transcription, audio quality tools, portable timelines, and an integrated operations recovery toolkit.
+# PeaBox Voice Studio v0.10.1
+A local-first corporate voice-production workspace with modular screens, bounded workflow APIs, governance, multi-provider speech generation, transcription, audio quality tools, portable timelines, recovery controls, and local maintenance planning.
 
-## v0.10.0 Operations Recovery Toolkit
-- Storage inventory and category-level capacity summaries
-- Unreferenced-output detection with reversible quarantine
-- Quarantine restore with collision-safe destination naming
-- SQLite integrity checks, local backups, transactional restore, and rollback preservation
-- Project metadata snapshots with explicit media exclusion
-- Sanitized support bundles excluding credentials, project text, transcripts, media, and absolute user paths
-- Historical project schema fixture matrix and nested-reference portability tests
-- Consolidated Operations Center tabs for health, repository, storage, backups, and support
+## v0.10.1 Maintenance & Retention
+- Local Daily, Weekly, Monthly, and Quarterly maintenance plans
+- Due, overdue, paused, and completion status tracking
+- Durable completion history with task results and notes
+- Preview-only retention policies for excess database backups, old restored-quarantine records, and generated support artifacts
+- Exact candidate counts and reclaimable-byte totals before cleanup
+- Explicit confirmation before retention is applied
+- Safe-root enforcement prevents retention from touching projects, outputs, models, or arbitrary files
+- Operations Center consolidation with a dedicated Maintenance tab
 
 ## Validation
-- 167 automated tests passed
-- All Python sources compile successfully
-- Recovery actions are confirmation-gated in the interface
-- Invalid database backups are rejected before mutation
-- All ZIP entries are verified byte-for-byte against the source tree
+- 178 automated tests passed
+- Retention preview never mutates files
+- Cleanup removes only exact preview candidates inside approved recovery directories
+- Plans are local checklists evaluated when Operations Center opens; no background scheduler is implied
+- All archive entries are verified byte-for-byte against the source tree
 
 ## Windows setup
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the launcher and sidebar display v0.10.0.
+4. Confirm the launcher and sidebar display v0.10.1.
 5. Keep the `data`, `outputs`, and `models` folders writable.
 ## Validation
 ```bash

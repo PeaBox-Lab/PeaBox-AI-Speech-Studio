@@ -1,3 +1,11 @@
+# v0.10.1 User Guide Update
+
+## Maintenance plans
+Open **Overview → Operations Center → Maintenance**. Create a plan, select its frequency, and complete it after reviewing the listed tasks. Use Pause when the checklist is temporarily inactive. Plans do not run in the background.
+
+## Retention
+Set the backup count and age thresholds, then review the Retention preview. The preview does not delete anything. To apply it, select the permanent-removal confirmation and click **Apply retention preview**. Only the displayed recovery artifacts are eligible.
+
 # v0.10.0 User Guide Update
 
 ## Storage

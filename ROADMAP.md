@@ -1,5 +1,20 @@
 # Roadmap
 
+## Delivered in v0.10.1
+- Local maintenance plans and completion history
+- Due, overdue, pause, and resume states
+- Preview-first retention policies
+- Safe-root and exact-candidate cleanup enforcement
+- Operations Center Maintenance tab
+
+## Recommended next release
+- Browser-driven screenshot regression suite
+- Cloud-provider sandbox integration tests
+- Governance and project portfolio workflow facades
+- Optional operating-system scheduling integration with explicit user setup
+
+# Roadmap
+
 ## Delivered in v0.10.0
 - Storage inventory and orphan detection
 - Reversible quarantine and restore
