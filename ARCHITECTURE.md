@@ -1,3 +1,20 @@
+# PeaBox Voice Studio v0.09.2 Architecture
+
+## Bootstrap and registry
+The 31-line bootstrap initializes state, creates `AppContext`, resolves navigation, and dispatches one of 19 registered screen renderers.
+
+## Explicit dependency rule
+Each screen imports the exact shared models, configuration values, services, and UI helpers that it uses. There is no wildcard dependency module. Screens cannot import `app.py` or another screen module.
+
+## Dependency budget
+A screen may import no more than 25 names. This threshold keeps ownership visible while allowing complex workflows such as Timeline Studio to remain cohesive. Unused imports are rejected.
+
+## Shared context
+`AppContext` carries session state and project lifecycle callbacks. It avoids global application imports while keeping screen renderer signatures consistent.
+
+## Persistence and safety
+Project JSON remains authoritative. SQLite is a rebuildable index. Operations are recorded as JSON Lines. Repairs are previewed and confirmed. Credentials remain session-only.
+
 # PeaBox Voice Studio v0.09.1 Architecture
 
 ## Bootstrap

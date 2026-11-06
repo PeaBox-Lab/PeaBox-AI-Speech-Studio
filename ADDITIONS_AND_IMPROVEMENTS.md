@@ -1,3 +1,21 @@
+# v0.09.2 Additions and Improvements
+
+## Screen ownership
+- Explicit imports for all 19 screen modules
+- Removed broad wildcard dependency sharing
+- No screen-to-screen implementation dependencies
+- No screen dependency on the application bootstrap
+
+## Architecture controls
+- 25-name maximum import budget per screen
+- Automated unused-import detection
+- Automated wildcard-import rejection
+- Automated peer-screen isolation checks
+
+## Validation
+- 170 passing automated tests
+- Complete compilation and archive-integrity verification
+
 # v0.09.1 Additions and Improvements
 
 ## Architecture

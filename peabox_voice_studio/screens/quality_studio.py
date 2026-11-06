@@ -1,5 +1,7 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.services.files import user_safe_error
+from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, pronunciation_conflicts, pronunciation_preview, validate_pause_markers
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

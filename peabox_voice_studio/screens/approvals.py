@@ -1,5 +1,7 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.services.governance import decide_approval, governance, governance_summary, request_approval
+from peabox_voice_studio.ui import callout, empty_state, kpi_card, section
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

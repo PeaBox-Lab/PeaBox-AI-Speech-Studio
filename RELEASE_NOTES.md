@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.09.2 Release Notes
+
+v0.09.2 hardens the full-screen modular architecture by replacing the broad shared dependency surface with explicit imports in every screen. Each screen now declares exactly which services, models, constants, and UI helpers it owns, making changes easier to review and preventing accidental cross-feature coupling.
+
 # PeaBox Voice Studio v0.09.1 Release Notes
 
 v0.09.1 completes the screen-architecture transition begun in v0.09.0. Every navigation destination now has an independent renderer module, while the main application only initializes shared state and dispatches the selected screen. This lowers regression risk, makes page ownership explicit, and creates a stable base for browser tests and future provider integrations.

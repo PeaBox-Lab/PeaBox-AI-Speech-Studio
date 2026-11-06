@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.09.2
+- Explicit dependencies for every screen
+- Removal of the shared wildcard dependency layer
+- Screen-to-screen isolation
+- Per-screen dependency budgets
+- Unused-import and wildcard-import quality gates
+
+## Recommended next release
+- Screen-specific service facades for the largest production screens
+- Historical project migration fixture matrix
+- Backup, restore, storage inventory, and support-bundle UI consolidation
+- Browser-driven navigation and visual regression suite
+- Cloud-provider sandbox integration tests
+
+# Roadmap
+
 ## Delivered in v0.09.1
 - Dedicated module for all 19 navigation pages
 - Complete registry dispatch

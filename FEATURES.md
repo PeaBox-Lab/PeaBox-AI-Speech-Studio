@@ -1,3 +1,11 @@
+# v0.09.2 Feature Additions
+
+## Explicit screen ownership
+Each screen declares only the shared services and interface components it requires. This reduces accidental coupling and makes screen-level maintenance and testing more predictable.
+
+## Dependency quality gates
+The test suite rejects wildcard imports, unused imports, peer-screen imports, application-bootstrap imports, and dependency budgets above 25 names.
+
 # v0.09.1 Feature Additions
 
 ## Fully modular workspace

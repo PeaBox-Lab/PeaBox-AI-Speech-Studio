@@ -1,5 +1,8 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.services.commands import record_command, resolve_commands, search_commands
+from peabox_voice_studio.services.preferences import save_preferences
+from peabox_voice_studio.ui import empty_state, navigate_to, section
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

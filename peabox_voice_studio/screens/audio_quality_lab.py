@@ -1,5 +1,12 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from pathlib import Path
+from peabox_voice_studio.config import MAX_BLOCK_CHARS, OUTPUTS_DIR
+from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES
+from peabox_voice_studio.services.audio import inspect_wav, normalize_wav, save_processed_wav, trim_silence_wav
+from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
+from peabox_voice_studio.services.files import safe_filename, user_safe_error
+from peabox_voice_studio.services.quality import prepare_text
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

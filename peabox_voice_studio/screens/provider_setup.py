@@ -1,5 +1,7 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import json, streamlit as st
+from peabox_voice_studio.services.catalogs import capability_rows
+from peabox_voice_studio.services.files import user_safe_error
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

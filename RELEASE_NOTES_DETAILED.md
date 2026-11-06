@@ -1,3 +1,20 @@
+# PeaBox Voice Studio v0.09.2 Detailed Release Notes
+
+## Dependency isolation
+The temporary shared wildcard module introduced during full extraction has been removed. Each of the 19 screen modules now has an explicit import list derived from the symbols it actually uses.
+
+## Enforced boundaries
+Automated checks prohibit wildcard imports, imports from the application bootstrap, and imports from peer screen modules. A screen may use shared models, services, configuration, and UI components, but it may not depend on another screen's implementation.
+
+## Complexity guard
+The largest screen currently imports 25 names, which is now the maximum allowed budget. Unused imports fail validation, so the declared surface remains accurate as screens evolve.
+
+## Compatibility
+Navigation identities, `AppContext`, project files, provider profiles, project schema migration, Operations Center, governance, approvals, timelines, transcription, quality processing, batch jobs, and export behavior remain cumulative and unchanged.
+
+## Verification
+170 tests cover cumulative features, every page smoke path, registry completeness, renderer contracts, project operations, repository rebuilding, repair previews, maintenance plans, event logs, import isolation, wildcard absence, unused imports, and dependency budgets.
+
 # PeaBox Voice Studio v0.09.1 Detailed Release Notes
 
 ## Complete screen extraction

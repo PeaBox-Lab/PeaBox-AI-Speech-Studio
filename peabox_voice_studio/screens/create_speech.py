@@ -1,5 +1,10 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.config import MAX_SCRIPT_CHARS
+from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES
+from peabox_voice_studio.services.files import safe_filename, user_safe_error
+from peabox_voice_studio.services.history import record_render
+from peabox_voice_studio.services.quality import prepare_text
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

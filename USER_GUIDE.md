@@ -1,3 +1,7 @@
+# v0.09.2 User Guide Update
+
+The interface and workflows are unchanged in this architecture-focused release. Project Workspace, Script Editor, speech generation, batch production, Timeline Studio, transcription, governance, approvals, Operations Center, and support screens remain in their existing navigation locations.
+
 # v0.09.1 User Guide Update
 
 ## Operations Center

@@ -1,5 +1,12 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.config import MAX_BLOCK_CHARS
+from peabox_voice_studio.models import Project, ScriptBlock
+from peabox_voice_studio.providers.catalog import KOKORO_VOICES
+from peabox_voice_studio.services.presets import apply_preset, create_preset, list_presets
+from peabox_voice_studio.services.projects import move_block, set_all_blocks_enabled, split_script_into_blocks
+from peabox_voice_studio.services.quality import insert_pause, prepare_text, validate_pause_markers
+from peabox_voice_studio.ui import empty_state, section
 
 def block_editor(ctx: AppContext, project: Project, index: int, block: ScriptBlock) -> None:
     save_project=ctx.save_project; voice_catalogs=ctx.voice_catalogs

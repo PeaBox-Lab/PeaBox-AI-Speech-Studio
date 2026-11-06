@@ -1,5 +1,11 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from pathlib import Path
+from peabox_voice_studio.config import MAX_UPLOAD_BYTES
+from peabox_voice_studio.services.diagnostics import transcription_readiness
+from peabox_voice_studio.services.files import safe_filename, user_safe_error
+from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
+from peabox_voice_studio.ui import section
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

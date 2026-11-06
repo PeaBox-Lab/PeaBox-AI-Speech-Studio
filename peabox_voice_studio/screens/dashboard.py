@@ -1,5 +1,11 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.services.commands import onboarding_status
+from peabox_voice_studio.services.diagnostics import system_diagnostics
+from peabox_voice_studio.services.governance import governance, governance_readiness, governance_summary
+from peabox_voice_studio.services.preferences import resolve_projects, save_preferences
+from peabox_voice_studio.services.timeline import list_clips, validate_timeline
+from peabox_voice_studio.ui import callout, kpi_card, navigate_to, section, workflow_step
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

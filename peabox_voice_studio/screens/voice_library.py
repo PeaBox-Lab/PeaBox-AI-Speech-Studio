@@ -1,5 +1,8 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.providers.catalog import KOKORO_VOICES
+from peabox_voice_studio.services.catalogs import catalog_facets, filter_voices
+from peabox_voice_studio.services.presets import delete_preset, list_presets
 
 def render(ctx: AppContext) -> None:
     store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences

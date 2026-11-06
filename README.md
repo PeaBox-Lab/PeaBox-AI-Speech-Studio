@@ -1,18 +1,19 @@
-# PeaBox Voice Studio v0.09.1
-A local-first corporate voice-production workspace with a fully registry-driven interface, project operations, governance, local and cloud speech generation, transcription, audio quality workflows, resumable jobs, and portable timelines.
+# PeaBox Voice Studio v0.09.2
+A local-first corporate voice-production workspace with a fully modular interface, explicit screen dependencies, project operations, governance, local and cloud speech generation, transcription, audio quality workflows, resumable jobs, and portable timelines.
 
-## v0.09.1 Full Screen Modularization
-- All 19 navigation pages render through dedicated screen modules
-- The application bootstrap is reduced to 31 lines of initialization and dispatch
-- Shared `AppContext` carries runtime state and service callbacks
-- Central registry guarantees one renderer per navigation identity
-- Screen modules cannot import the application bootstrap
-- Operations Center includes health checks, confirmed repair plans, repository rebuilds, maintenance plans, and event history
-- JSON project files remain authoritative; SQLite remains disposable and rebuildable
+## v0.09.2 Explicit Screen Dependencies
+- Removed the shared wildcard dependency module
+- Each of the 19 screen modules imports only the services and UI components it uses
+- Screen-to-screen and screen-to-application imports are prohibited
+- Per-screen dependency budget is capped at 25 imported names
+- Unused imports and wildcard imports fail automated validation
+- The 31-line bootstrap and complete registry dispatch remain unchanged
+- All cumulative operations, governance, production, audio, and transcription workflows remain available
 
 ## Validation
-- 165 automated tests passed
-- Every navigation page smoke-renders without an active project
+- 170 automated tests passed
+- All 19 screens smoke-render without an active project
+- Every imported screen dependency is verified as used
 - All Python sources compile successfully
 - Archive entries are verified byte-for-byte against the source tree
 
@@ -20,7 +21,7 @@ A local-first corporate voice-production workspace with a fully registry-driven 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the launcher and sidebar display v0.09.1.
+4. Confirm the launcher and sidebar display v0.09.2.
 5. Keep the `data`, `outputs`, and `models` folders writable.
 ## Validation
 ```bash

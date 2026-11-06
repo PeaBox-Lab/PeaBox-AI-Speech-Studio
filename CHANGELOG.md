@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.09.2 — Explicit Screen Dependencies
+- Removed `screens/dependencies.py` and all wildcard imports.
+- Generated minimal explicit imports for every screen based on its actual symbol usage.
+- Enforced isolation from the application bootstrap and peer screen modules.
+- Added a maximum dependency budget of 25 imported names per screen.
+- Added tests for wildcard absence, dependency-module removal, peer isolation, unused imports, and import budgets.
+- Preserved the 19-screen registry, 31-line bootstrap, Operations Center, and all cumulative workflows.
+- Validation: 170 tests passed.
+
+# Changelog
+
 ## v0.09.1 — Full Screen Modularization
 - Moved every navigation page into `peabox_voice_studio/screens/`.
 - Reduced `app.py` to initialization, context construction, navigation, and registry dispatch.

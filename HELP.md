@@ -1,3 +1,7 @@
+# v0.09.2 Help Update
+
+No project migration or user action is required for v0.09.2. Existing project JSON files, timeline bundles, transcript sessions, batch jobs, governance records, and local preferences remain compatible.
+
 # v0.09.1 Help Update
 
 ## Repository recovery

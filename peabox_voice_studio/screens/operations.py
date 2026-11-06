@@ -1,5 +1,6 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.screens.dependencies import *
+import streamlit as st
+from peabox_voice_studio.ui import empty_state, kpi_card, section
 from peabox_voice_studio.services.health import apply_repairs,check_project,repair_preview
 from peabox_voice_studio.services.maintenance_plans import complete,create,load,save,status
 from peabox_voice_studio.services.operations import read,record

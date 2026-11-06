@@ -1,5 +1,10 @@
 # Version History
 
+## v0.09.2
+Replaced the shared wildcard screen dependency layer with minimal explicit imports, added import budgets and module-isolation rules, and expanded cumulative validation to 170 tests.
+
+# Version History
+
 ## v0.09.1
 Completed registry-driven modularization for all 19 navigation pages, reduced the bootstrap to initialization and dispatch, expanded the application context, restored operations and recovery workflows, and added 165-test validation.
 
