@@ -1,17 +1,13 @@
 # Help Articles
 
-## What is an orphaned output?
+## Will maintenance plans run automatically?
 
-It is a file in the output folder that no current project record references. It may still be valuable, so PeaBox quarantines rather than deleting it immediately.
+No. They are local checklists and due-date reminders evaluated when PeaBox is running.
 
-## A valid file is marked orphaned
+## A plan is overdue
 
-Ensure the project referencing it is present and readable, then rebuild the index and reload Operations Center. References use current project JSON, not only the SQLite index.
+Open Operations Center, perform the listed checks, add notes, and complete the plan. The next due date is calculated from the selected frequency.
 
-## Database restore does not restore a project
+## What does retention preview do?
 
-The database is a metadata index. Restore project content from a project snapshot, project JSON, or timeline bundle.
-
-## Support bundle privacy
-
-The bundle excludes credentials, project scripts, transcripts, and audio. Operational event details and project counts are included.
+It calculates excess records against policy targets. It does not delete anything.

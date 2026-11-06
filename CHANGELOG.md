@@ -1,39 +1,17 @@
 # Changelog
 
-## v0.08.1 — 2026-11-06
+## v0.08.2 — 2026-11-06
 
 ### Added
+- Recurring local maintenance plans
+- Due-state calculation and completion history
+- Maintenance health scoring
+- Preview-only retention policy calculations
+- Operations Center maintenance-plan UI
+- Maintenance-plan and cumulative regression tests
 
-- Storage inventory and output reference analysis
-- Orphaned-output preview and reversible quarantine
-- Quarantine restore and confirmation-gated deletion
-- SQLite backup retention, integrity restore, sidecar cleanup, and optimization
-- Sanitized support bundle
-- Maintenance, database recovery, support, UI, and cumulative regression tests
-
-### Safety
-
-- Cleanup is quarantine-first rather than direct deletion
-- Project JSON remains source-of-truth
-- Support bundles exclude content and credentials
-
-## v0.08.0 — 2026-11-06
-
-### Added
-
-- Rebuildable SQLite project metadata index
-- Repository schema and integrity health
-- Operations Center screen and indexed catalog
-- Project snapshots, retention, and restore workflows
-- Structured JSONL operational logs and rotation
-- Operation-log download
-- Repository, snapshots, operations, UI, page-smoke, and cumulative regression tests
-
-### Architecture
-
-- JSON remains the portable source-of-truth
-- SQLite remains secondary and rebuildable
-- No new external dependency is required
+### Clarification
+- Plans do not run in the background or delete records automatically
 
 # Changelog
 ## v0.07.4 — 2026-11-05

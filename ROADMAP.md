@@ -63,17 +63,11 @@ Authenticated identities, permissions, and shared storage remain part of the fut
 - Collision-safe outputs and live asset hash verification
 - Schema migrations, reference repair, transactional imports, and project write locks
 - Bounded media memory, cached models, sanitized errors, and release consistency controls
-## Delivered — v0.08.0: Operations and repository foundation
+## Delivered — v0.08.2: Maintenance planning
 
-- Rebuildable SQLite metadata index
-- Project snapshots and restore workflows
-- Structured operation log and repository health dashboard
-
-## Delivered — v0.08.1: Operational maintenance and supportability
-
-- Storage inventory, reference analysis, and reversible quarantine
-- Database backup/restore/optimization
-- Sanitized support bundles and maintenance guidance
+- Recurring local operational checklists
+- Due-state and run history
+- Preview-only retention policies
 
 ## v0.06.00: Scale and collaboration
 - SQLite repository migration followed by optional PostgreSQL

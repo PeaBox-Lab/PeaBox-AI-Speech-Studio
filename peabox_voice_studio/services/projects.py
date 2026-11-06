@@ -4,16 +4,14 @@ from uuid import uuid4
 from peabox_voice_studio.config import DATABASE_PATH, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, PROJECTS_DIR
 from peabox_voice_studio.models import Project, ScriptBlock, utc_now
 from peabox_voice_studio.services.files import FileLock, atomic_write_bytes
+from peabox_voice_studio.services.repository import remove_project as remove_index, upsert_project
 from peabox_voice_studio.services.migrations import CURRENT_PROJECT_SCHEMA, migrate_project_payload, rewrite_import_references
-from peabox_voice_studio.services.operations import record_operation
-from peabox_voice_studio.services.repository import remove_project as remove_project_index, upsert_project
 PROJECT_EXPORT_SCHEMA = CURRENT_PROJECT_SCHEMA
 class ProjectStore:
     def __init__(self, root: Path = PROJECTS_DIR):
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
-        self.is_default_store = self.root.resolve() == PROJECTS_DIR.resolve()
-        self.index_path = DATABASE_PATH if self.is_default_store else self.root.parent / "peabox.db"
+        self.index_path = DATABASE_PATH if self.root.resolve() == PROJECTS_DIR.resolve() else self.root.parent / "peabox.db"
     def _path(self, project_id: str) -> Path:
         if not project_id or not project_id.isalnum():
             raise ValueError("Invalid project identifier")
@@ -31,13 +29,8 @@ class ProjectStore:
         path = self._path(project.id)
         with FileLock(path.with_suffix(".lock")):
             atomic_write_bytes(path, json.dumps(project.to_dict(), ensure_ascii=False, indent=2).encode("utf-8"))
-        try:
-            upsert_project(project, path, self.index_path)
-            record_operation("project.saved", project_id=project.id, details={"name": project.name}) if self.is_default_store else None
-        except Exception as exc:
-            # JSON remains the portable source of truth; metadata indexing is recoverable.
-            try: record_operation("repository.index_failed", "warning", project.id, {"error_type": type(exc).__name__}) if self.is_default_store else None
-            except Exception: pass
+        try: upsert_project(project, path, self.index_path)
+        except Exception: pass
         return project
     def load(self, project_id: str) -> Project:
         path = self._path(project_id)
@@ -48,18 +41,13 @@ class ProjectStore:
         result = []
         for path in self.root.glob("*.json"):
             try:
-                project = Project.from_dict(json.loads(path.read_text(encoding="utf-8")))
-                result.append(project)
-                try: upsert_project(project, path, self.index_path)
-                except Exception: pass
+                result.append(Project.from_dict(json.loads(path.read_text(encoding="utf-8"))))
             except (OSError, json.JSONDecodeError, TypeError, ValueError):
                 continue
         return sorted(result, key=lambda item: item.updated_at, reverse=True)
     def delete(self, project_id: str) -> None:
         self._path(project_id).unlink(missing_ok=False)
-        try:
-            remove_project_index(project_id, self.index_path)
-            record_operation("project.deleted", project_id=project_id) if self.is_default_store else None
+        try: remove_index(project_id, self.index_path)
         except Exception: pass
     def import_project(self, raw: bytes | str, preserve_identity: bool = False) -> Project:
         text = raw.decode("utf-8-sig") if isinstance(raw, bytes) else raw

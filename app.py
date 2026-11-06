@@ -1,32 +1,32 @@
 import json
 from pathlib import Path
 import streamlit as st
-from peabox_voice_studio.config import APP_NAME, DATABASE_BACKUPS_DIR, DATABASE_PATH, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, OUTPUTS_DIR, VERSION
+from peabox_voice_studio.config import APP_NAME, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, OUTPUTS_DIR, VERSION
 from peabox_voice_studio.models import Project, ScriptBlock
 from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, PROVIDER_RATES
 from peabox_voice_studio.services.audio import inspect_wav, normalize_wav, save_processed_wav, trim_silence_wav
-from peabox_voice_studio.services.backups import create_snapshot, delete_snapshot, list_snapshots, load_snapshot
 from peabox_voice_studio.services.batch import build_manifest
 from peabox_voice_studio.services.commands import onboarding_status, record_command, resolve_commands, search_commands
 from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
 from peabox_voice_studio.services.bundles import export_timeline_bundle, import_timeline_bundle
 from peabox_voice_studio.services.files import atomic_write_bytes, build_render_zip, safe_filename, user_safe_error
 from peabox_voice_studio.services.governance import ALLOWED_TRANSITIONS, APPROVAL_STATES, RISK_LEVELS, WORKFLOW_STATES, add_comment, add_decision, decide_approval, governance, governance_readiness, governance_summary, reopen_comment, request_approval, resolve_comment, supersede_decision, transition_status, update_project_governance
+from peabox_voice_studio.services.backups import create_snapshot, list_snapshots
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
-from peabox_voice_studio.services.maintenance import analyze_output_storage, delete_quarantine_batch, list_quarantine_batches, quarantine_files, restore_quarantine_batch, storage_inventory
-from peabox_voice_studio.services.operations import operation_log_health, read_operations, record_operation
+from peabox_voice_studio.services.maintenance_plans import complete_plan, create_plan, load_plans, maintenance_health, plan_status, retention_preview, save_plans
+from peabox_voice_studio.services.operations import read_operations, record_operation
 from peabox_voice_studio.services.preferences import load_preferences, mark_project_opened, resolve_projects, save_preferences, toggle_favorite
 from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
+from peabox_voice_studio.services.repository import create_database_backup, list_database_backups, list_indexed_projects, rebuild_index, repository_health
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
-from peabox_voice_studio.services.repository import create_database_backup, list_database_backups, list_indexed_projects, optimize_database, rebuild_index, repository_health, restore_database
 from peabox_voice_studio.services.diagnostics import system_diagnostics, transcription_readiness
 from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, pronunciation_conflicts, pronunciation_preview, validate_pause_markers
 from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
-from peabox_voice_studio.services.subtitles import to_srt, to_vtt
 from peabox_voice_studio.services.support import create_support_bundle
+from peabox_voice_studio.services.subtitles import to_srt, to_vtt
 from peabox_voice_studio.ui import callout, empty_state, inject_corporate_theme, kpi_card, navigate_to, page_header, section, sidebar_navigation, status_badge, workflow_step
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide", initial_sidebar_state="expanded")
 ui_preferences = st.session_state.setdefault("ui_preferences", load_preferences())
@@ -148,7 +148,6 @@ if page == "Dashboard":
             {"Area": "Providers", "Status": "Ready" if configured_providers() else "Needs setup", "Detail": f"{len(configured_providers())} provider paths available"},
             {"Area": "Timeline", "Status": "Ready" if validation.get("valid") else "Needs review", "Detail": f"{validation.get('enabled_clips', 0)} enabled clips; {validation.get('errors', 0)} errors"},
             {"Area": "Governance", "Status": "Ready" if governance_readiness(project)["ready"] else "Needs review", "Detail": f"{gov_summary['open_comments']} open comments; {gov_summary['pending_approvals']} pending approvals"},
-            {"Area": "Repository", "Status": "Ready" if repository_health()["ready"] else "Needs repair", "Detail": f"{repository_health()['indexed_projects']} indexed projects"},
             {"Area": "System", "Status": f"{ready_checks}/{total_checks} ready", "Detail": "Open System Check for details"},
         ]
         st.dataframe(readiness_rows, use_container_width=True, hide_index=True)
@@ -299,89 +298,41 @@ elif page == "Projects":
                 confirm = st.checkbox("I understand this permanently deletes the project")
                 if st.button("Delete permanently", disabled=not confirm): store.delete(project.id); st.session_state.pop("project", None); st.rerun()
 elif page == "Operations":
-    section("Operational health", "JSON projects remain portable source-of-truth; SQLite provides a rebuildable local index.")
-    health = repository_health(); log_health = operation_log_health(); projects = store.list()
-    o1, o2, o3, o4 = st.columns(4)
-    with o1: kpi_card("Repository", "Ready" if health["ready"] else "Repair", f"Schema {health['schema_version']}")
-    with o2: kpi_card("Indexed projects", str(health["indexed_projects"]), f"{health['bytes']:,} database bytes")
-    with o3: kpi_card("Operation events", str(log_health["entries"]), f"{log_health['bytes']:,} log bytes")
-    with o4: kpi_card("Snapshots", str(len(list_snapshots(project.id)) if project else 0), "Active-project recovery points")
-    r1, r2 = st.columns(2)
-    if r1.button("Rebuild project index", use_container_width=True):
-        result = rebuild_index([(item, store._path(item.id)) for item in projects]); record_operation("repository.rebuilt", details=result); st.success(f"Indexed {result['indexed']} projects"); st.rerun()
-    r2.download_button("Download operation log", "\n".join(json.dumps(item, ensure_ascii=False) for item in reversed(read_operations(2000))), "peabox_operations.jsonl", "application/jsonl", use_container_width=True)
-    section("Indexed project catalog", "The index can be deleted and rebuilt from project JSON at any time.")
-    indexed = list_indexed_projects()
-    if indexed: st.dataframe(indexed, use_container_width=True, hide_index=True)
-    else: empty_state("No projects indexed", "Rebuild the project index after creating or importing projects.")
-    section("Project snapshots", "Snapshots preserve project JSON and metadata but do not copy external audio assets.")
-    if not project:
-        empty_state("No active project", "Open a project before creating or restoring snapshots.", "Open Project Workspace", "Projects")
-    else:
-        snapshot_label = st.text_input("Snapshot label", placeholder="Before timeline changes")
-        if st.button("Create project snapshot", type="primary"):
-            path = create_snapshot(project, snapshot_label); record_operation("snapshot.created", project_id=project.id, details={"file": path.name}); st.success(f"Created {path.name}"); st.rerun()
-        snapshots = list_snapshots(project.id)
-        if snapshots:
-            selected_snapshot = st.selectbox("Saved snapshots", snapshots, format_func=lambda item: f"{item['created_at']} · {item['label'] or item['name']}")
-            s1, s2, s3 = st.columns(3)
-            if s1.button("Restore over active project", use_container_width=True):
-                restored = load_snapshot(Path(selected_snapshot["path"]), new_identity=False); restored.id = project.id; set_active_project(store.save(restored)); record_operation("snapshot.restored", project_id=project.id, details={"file": selected_snapshot["name"]}); st.rerun()
-            if s2.button("Restore as new project", use_container_width=True):
-                restored = load_snapshot(Path(selected_snapshot["path"]), new_identity=True); set_active_project(store.save(restored)); record_operation("snapshot.restored_copy", project_id=restored.id, details={"file": selected_snapshot["name"]}); st.rerun()
-            if s3.button("Delete snapshot", use_container_width=True):
-                delete_snapshot(Path(selected_snapshot["path"]), project.id); record_operation("snapshot.deleted", project_id=project.id, details={"file": selected_snapshot["name"]}); st.rerun()
-            st.dataframe(snapshots, use_container_width=True, hide_index=True)
-        else: empty_state("No snapshots", "Create a recovery point before major script, timeline, or governance changes.")
-    tabs_ops = st.tabs(["Storage maintenance", "Database maintenance", "Support bundle", "Recent events"])
-    with tabs_ops[0]:
-        inventory = storage_inventory()
-        st.dataframe(inventory, use_container_width=True, hide_index=True)
-        analysis = analyze_output_storage(projects)
-        m1,m2,m3,m4=st.columns(4)
-        with m1:kpi_card("Output files",str(analysis["files"]),f"{analysis['bytes']:,} bytes")
-        with m2:kpi_card("Referenced",str(analysis["referenced"]),"Used by project records")
-        with m3:kpi_card("Orphaned",str(analysis["orphaned"]),f"{analysis['orphaned_bytes']:,} bytes")
-        with m4:kpi_card("Missing refs",str(analysis["missing_references"]),"Referenced but unavailable")
-        if analysis["orphaned_files"]:
-            st.dataframe(analysis["orphaned_files"],use_container_width=True,hide_index=True)
-            confirm_quarantine=st.checkbox("I reviewed the orphan preview and want to quarantine all listed files")
-            if st.button("Quarantine orphaned outputs",disabled=not confirm_quarantine):
-                manifest=quarantine_files([Path(item["path"]) for item in analysis["orphaned_files"]]);record_operation("storage.quarantined",details={"batch_id":manifest["batch_id"],"files":len(manifest["files"])});st.rerun()
-        else:st.success("No orphaned output files were detected.")
-        batches=list_quarantine_batches()
-        if batches:
-            selected_batch=st.selectbox("Quarantine batches",batches,format_func=lambda item:f"{item['created_at']} · {item['files']} files · {item['bytes']:,} bytes")
-            q1,q2=st.columns(2)
-            if q1.button("Restore selected batch",use_container_width=True):
-                result=restore_quarantine_batch(Path(selected_batch["path"]));record_operation("storage.quarantine_restored",details=result);st.rerun()
-            delete_confirm=q2.checkbox("Permanently delete selected batch")
-            if q2.button("Delete batch permanently",disabled=not delete_confirm,use_container_width=True):
-                delete_quarantine_batch(Path(selected_batch["path"]));record_operation("storage.quarantine_deleted",details={"batch_id":selected_batch["batch_id"]});st.rerun()
-    with tabs_ops[1]:
-        DATABASE_BACKUPS_DIR.mkdir(parents=True,exist_ok=True)
-        db_backups=list_database_backups()
-        d1,d2=st.columns(2)
-        if d1.button("Create database backup",use_container_width=True):
-            backup=create_database_backup();record_operation("database.backup_created",details={"file":backup.name});st.rerun()
-        if d2.button("Optimize database",use_container_width=True):
-            result=optimize_database();record_operation("database.optimized",details=result);st.success("Database optimized");st.rerun()
-        if db_backups:
-            selected_db=st.selectbox("Database backups",db_backups,format_func=lambda item:f"{item['name']} · {item['bytes']:,} bytes")
-            restore_confirm=st.checkbox("I understand this replaces the current metadata index")
-            if st.button("Restore selected database backup",disabled=not restore_confirm):
-                result=restore_database(Path(selected_db["path"]));record_operation("database.backup_restored",details={"file":selected_db["name"],"health":result});st.rerun()
-            st.dataframe(db_backups,use_container_width=True,hide_index=True)
-        else:st.info("No database backups have been created.")
-    with tabs_ops[2]:
-        summary={"id":project.id,"name":project.name,"blocks":len(project.blocks),"clips":len(project.settings.get("audio_clips",[])),"jobs":len(project.settings.get("batch_jobs",[]))} if project else {}
-        support=create_support_bundle(repository_health(),storage_inventory(),read_operations(500),system_diagnostics(),VERSION,summary)
-        st.download_button("Download sanitized support bundle",support,f"peabox_support_{VERSION}.zip","application/zip",use_container_width=True)
-        callout("The support bundle contains diagnostics, metadata, and operation events. It does not include cloud credentials, scripts, project JSON, or audio files.")
-    with tabs_ops[3]:
-        operations = read_operations(200)
-        if operations: st.dataframe(operations, use_container_width=True, hide_index=True)
-        else: st.info("No operational events have been recorded.")
+    section("Operations and maintenance", "JSON projects remain portable source-of-truth; the local index and maintenance plans are rebuildable.")
+    projects=store.list();health=repository_health();plans=load_plans();mhealth=maintenance_health(plans)
+    c1,c2,c3,c4=st.columns(4)
+    with c1:kpi_card("Repository","Ready" if health["ready"] else "Repair",f"{health['indexed_projects']} projects")
+    with c2:kpi_card("Plans",str(mhealth["enabled"]),f"{mhealth['overdue']} overdue")
+    with c3:kpi_card("Snapshots",str(len(list_snapshots(project.id)) if project else 0),"Active project")
+    with c4:kpi_card("Events",str(len(read_operations(2000))),"Operational log")
+    tabs=st.tabs(["Maintenance plans","Repository & backup","Support bundle"])
+    with tabs[0]:
+        name=st.text_input("Plan name",value="Weekly maintenance");frequency=st.selectbox("Frequency",["Daily","Weekly","Monthly","Quarterly"]);owner=st.text_input("Owner label",value="Local User")
+        if st.button("Create maintenance plan",type="primary"):
+            plans.append(create_plan(name,frequency,owner=owner));save_plans(plans);record_operation("maintenance.plan_created",details={"name":name});st.rerun()
+        if plans:
+            selected=st.selectbox("Maintenance plans",plans,format_func=lambda x:f"{x['name']} · {plan_status(x)} · due {x['next_due_at']}")
+            st.dataframe([{"Task":t,"Complete":False} for t in selected['tasks']],use_container_width=True,hide_index=True)
+            notes=st.text_area("Completion notes",key=f"plan_notes_{selected['id']}")
+            if st.button("Complete selected plan"):
+                complete_plan(selected,owner,{t:"Complete" for t in selected['tasks']},notes);save_plans(plans);record_operation("maintenance.plan_completed",details={"plan":selected['name']});st.rerun()
+            st.json(maintenance_health(plans))
+        preview=retention_preview(len(list_snapshots(project.id)) if project else 0,len(list_database_backups()),0,{"snapshots_keep":20,"database_backups_keep":10,"quarantine_batches_keep":20})
+        st.caption("Retention preview (no automatic deletion)");st.json(preview)
+    with tabs[1]:
+        if st.button("Rebuild project index"):
+            rebuild_index([(x,store._path(x.id)) for x in projects]);st.rerun()
+        if st.button("Create database backup"):
+            create_database_backup();st.rerun()
+        st.dataframe(list_indexed_projects(),use_container_width=True,hide_index=True)
+        st.dataframe(list_database_backups(),use_container_width=True,hide_index=True)
+        if project and st.button("Create project snapshot"):
+            create_snapshot(project,"Operations snapshot");st.rerun()
+    with tabs[2]:
+        summary={"name":project.name,"id":project.id} if project else {}
+        bundle=create_support_bundle(repository_health(),[],read_operations(500),system_diagnostics(),VERSION,summary)
+        st.download_button("Download sanitized support bundle",bundle,f"peabox_support_{VERSION}.zip","application/zip")
+        callout("Support bundles exclude project scripts, transcripts, audio, and cloud credentials.")
 
 elif page == "Governance":
     if not project:
@@ -1037,7 +988,6 @@ else:
     section("Product roadmap and operating guidance", "Delivered capabilities, planned architecture, and setup notes for this release.")
     st.markdown("""
 ### Current release
-- Operations Center with SQLite project index, snapshots, structured logs, and rebuildable health
 - Governance Center with ownership, contributors, risk, due dates, and controlled workflow status
 - Persistent review comments with priority, targets, resolution, and reopening
 - Decision register with rationale and supersession history

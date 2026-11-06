@@ -1,24 +1,15 @@
 # User Guide
 
-## Review storage
+## Create a maintenance plan
 
 1. Open **Administration → Operations Center**.
-2. Select **Storage maintenance**.
-3. Review totals, orphaned files, and missing references.
-4. Quarantine orphaned outputs only after reviewing the preview.
+2. Choose Maintenance plans.
+3. Enter a name, frequency, and owner label.
+4. Create the plan.
+5. Complete it after performing the listed tasks.
 
-## Restore quarantined files
+PeaBox stores run history and calculates the next due date.
 
-Choose a quarantine batch and select **Restore selected batch**. Files return to the output folder with collision-safe names.
+## Retention policy
 
-## Back up the project index
-
-Use **Database maintenance → Create database backup**. PeaBox retains the configured number of recent backups.
-
-## Restore the index
-
-Choose a backup, acknowledge replacement, and restore it. Project JSON is not replaced by this operation.
-
-## Create a support bundle
-
-Use **Support bundle → Download sanitized support bundle**. Review the bundle before sharing it with support.
+Retention preview reports how many snapshots, database backups, or quarantine batches exceed configured targets. v0.08.2 does not automatically delete them.

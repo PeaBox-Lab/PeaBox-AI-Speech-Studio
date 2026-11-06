@@ -1,7 +1,5 @@
-# PeaBox Voice Studio v0.08.1 Release Notes
+# PeaBox Voice Studio v0.08.2 Release Notes
 
-This maintenance release expands Operations Center with storage analysis, reversible cleanup, database recovery, and support diagnostics.
+This release adds local maintenance planning to Operations Center. Teams can define recurring operational checklists, see due state, record completion evidence, and retain up to fifty run records per plan.
 
-PeaBox identifies output files that are referenced, orphaned, or missing. Orphaned files can be moved into quarantine and later restored. Permanent quarantine deletion requires explicit confirmation.
-
-SQLite backups are collision-safe, retained to a configured count, integrity-checked before restore, and restored with stale WAL/SHM cleanup. A sanitized support bundle packages operational metadata without scripts, credentials, transcripts, or audio.
+Retention preview calculates excess snapshots, database backups, and quarantine batches without deleting them. Maintenance plans are not background schedules; they require PeaBox to be open and the user to complete them.
