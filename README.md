@@ -1,23 +1,27 @@
-# PeaBox Voice Studio v0.08.3
+# PeaBox Voice Studio v0.09.0
+A local-first, corporate voice-production workspace with modular screens, project operations, governance, local/cloud speech generation, transcription, quality processing, resumable jobs, and portable timelines.
 
-A local-first enterprise voice-production workspace with project health checks, preview-only repair plans, maintenance checklists, a rebuildable SQLite metadata index, governance, multi-provider speech, transcription, audio quality, and portable timelines.
+## v0.09.0 Modular Screen Architecture
+- Shared `AppContext` for stable screen dependencies
+- Central screen registry and renderer contract
+- Dedicated modules for Executive Dashboard, Command Center, Interface Preferences, Operations Center, and Roadmap & Help
+- Operations Center with project health, safe repair previews, repository rebuilds, maintenance plans, and event history
+- Rebuildable SQLite project metadata index; JSON project files remain authoritative
+- Architecture guards for registry uniqueness, renderer availability, context fields, and bootstrap size
+- Cumulative reliability, governance, timeline, transcription, and provider functionality retained
 
-## v0.08.3 Project Health & Repair
+## Validation
+- 157 automated tests passed
+- All Python sources compiled successfully
+- Archive contents are verified against the source tree before delivery
 
-- Health checks for duplicate or missing IDs, invalid job states, stale project references, missing files, and governance gaps
-- Severity-ranked issue reports
-- Preview-only repair plans
-- Explicit confirmation before safe repairs
-- Repair audit metadata in the project
-- Portfolio health summary in Operations Center
-
-## Maintenance planning
-
-- Daily, weekly, monthly, and quarterly local plans
-- Due, due-soon, overdue, and disabled states
-- Checklist run history and next due date
-- Plans are local reminders, not background schedulers
-
-## Cumulative platform
-
-The release retains all v0.07.4 reliability controls plus the corporate workspace, governance, cloud/local generation, transcription, quality tools, Timeline Studio, portable bundles, and complete documentation.
+## Windows setup
+1. Install 64-bit Python 3.10, 3.11, or 3.12.
+2. Extract the ZIP into a new folder.
+3. Run `start_windows.bat`.
+4. Confirm the launcher and sidebar display v0.09.0.
+5. Keep the `data`, `outputs`, and `models` folders writable.
+## Validation
+```bash
+python -m unittest discover -s tests -v
+```

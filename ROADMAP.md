@@ -1,3 +1,17 @@
+# Roadmap
+
+## Delivered in v0.09.0
+- Shared application context
+- Screen registry and renderer contract
+- Modular Dashboard, Command Center, Preferences, Operations, and Help screens
+- Operations Center with health, repairs, repository maintenance, plans, and events
+
+## Next architecture milestones
+- Extract remaining production, audio, transcription, governance, and project screens
+- Add browser-driven navigation tests
+- Add provider sandbox integration tests
+- Add schema migration fixtures across historical releases
+
 # Evidence-Based Product Roadmap
 ## Roadmap basis
 This roadmap translates the attached market, architecture, UX, and user-story context into build stages appropriate for the existing local Streamlit application. The attached market figures and legal statements are treated as supplied planning context, not independently verified claims.

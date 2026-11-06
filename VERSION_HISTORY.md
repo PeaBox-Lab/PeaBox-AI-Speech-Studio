@@ -1,3 +1,8 @@
+# Version History
+
+## v0.09.0
+Modular screen architecture, shared application context, registry dispatch, Operations Center, project health and safe repairs, rebuildable repository index, maintenance plans, and architecture-quality tests.
+
 # Cumulative Version History
 - **v0.02.01** — Modular project workspace foundation
 - **v0.02.02** — Flexible Python 3.10–3.12 launcher
@@ -16,4 +21,4 @@
 - **v0.07.1** — Responsive contrast, banner, and navigation patch
 - **v0.07.2** — Quick actions, favorites, recents, and interface preferences
 - **v0.07.3** — Workspace Command Center, onboarding, and actionable empty states
-- **v0.07.4** — Reliability, integrity, migration, and runtime hardening- **v0.08.3** — Project health checks, safe repair plans, and maintenance checklists
+- **v0.07.4** — Reliability, integrity, migration, and runtime hardening

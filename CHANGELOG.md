@@ -1,19 +1,13 @@
 # Changelog
 
-## v0.08.3 — 2026-11-06
-
-### Added
-- Project and portfolio health checks
-- Severity-ranked issue reports
-- Preview-only safe repair plans
-- Explicit confirmation and repair metadata
-- Maintenance plans with due state and run history
-- Operations Center health and repair UI
-- Health, maintenance, UI, and cumulative regression tests
-
-### Safety
-- Repairs are never automatic
-- Human-decision warnings are not auto-repaired
+## v0.09.0 — Modular Screen Architecture
+- Introduced `AppContext`, a central screen registry, and dedicated screen modules.
+- Extracted Dashboard, Command Center, Preferences, Operations, and Help from the application bootstrap.
+- Added Operations Center project health, confirmed safe repairs, repository rebuild, maintenance plans, and operational events.
+- Restored the rebuildable SQLite metadata index while keeping project JSON authoritative.
+- Added architecture tests and updated UI tests for modular ownership.
+- Reduced the bootstrap below the architecture line-count guard while preserving all prior workflows.
+- Validation: 157 tests passed.
 
 # Changelog
 ## v0.07.4 — 2026-11-05

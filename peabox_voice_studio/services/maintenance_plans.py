@@ -1,21 +1,23 @@
-import json
+import json,uuid
 from datetime import datetime,timedelta,timezone
-from pathlib import Path
-from uuid import uuid4
 from peabox_voice_studio.config import MAINTENANCE_PATH
 from peabox_voice_studio.services.files import atomic_write_bytes
-from peabox_voice_studio.models import utc_now
-FREQ={'Daily':1,'Weekly':7,'Monthly':30,'Quarterly':90}
-def load(path=MAINTENANCE_PATH):
- try:return json.loads(Path(path).read_text())
- except:return []
-def save(plans,path=MAINTENANCE_PATH):atomic_write_bytes(Path(path),json.dumps(plans,indent=2).encode());return plans
-def create(name,frequency='Weekly'):
- now=utc_now();return {'id':uuid4().hex,'name':name or 'Maintenance','frequency':frequency,'tasks':['Review repository health','Run project health checks','Review missing/orphaned assets','Create backup'],'created_at':now,'next_due_at':future(now,FREQ[frequency]),'last_run_at':None,'runs':[],'enabled':True}
-def status(plan,now=None):
- if not plan.get('enabled',True):return 'Disabled'
- n=parse(now or utc_now());d=parse(plan['next_due_at']);return 'Overdue' if n>d else ('Due soon' if d-n<=timedelta(days=2) else 'Scheduled')
+
+def now():return datetime.now(timezone.utc).isoformat()
+def load():
+    if not MAINTENANCE_PATH.exists():return []
+    try:
+        data=json.loads(MAINTENANCE_PATH.read_text());return data if isinstance(data,list) else []
+    except Exception:return []
+def save(plans):atomic_write_bytes(MAINTENANCE_PATH,json.dumps(plans,ensure_ascii=False,indent=2).encode())
+def create(name,frequency,tasks=None):return {'id':uuid.uuid4().hex,'name':name.strip() or 'Maintenance plan','frequency':frequency,'tasks':tasks or ['Review project health','Review storage and backups','Review operations log'],'enabled':True,'last_completed_at':'','next_due_at':now(),'history':[]}
+def status(plan,at=None):
+    if not plan.get('enabled',True):return 'Paused'
+    due=plan.get('next_due_at','')
+    if not due:return 'Not scheduled'
+    current=at or datetime.now(timezone.utc)
+    if isinstance(current,str):current=datetime.fromisoformat(current.replace('Z','+00:00'))
+    return 'Overdue' if current>datetime.fromisoformat(due.replace('Z','+00:00')) else 'Due'
 def complete(plan,results,notes=''):
- now=utc_now();plan['last_run_at']=now;plan['next_due_at']=future(now,FREQ[plan['frequency']]);plan['runs'].insert(0,{'at':now,'results':results,'notes':notes});plan['runs']=plan['runs'][:50];return plan
-def future(v,d):return (parse(v)+timedelta(days=d)).isoformat(timespec='seconds')
-def parse(v):return datetime.fromisoformat(v.replace('Z','+00:00')).astimezone(timezone.utc)
+    completed=datetime.now(timezone.utc);days={'Daily':1,'Weekly':7,'Monthly':30,'Quarterly':90}.get(plan.get('frequency'),7)
+    plan['last_completed_at']=completed.isoformat();plan['next_due_at']=(completed+timedelta(days=days)).isoformat();plan.setdefault('history',[]).append({'completed_at':completed.isoformat(),'results':results,'notes':notes});return plan

@@ -10,6 +10,7 @@ class ProjectStore:
     def __init__(self, root: Path = PROJECTS_DIR):
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
+        self.index_enabled = self.root.resolve() == PROJECTS_DIR.resolve()
     def _path(self, project_id: str) -> Path:
         if not project_id or not project_id.isalnum():
             raise ValueError("Invalid project identifier")
@@ -27,6 +28,14 @@ class ProjectStore:
         path = self._path(project.id)
         with FileLock(path.with_suffix(".lock")):
             atomic_write_bytes(path, json.dumps(project.to_dict(), ensure_ascii=False, indent=2).encode("utf-8"))
+        if self.index_enabled:
+            try:
+                from peabox_voice_studio.services.repository import upsert
+                from peabox_voice_studio.services.operations import record
+                upsert(project, path)
+                record("project.saved", project_id=project.id, details={"name": project.name})
+            except Exception:
+                pass
         return project
     def load(self, project_id: str) -> Project:
         path = self._path(project_id)
@@ -43,6 +52,13 @@ class ProjectStore:
         return sorted(result, key=lambda item: item.updated_at, reverse=True)
     def delete(self, project_id: str) -> None:
         self._path(project_id).unlink(missing_ok=False)
+        if self.index_enabled:
+            try:
+                from peabox_voice_studio.services.repository import remove
+                from peabox_voice_studio.services.operations import record
+                remove(project_id); record("project.deleted", project_id=project_id)
+            except Exception:
+                pass
     def import_project(self, raw: bytes | str, preserve_identity: bool = False) -> Project:
         text = raw.decode("utf-8-sig") if isinstance(raw, bytes) else raw
         payload = json.loads(text)

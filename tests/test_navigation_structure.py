@@ -6,16 +6,19 @@ class NavigationStructureTests(unittest.TestCase):
     def setUp(self):
         self.app_source = (ROOT / "app.py").read_text(encoding="utf-8")
         self.ui_source = (ROOT / "peabox_voice_studio" / "ui.py").read_text(encoding="utf-8")
+        self.registry_source = (ROOT / "peabox_voice_studio" / "screens" / "registry.py").read_text(encoding="utf-8")
         ast.parse(self.app_source); ast.parse(self.ui_source)
     def test_business_navigation_groups_exist(self):
         for group in ("Overview", "Production", "Audio & Quality", "Administration", "Support"):
             self.assertIn(f'"{group}"', self.ui_source)
     def test_professional_display_labels_exist(self):
-        labels = ["Executive Dashboard", "Project Workspace", "Command Center", "Interface Preferences", "Script Editor", "Speech Generator", "Batch Jobs", "Timeline Studio", "Transcription Studio", "Operations Center", "Governance Center", "Approval Queue", "Activity & History"]
+        labels = ["Executive Dashboard", "Project Workspace", "Command Center", "Interface Preferences", "Script Editor", "Speech Generator", "Batch Jobs", "Timeline Studio", "Transcription Studio", "Governance Center", "Approval Queue", "Activity & History"]
         for label in labels: self.assertIn(f'"{label}"', self.ui_source)
     def test_all_internal_page_branches_exist(self):
-        branches = ["Dashboard", "Projects", "Command Center", "Preferences", "Operations", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History"]
+        branches = ["Projects", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History"]
         for page in branches: self.assertIn(f'page == "{page}"', self.app_source)
+        for page in ("Dashboard", "Command Center", "Preferences", "Operations", "Roadmap & Help"):
+            self.assertIn(f'"{page}"', self.registry_source)
     def test_sidebar_uses_grouped_navigation(self):
         self.assertIn('selectbox("Workspace area"', self.ui_source)
         self.assertIn('radio("Navigation"', self.ui_source)

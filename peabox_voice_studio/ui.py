@@ -7,6 +7,7 @@ NAVIGATION = {
         ("Project Workspace", "Projects", "▣"),
         ("Command Center", "Command Center", "⌕"),
         ("Interface Preferences", "Preferences", "◐"),
+        ("Operations Center", "Operations", "⚙"),
     ],
     "Production": [
         ("Script Editor", "Script Blocks", "✎"),
@@ -21,7 +22,6 @@ NAVIGATION = {
         ("Transcription Studio", "Transcription", "▤"),
     ],
     "Administration": [
-        ("Operations Center", "Operations", "▥"),
         ("Governance Center", "Governance", "◆"),
         ("Approval Queue", "Approvals", "✓"),
         ("Provider Setup", "Provider Setup", "⚙"),
@@ -37,6 +37,7 @@ PAGE_META = {
     "Projects": ("Project Workspace", "Create, open, import, export, and maintain portable production projects.", "Overview"),
     "Command Center": ("Workspace Command Center", "Search screens, discover project-aware actions, and reopen recent commands.", "Overview"),
     "Preferences": ("Interface Preferences", "Personalize navigation density, startup area, motion, and dashboard detail on this device.", "Overview"),
+    "Operations": ("Operations Center", "Monitor project health, maintenance plans, repository integrity, and operational evidence.", "Overview"),
     "Script Blocks": ("Script Editor", "Structure the master script into reusable, provider-aware production blocks.", "Production"),
     "Create Speech": ("Speech Generator", "Generate and review individual local voice outputs.", "Production"),
     "Batch Production": ("Batch Jobs", "Validate, queue, resume, retry, cancel, and package multi-provider production jobs.", "Production"),
@@ -45,7 +46,6 @@ PAGE_META = {
     "Quality Studio": ("Quality Studio", "Manage pronunciation rules, pause controls, and processed-text previews.", "Audio & Quality"),
     "Audio Quality Lab": ("Audio Quality Lab", "Analyze WAV files, create normalized or trimmed copies, and compare voices.", "Audio & Quality"),
     "Transcription": ("Transcription Studio", "Transcribe, edit, validate, save, and export timestamped media text.", "Audio & Quality"),
-    "Operations": ("Operations Center", "Project health, repair plans, repository index, and maintenance checklists.", "Administration"),
     "Governance": ("Governance Center", "Manage ownership, workflow state, review comments, decisions, and project risk.", "Administration"),
     "Approvals": ("Approval Queue", "Request, decide, and review local approval attestations and workflow gates.", "Administration"),
     "Provider Setup": ("Provider Setup", "Configure session-only cloud credentials and discover provider voices.", "Administration"),
