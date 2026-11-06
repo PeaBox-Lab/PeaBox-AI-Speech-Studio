@@ -1,3 +1,26 @@
+# PeaBox Voice Studio v0.10.4 Detailed Release Notes
+
+## Managed daemon
+Run `python worker_local.py --daemon` or `start_worker_windows.bat` to keep a local worker active. The daemon polls for queued Kokoro jobs, processes one at a time, updates progress events, and remains available for later work.
+
+## Ownership and heartbeat
+The daemon claims a single local lock and writes a durable status record containing worker identity, process ID, mode, start time, heartbeat, processed count, last queue, and last error. A second live daemon is rejected. An expired heartbeat allows controlled stale takeover.
+
+## Operational controls
+`--pause` stops taking new work while continuing heartbeats. `--resume` returns to normal polling. `--drain` processes remaining eligible jobs and then stops. `--shutdown` requests graceful exit before new work begins. `--status` prints the durable status record.
+
+## Interface
+Batch Production displays current daemon mode, stale status, worker identity, heartbeat, and processed count. Pause, resume, drain, and shutdown controls write durable commands for the foreground daemon to observe.
+
+## Launch safety
+The Windows worker launcher reuses the application virtual environment and does not install or upgrade packages. The daemon remains a visible foreground process so the user can stop it with Ctrl+C. This release does not silently install an operating-system service.
+
+## Compatibility
+One-shot worker mode, inline Run/resume, queue cancellation, stale job leases, live events, synchronization, cloud session boundaries, portfolio governance, recovery, and maintenance remain cumulative.
+
+## Verification
+165 tests cover daemon claims, duplicate rejection, orphan-lock replacement, stale takeover, heartbeat ownership, control modes, managed queue processing, status reporting, UI controls, and Windows launcher behavior.
+
 # PeaBox Voice Studio v0.10.3 Detailed Release Notes
 
 ## Durable worker queue

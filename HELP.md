@@ -1,3 +1,11 @@
+# v0.10.4 Help Update
+
+- **Daemon already active:** use `--status`; do not start a second process.
+- **Daemon shown as stale:** start the daemon again; stale ownership can be reclaimed.
+- **Paused:** use `--resume` or the Batch Jobs control.
+- **Draining:** the worker stops after eligible queued work is complete.
+- **Foreground terminal closed unexpectedly:** recover stale job leases in Batch Jobs and restart the daemon.
+
 # v0.10.3 Help Update
 
 - **No queued jobs:** create and queue a Kokoro local batch first.

@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.4
+Added a managed foreground worker daemon with single-process ownership, durable status and heartbeat, pause/resume, drain, shutdown, stale takeover, UI controls, and 165-test validation.
+
+# Version History
+
 ## v0.10.3
 Added a durable local Kokoro worker queue with leases, heartbeat, stale recovery, progress events, cancellation, and explicit project synchronization, validated by 155 tests.
 

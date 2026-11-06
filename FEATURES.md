@@ -1,3 +1,8 @@
+# v0.10.4 Feature Additions
+
+## Managed Local Worker
+Keep one Kokoro worker running in a separate foreground terminal, inspect its durable status, control its intake, drain queued work, and shut it down gracefully.
+
 # v0.10.3 Feature Additions
 
 ## Local Worker & Live Progress

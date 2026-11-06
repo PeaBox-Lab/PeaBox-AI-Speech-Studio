@@ -1,20 +1,20 @@
-# Local Worker Guide
+# Managed Worker Guide
 
-## Scope
-The worker processes Kokoro local jobs only. Cloud credentials are not persisted.
+## Start
+Use `start_worker_windows.bat` or `python worker_local.py --daemon`. The worker stays in the foreground.
 
-## Run once
-```bash
-python worker_local.py --once
-```
+## Status record
+The local status includes worker ID, PID, mode, timestamps, processed jobs, last queue ID, and last error.
 
-## Lifecycle
-1. Queue a validated Kokoro job.
-2. Worker acquires an exclusive lease.
-3. Each item emits started and finished events.
-4. Durable progress is updated.
-5. Worker releases the lease.
-6. User synchronizes results into the project.
+## Modes
+- **running:** polls and processes queued Kokoro work.
+- **paused:** heartbeats but takes no new work.
+- **draining:** processes eligible work, then stops.
+- **shutdown:** exits before accepting new work.
+- **stopped:** no active daemon.
 
-## Recovery
-Expired leases can be recovered from Batch Jobs. Running items are returned to queued state with a recovery note.
+## Ownership
+Only one non-stale daemon may own the local claim. A stale heartbeat permits takeover.
+
+## Security
+Only Kokoro local jobs are accepted. Cloud credentials remain session-only and never enter daemon files.

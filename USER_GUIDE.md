@@ -1,3 +1,23 @@
+# v0.10.4 User Guide Update
+
+## Start the daemon
+Run `start_worker_windows.bat`, or activate the environment and run:
+```bash
+python worker_local.py --daemon
+```
+Keep the terminal open.
+
+## Control it
+Use Batch Jobs or these commands:
+```bash
+python worker_local.py --status
+python worker_local.py --pause
+python worker_local.py --resume
+python worker_local.py --drain
+python worker_local.py --shutdown
+```
+Drain completes queued work before stopping. Shutdown stops before taking new work.
+
 # v0.10.3 User Guide Update
 
 ## Queue a job

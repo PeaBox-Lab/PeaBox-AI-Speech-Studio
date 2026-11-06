@@ -4,3 +4,6 @@ __all__=['add_job','build_manifest','create_job','delete_job','duplicate_job','r
 
 from peabox_voice_studio.services.worker_queue import enqueue,list_queue,load as load_queue,progress as queue_progress,read_events,recover_stale,request_cancel as request_worker_cancel,sync_to_project
 __all__ += ['enqueue','list_queue','load_queue','queue_progress','read_events','recover_stale','request_worker_cancel','sync_to_project']
+
+from peabox_voice_studio.services.worker_daemon import command as daemon_command,daemon_status
+__all__ += ['daemon_command','daemon_status']

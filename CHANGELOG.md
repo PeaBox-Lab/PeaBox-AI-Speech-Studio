@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.4 — Managed Worker Daemon
+- Added long-running `--daemon` worker mode.
+- Added durable daemon state, heartbeat, PID, worker identity, processed count, and last error.
+- Added exclusive daemon claim and stale-daemon takeover.
+- Added status, pause, resume, drain, and shutdown commands.
+- Added managed daemon controls and status in Batch Production.
+- Added dedicated Windows worker launcher using the existing environment.
+- Retained one-shot worker and inline execution.
+- Validation: 165 tests passed.
+
+# Changelog
+
 ## v0.10.3 — Local Worker & Live Progress
 - Added durable local worker queue envelopes and progress event logs.
 - Added exclusive leases, heartbeat renewal, release, and stale-lease recovery.

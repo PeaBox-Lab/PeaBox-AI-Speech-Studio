@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.10.4
+- Long-running local worker daemon
+- Single-daemon ownership and stale takeover
+- Durable heartbeat and status
+- Pause, resume, drain, and shutdown
+- Batch Production daemon controls
+- Dedicated foreground Windows launcher
+
+## Recommended next release
+- Local storage quotas and capacity policies
+- Cloud-provider sandbox integration tests
+- Browser-driven screenshot regression suite
+- Optional operating-system service installation with explicit user consent
+
+# Roadmap
+
 ## Delivered in v0.10.3
 - Durable local worker queue
 - Exclusive leases and heartbeat

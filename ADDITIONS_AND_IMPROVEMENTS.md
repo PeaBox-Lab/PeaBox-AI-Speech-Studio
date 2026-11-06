@@ -1,3 +1,24 @@
+# v0.10.4 Additions and Improvements
+
+## Daemon lifecycle
+- Foreground daemon mode
+- Single-daemon claim
+- Durable heartbeat and status
+- Stale takeover
+- Graceful release
+
+## Controls
+- Status
+- Pause
+- Resume
+- Drain
+- Shutdown
+
+## Launching
+- Dedicated Windows worker launcher
+- Reuses existing virtual environment
+- No silent service installation
+
 # v0.10.3 Additions and Improvements
 
 ## Worker architecture

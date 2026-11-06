@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.4 Release Notes
+
+v0.10.4 advances the local worker foundation into a managed daemon. One process can continuously drain Kokoro jobs while exposing durable status, heartbeat, pause/resume, drain, shutdown, and stale-takeover controls.
+
 # PeaBox Voice Studio v0.10.3 Release Notes
 
 v0.10.3 introduces the roadmap’s local worker and live-progress foundation. Kokoro batch jobs can be queued durably, processed from a separate terminal, monitored through append-only events, cancelled, recovered after stale leases, and explicitly synchronized back into the project.

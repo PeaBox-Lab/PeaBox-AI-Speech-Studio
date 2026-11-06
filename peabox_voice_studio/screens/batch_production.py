@@ -1,5 +1,5 @@
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.facades.batch import add_job, build_manifest, create_job, delete_job, duplicate_job, enqueue, list_queue, load_queue, queue_progress, read_events, recover_stale, reopen_cancelled, replace_job, request_cancel, request_worker_cancel, retry_failed, run_job, sync_to_project
+from peabox_voice_studio.facades.batch import add_job, build_manifest, create_job, delete_job, duplicate_job, daemon_command, daemon_status, enqueue, list_queue, load_queue, queue_progress, read_events, recover_stale, reopen_cancelled, replace_job, request_cancel, request_worker_cancel, retry_failed, run_job, sync_to_project
 import json
 import streamlit as st
 from pathlib import Path
@@ -56,6 +56,16 @@ def render(ctx: AppContext) -> None:
                 add_job(project, duplicate_job(selected_job)); save_project(project); st.rerun()
             if delete_clicked:
                 delete_job(project, selected_job["id"]); save_project(project); st.rerun()
+            daemon = daemon_status()
+            st.subheader("Managed local worker")
+            d1,d2,d3,d4,d5 = st.columns(5)
+            d1.metric("Daemon", "Stale" if daemon.get("stale") else daemon.get("mode", "stopped").title())
+            if d2.button("Pause daemon", disabled=not daemon.get("active") or daemon.get("mode")=="paused"): daemon_command("paused"); st.rerun()
+            if d3.button("Resume daemon", disabled=not daemon.get("active") or daemon.get("mode")=="running"): daemon_command("running"); st.rerun()
+            if d4.button("Drain daemon", disabled=not daemon.get("active")): daemon_command("draining"); st.rerun()
+            if d5.button("Shutdown daemon", disabled=not daemon.get("active")): daemon_command("shutdown"); st.rerun()
+            st.caption(f"Worker ID: {daemon.get('worker_id') or 'None'} · Processed: {daemon.get('processed',0)} · Last heartbeat: {daemon.get('heartbeat_at') or 'None'}")
+            st.code("python worker_local.py --daemon", language="bash")
             st.subheader("Local worker queue")
             eligible = all(item.get("provider") == "Kokoro local" for item in selected_job.get("items", []) if item.get("status") == "queued")
             worker_cols = st.columns(4)
