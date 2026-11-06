@@ -1,3 +1,11 @@
+# v0.10.8 Help Update
+
+- **Circuit open:** wait for the recovery duration before the half-open probe.
+- **Timeout:** increase the runtime probe timeout only after checking backend health.
+- **Retries exhausted:** inspect the last error and backend audit.
+- **Memory backend:** non-persistent validation only.
+- **Remote backend:** not configured in this release.
+
 # v0.10.7 Help Update
 
 - **Memory backend:** temporary validation only; never treat it as durable storage.

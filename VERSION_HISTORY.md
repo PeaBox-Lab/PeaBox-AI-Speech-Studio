@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.8
+Added backend retries, timeouts, circuit breaking, cooldown recovery, runtime metrics, health reports, Operations Center probes, and 218-test validation.
+
+# Version History
+
 ## v0.10.7
 Added a formal pluggable storage contract, durable local adapter, in-memory backend, registry, cross-backend migrations, contract validation, and 205-test verification.
 

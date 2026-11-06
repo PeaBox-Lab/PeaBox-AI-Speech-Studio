@@ -1,3 +1,30 @@
+# v0.10.8 Additions and Improvements
+
+## Retry
+- Bounded attempts
+- Retryable exception policy
+- Initial delay and backoff
+- Retry metrics
+
+## Timeout
+- Per-operation timeout
+- Dedicated timeout error
+- Timeout metrics
+
+## Circuit breaker
+- Closed/open/half-open states
+- Failure threshold
+- Cooldown
+- Single probe
+- Automatic reset on success
+
+## Observability
+- Call and success counts
+- Failure and retry counts
+- Average latency
+- Last operation and error
+- Health reports
+
 # v0.10.7 Additions and Improvements
 
 ## Backend contract

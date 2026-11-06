@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.8 Release Notes
+
+v0.10.8 adds the resilience contract required before future remote storage can be considered. Any storage backend can now be wrapped with retries, operation timeouts, circuit breaking, health probes, and operational metrics without changing its object semantics.
+
 # PeaBox Voice Studio v0.10.7 Release Notes
 
 v0.10.7 formalizes the object-storage layer behind a pluggable backend contract. The current local backend remains authoritative, while a non-persistent in-memory backend verifies behavioral parity and cross-backend migration without introducing remote credentials.

@@ -1,3 +1,29 @@
+# PeaBox Voice Studio v0.10.8 Detailed Release Notes
+
+## Retry policy
+Retries are limited to configured attempts and retryable exception classes. Delay begins at the configured value and grows by the backoff multiplier. Non-retryable errors stop immediately. Attempts and retries are counted separately.
+
+## Timeouts
+Each backend call runs through a bounded execution future. Operations exceeding the configured duration raise a backend timeout and increment timeout metrics. The wrapper does not reinterpret object results.
+
+## Circuit breaker
+The circuit begins closed. Consecutive terminal failures increment the failure count and open the circuit at the threshold. Open circuits reject calls until cooldown. After cooldown, one half-open probe is allowed. Success closes and resets the circuit; failure reopens it.
+
+## Metrics
+The wrapper records calls, successes, terminal failures, retries, timeouts, total duration, average milliseconds, last operation, and last error type. Metrics are runtime operational evidence and contain no object content.
+
+## Health
+Health runs the backend audit through the same resilience wrapper and reports backend name, healthy state, audit result, circuit snapshot, and metrics. Failures are reported without exposing object data.
+
+## Operations interface
+The Resilience tab configures runtime retry attempts, delay, timeout, failure threshold, and cooldown, then probes local and memory backends. Results show health, circuit, calls, retries, timeouts, and last error.
+
+## Boundary
+Policies are runtime-only in this release. No remote backend, endpoint, credential, or durable resilience profile is configured.
+
+## Verification
+218 tests cover retry success, delays, non-retryable errors, exhaustion, open rejection, half-open recovery, one-probe protection, reopen on failure, timeouts, metrics, health, combined reports, policy normalization, and UI controls.
+
 # PeaBox Voice Studio v0.10.7 Detailed Release Notes
 
 ## Backend contract

@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.8 — Backend Resilience
+- Added retry policy with bounded attempts and exponential backoff.
+- Added per-operation timeout enforcement.
+- Added circuit breaker with closed, open, and half-open states.
+- Added cooldown recovery and one-probe half-open protection.
+- Added backend operation metrics and health reports.
+- Added runtime resilience controls to Operations Center.
+- Kept policies runtime-only and remote credentials unconfigured.
+- Validation: 218 tests passed.
+
+# Changelog
+
 ## v0.10.7 — Pluggable Storage Backends
 - Added formal storage backend abstract contract.
 - Added local backend adapter over v0.10.6 object storage.

@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.10.8
+- Backend health contract
+- Bounded retries and backoff
+- Operation timeouts
+- Circuit breaker and cooldown
+- Runtime metrics and health reports
+- Operations Center resilience probes
+
+## Recommended next release
+- Cloud-provider sandbox integration tests
+- Browser-driven screenshot regression suite
+- Durable resilience profiles with review controls
+- Optional remote backend with explicit credentials, approval, and rollback
+
+# Roadmap
+
 ## Delivered in v0.10.7
 - Formal storage backend contract
 - Local backend adapter

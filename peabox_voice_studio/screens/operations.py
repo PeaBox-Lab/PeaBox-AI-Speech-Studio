@@ -5,6 +5,7 @@ from peabox_voice_studio.facades.governance import portfolio_governance
 from peabox_voice_studio.services.object_storage import audit_manifest, copy_object, delete_object, list_objects, move_object, rebuild_manifest
 from peabox_voice_studio.services.maintenance import apply_retention,complete,create,load,retention_preview,save,status
 from peabox_voice_studio.services.recovery import backup_database,inventory,snapshot,validate_database
+from peabox_voice_studio.services.backend_resilience import CircuitBreaker, ResilientBackend, RetryPolicy, resilience_report
 from peabox_voice_studio.services.storage_backends import MemoryBackend, contract_report, migration_preview as backend_migration_preview, migrate as migrate_backend, registry as backend_registry
 from peabox_voice_studio.services.storage_policy import active_reservations,load_policy,policy_status,release_reservation,reserve,save_policy
 from peabox_voice_studio.ui import empty_state,kpi_card,section
@@ -16,7 +17,7 @@ def render(ctx:AppContext)->None:
  with cols[2]:kpi_card('Pending approvals',str(sum(x['pending_approvals'] for x in rows)),'Awaiting decisions')
  with cols[3]:kpi_card('Unassigned',str(sum(x['owner']=='Unassigned' for x in rows)),'Projects without owner')
  with cols[4]:kpi_card('Storage',f'{len(files)} files',f"{sum(x['bytes'] for x in files)/1048576:.1f} MB")
- tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects','Backends'])
+ tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects','Backends','Resilience'])
  with tabs[0]:
   if rows:st.dataframe(rows,use_container_width=True,hide_index=True)
   else:empty_state('No projects','Create a project to begin portfolio monitoring.','Open Project Workspace','Projects')
@@ -41,6 +42,8 @@ def render(ctx:AppContext)->None:
   _render_object_storage_tab()
  with tabs[5]:
   _render_storage_backends_tab()
+ with tabs[6]:
+  _render_backend_resilience_tab()
 
 # Capacity policy is rendered as the fourth Operations tab.
 def _render_capacity_tab():
@@ -102,3 +105,13 @@ def _render_storage_backends_tab():
  if st.button('Validate backend migration',disabled=not confirm):
   result=migrate_backend(preview,local,memory);st.write({'Migrated':result['files'],'Failed':len(result['failed']),'Memory audit healthy':memory.audit()['healthy']})
  st.info('Backend selection is not persisted. Remote backends require a future explicit credential and approval workflow.')
+
+def _render_backend_resilience_tab():
+ st.caption('Resilience controls wrap a backend at runtime. They do not change stored objects or persist remote credentials.')
+ attempts=st.slider('Retry attempts',1,5,3);delay=st.number_input('Initial retry delay seconds',min_value=0.0,max_value=10.0,value=0.05,step=0.05);timeout=st.number_input('Operation timeout seconds',min_value=0.1,max_value=60.0,value=5.0,step=0.5);threshold=st.slider('Circuit failure threshold',1,10,3);cooldown=st.number_input('Circuit recovery seconds',min_value=1,max_value=3600,value=30)
+ local=ResilientBackend(backend_registry.create('local'),RetryPolicy(attempts,delay,2.0),CircuitBreaker(threshold,cooldown),timeout);memory=ResilientBackend(MemoryBackend(),RetryPolicy(attempts,delay,2.0),CircuitBreaker(threshold,cooldown),timeout)
+ if st.button('Run backend health probes'):
+  st.session_state['backend_resilience_report']=resilience_report([local,memory])
+ report=st.session_state.get('backend_resilience_report')
+ if report:st.dataframe([{'Backend':x['backend'],'Healthy':x['healthy'],'Circuit':x.get('circuit',{}).get('state','n/a'),'Calls':x.get('metrics',{}).get('calls',0),'Retries':x.get('metrics',{}).get('retries',0),'Timeouts':x.get('metrics',{}).get('timeouts',0),'Last error':x.get('metrics',{}).get('last_error','')} for x in report],use_container_width=True,hide_index=True)
+ st.info('The local backend is fast and durable. These policies establish the contract required before any future remote backend is approved.')

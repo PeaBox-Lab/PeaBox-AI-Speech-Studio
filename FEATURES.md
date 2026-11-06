@@ -1,3 +1,8 @@
+# v0.10.8 Feature Additions
+
+## Backend Resilience
+Wrap any storage backend with bounded retries, timeouts, circuit protection, health probes, and operational metrics before using it in production workflows.
+
 # v0.10.7 Feature Additions
 
 ## Pluggable Storage Backends

@@ -1,3 +1,7 @@
+# v0.10.8 User Guide Update
+
+Open **Portfolio Operations → Resilience**. Configure retry attempts, delay, timeout, failure threshold, and recovery duration, then select **Run backend health probes**. These settings apply only to the current probe and are not saved.
+
 # v0.10.7 User Guide Update
 
 Open **Portfolio Operations → Backends** to view registered backends and contract status. You can preview local objects by namespace and run a confirmed migration validation into temporary memory. The memory backend is erased when the application reruns or exits and is not a backup.
