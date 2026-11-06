@@ -37,7 +37,7 @@ PAGE_META = {
     "Projects": ("Project Workspace", "Create, open, import, export, and maintain portable production projects.", "Overview"),
     "Command Center": ("Workspace Command Center", "Search screens, discover project-aware actions, and reopen recent commands.", "Overview"),
     "Preferences": ("Interface Preferences", "Personalize navigation density, startup area, motion, and dashboard detail on this device.", "Overview"),
-    "Operations": ("Operations Center", "Monitor project health, repository integrity, maintenance plans, and operational events.", "Overview"),
+    "Operations": ("Operations Center", "Review project health, repairs, and repository integrity.", "Overview"),
     "Script Blocks": ("Script Editor", "Structure the master script into reusable, provider-aware production blocks.", "Production"),
     "Create Speech": ("Speech Generator", "Generate and review individual local voice outputs.", "Production"),
     "Batch Production": ("Batch Jobs", "Validate, queue, resume, retry, cancel, and package multi-provider production jobs.", "Production"),

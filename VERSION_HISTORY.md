@@ -1,12 +1,7 @@
 # Version History
 
-## v0.09.2
-Replaced the shared wildcard screen dependency layer with minimal explicit imports, added import budgets and module-isolation rules, and expanded cumulative validation to 170 tests.
-
-# Version History
-
-## v0.09.1
-Completed registry-driven modularization for all 19 navigation pages, reduced the bootstrap to initialization and dispatch, expanded the application context, restored operations and recovery workflows, and added 165-test validation.
+## v0.09.3
+Introduced bounded service facades for Timeline Studio, Batch Production, and Transcription Studio, with enforced isolation and behavioral parity validation across 145 tests.
 
 # Cumulative Version History
 - **v0.02.01** — Modular project workspace foundation

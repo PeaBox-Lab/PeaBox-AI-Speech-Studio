@@ -1,24 +1,13 @@
 # Changelog
 
-## v0.09.2 — Explicit Screen Dependencies
-- Removed `screens/dependencies.py` and all wildcard imports.
-- Generated minimal explicit imports for every screen based on its actual symbol usage.
-- Enforced isolation from the application bootstrap and peer screen modules.
-- Added a maximum dependency budget of 25 imported names per screen.
-- Added tests for wildcard absence, dependency-module removal, peer isolation, unused imports, and import budgets.
-- Preserved the 19-screen registry, 31-line bootstrap, Operations Center, and all cumulative workflows.
-- Validation: 170 tests passed.
-
-# Changelog
-
-## v0.09.1 — Full Screen Modularization
-- Moved every navigation page into `peabox_voice_studio/screens/`.
-- Reduced `app.py` to initialization, context construction, navigation, and registry dispatch.
-- Expanded `AppContext` for provider profiles, voice catalogs, projects, preferences, and project lifecycle callbacks.
-- Added an Operations Center for health, safe repairs, repository rebuilds, maintenance plans, and event evidence.
-- Integrated project save/delete activity with the rebuildable metadata index and operations log.
-- Added registry uniqueness, complete navigation coverage, bootstrap-size, module-boundary, smoke, repository, repair, maintenance, and event tests.
-- Validation: 165 tests passed.
+## v0.09.3 — Production Service Facades
+- Added `facades.timeline`, `facades.batch`, and `facades.transcription`.
+- Routed the three largest production workflows through bounded APIs.
+- Blocked direct imports of hidden timeline, bundle, batch, job, transcript, and readiness services from their screens.
+- Added explicit facade export contracts and behavioral parity tests.
+- Kept facades independent of Streamlit and peer screens.
+- Preserved the registry-driven interface and cumulative Operations Center.
+- Validation: 145 tests passed.
 
 # Changelog
 ## v0.07.4 — 2026-11-05

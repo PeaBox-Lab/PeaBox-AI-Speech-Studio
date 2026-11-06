@@ -1,14 +1,6 @@
-# v0.09.2 User Guide Update
+# v0.09.3 User Guide Update
 
-The interface and workflows are unchanged in this architecture-focused release. Project Workspace, Script Editor, speech generation, batch production, Timeline Studio, transcription, governance, approvals, Operations Center, and support screens remain in their existing navigation locations.
-
-# v0.09.1 User Guide Update
-
-## Operations Center
-Open **Overview → Operations Center** to inspect project health, rebuild the metadata index, complete local maintenance plans, and review events. Repairs always appear as a preview and require explicit confirmation.
-
-## Navigation behavior
-All screens retain their existing names and workflows. The modular architecture changes internal ownership without changing project files or expected user actions.
+This architecture release does not change user actions. Timeline Studio, Batch Jobs, and Transcription Studio remain in the same navigation locations and retain their existing controls, saved data, exports, and recovery behavior.
 
 # User Guide
 ## Preserve output history

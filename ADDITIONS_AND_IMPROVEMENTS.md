@@ -1,43 +1,20 @@
-# v0.09.2 Additions and Improvements
+# v0.09.3 Additions and Improvements
 
-## Screen ownership
-- Explicit imports for all 19 screen modules
-- Removed broad wildcard dependency sharing
-- No screen-to-screen implementation dependencies
-- No screen dependency on the application bootstrap
+## New workflow APIs
+- Timeline workflow facade
+- Batch job workflow facade
+- Transcription workflow facade
 
 ## Architecture controls
-- 25-name maximum import budget per screen
-- Automated unused-import detection
-- Automated wildcard-import rejection
-- Automated peer-screen isolation checks
+- Direct hidden-service imports blocked in facaded screens
+- Explicit and unique facade export lists
+- Streamlit-free facade modules
+- Behavioral parity validation
 
-## Validation
-- 170 passing automated tests
-- Complete compilation and archive-integrity verification
-
-# v0.09.1 Additions and Improvements
-
-## Architecture
-- Dedicated module for every navigation page
-- 31-line application bootstrap
-- Expanded shared application context
-- Single complete screen registry
-- Enforced one-page/one-renderer mapping
-
-## Operations
-- Project health summary and issue details
-- Preview-only safe repair plans
-- Explicit repair confirmation
-- Rebuildable project metadata index
-- Local maintenance plans and completion evidence
-- Structured operations event viewer
-
-## Quality
-- Full page smoke coverage
-- Module-boundary checks
-- Repository and operations service tests
-- 165 passing automated tests
+## Compatibility
+- No project migration required
+- No navigation or workflow changes
+- Cumulative Operations Center retained
 
 # v0.07.4 Additions and Improvements
 ## Integrity

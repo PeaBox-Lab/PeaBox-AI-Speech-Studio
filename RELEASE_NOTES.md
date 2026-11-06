@@ -1,10 +1,6 @@
-# PeaBox Voice Studio v0.09.2 Release Notes
+# PeaBox Voice Studio v0.09.3 Release Notes
 
-v0.09.2 hardens the full-screen modular architecture by replacing the broad shared dependency surface with explicit imports in every screen. Each screen now declares exactly which services, models, constants, and UI helpers it owns, making changes easier to review and preventing accidental cross-feature coupling.
-
-# PeaBox Voice Studio v0.09.1 Release Notes
-
-v0.09.1 completes the screen-architecture transition begun in v0.09.0. Every navigation destination now has an independent renderer module, while the main application only initializes shared state and dispatches the selected screen. This lowers regression risk, makes page ownership explicit, and creates a stable base for browser tests and future provider integrations.
+v0.09.3 introduces bounded workflow APIs for Timeline Studio, Batch Production, and Transcription Studio. These complex screens now depend on stable facade modules rather than the implementation details of multiple underlying services, improving maintainability without changing user workflows or project formats.
 
 # PeaBox Voice Studio v0.07.4 Release Notes
 This release implements the highest-priority findings from the v0.07.3 audit. Generated outputs no longer silently replace files with the same name. Timeline readiness now checks the stored audio content hash, not only file existence and script-block state.

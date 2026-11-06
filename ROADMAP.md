@@ -1,34 +1,18 @@
 # Roadmap
 
-## Delivered in v0.09.2
-- Explicit dependencies for every screen
-- Removal of the shared wildcard dependency layer
-- Screen-to-screen isolation
-- Per-screen dependency budgets
-- Unused-import and wildcard-import quality gates
+## Delivered in v0.09.3
+- Timeline workflow facade
+- Batch production workflow facade
+- Transcription workflow facade
+- Hidden-service import enforcement
+- Facade behavioral parity tests
 
 ## Recommended next release
-- Screen-specific service facades for the largest production screens
+- Backup, restore, storage inventory, and support-bundle consolidation
 - Historical project migration fixture matrix
-- Backup, restore, storage inventory, and support-bundle UI consolidation
 - Browser-driven navigation and visual regression suite
 - Cloud-provider sandbox integration tests
-
-# Roadmap
-
-## Delivered in v0.09.1
-- Dedicated module for all 19 navigation pages
-- Complete registry dispatch
-- Expanded application context
-- Operations and repository recovery foundation
-- Page smoke and module-boundary test coverage
-
-## Recommended next release
-- Browser-driven navigation and visual regression suite
-- Screen-specific service facades to replace the shared dependency surface
-- Historical project migration fixture matrix
-- Cloud-provider sandbox integration tests
-- Backup, restore, storage inventory, and support-bundle UI consolidation
+- Additional facades for governance and project portfolio workflows
 
 # Evidence-Based Product Roadmap
 ## Roadmap basis

@@ -1,27 +1,27 @@
-# PeaBox Voice Studio v0.09.2
-A local-first corporate voice-production workspace with a fully modular interface, explicit screen dependencies, project operations, governance, local and cloud speech generation, transcription, audio quality workflows, resumable jobs, and portable timelines.
+# PeaBox Voice Studio v0.09.3
+A local-first corporate voice-production workspace with registry-driven screens, bounded production workflow APIs, project operations, governance, multi-provider speech generation, transcription, audio quality tools, resumable jobs, and portable timelines.
 
-## v0.09.2 Explicit Screen Dependencies
-- Removed the shared wildcard dependency module
-- Each of the 19 screen modules imports only the services and UI components it uses
-- Screen-to-screen and screen-to-application imports are prohibited
-- Per-screen dependency budget is capped at 25 imported names
-- Unused imports and wildcard imports fail automated validation
-- The 31-line bootstrap and complete registry dispatch remain unchanged
-- All cumulative operations, governance, production, audio, and transcription workflows remain available
+## v0.09.3 Production Service Facades
+- Added bounded workflow facades for Timeline, Batch Production, and Transcription
+- Complex screens no longer import their underlying service modules directly
+- Facade exports are explicit, unique, callable, and parity-tested against the real services
+- Facades contain no Streamlit dependency and remain reusable outside the UI
+- Screen-to-service boundary violations fail automated tests
+- All 19 navigation pages remain registry-driven
+- Operations Center health, repair, and repository workflows remain cumulative
 
 ## Validation
-- 170 automated tests passed
-- All 19 screens smoke-render without an active project
-- Every imported screen dependency is verified as used
+- 145 automated tests passed
 - All Python sources compile successfully
-- Archive entries are verified byte-for-byte against the source tree
+- All 19 navigation pages smoke-render without an active project
+- Facade isolation and behavioral parity are verified
+- Archive contents are checked byte-for-byte against the source tree
 
 ## Windows setup
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the launcher and sidebar display v0.09.2.
+4. Confirm the launcher and sidebar display v0.09.3.
 5. Keep the `data`, `outputs`, and `models` folders writable.
 ## Validation
 ```bash

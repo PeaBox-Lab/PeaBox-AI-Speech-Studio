@@ -1,18 +1,7 @@
-# v0.09.2 Feature Additions
+# v0.09.3 Feature Additions
 
-## Explicit screen ownership
-Each screen declares only the shared services and interface components it requires. This reduces accidental coupling and makes screen-level maintenance and testing more predictable.
-
-## Dependency quality gates
-The test suite rejects wildcard imports, unused imports, peer-screen imports, application-bootstrap imports, and dependency budgets above 25 names.
-
-# v0.09.1 Feature Additions
-
-## Fully modular workspace
-Every workspace destination is isolated in its own screen module and resolved through one central registry.
-
-## Operations Center
-Review project health, preview and confirm safe repairs, rebuild the secondary project index, manage local maintenance plans, and inspect operational events.
+## Stable production workflow APIs
+Timeline, batch jobs, and transcription now expose cohesive public workflow surfaces to the interface. This hides implementation detail and creates reusable boundaries for future browser, CLI, or automation clients.
 
 # Features Guide
 ## Workspace productivity

@@ -1,14 +1,6 @@
-# v0.09.2 Help Update
+# v0.09.3 Help Update
 
-No project migration or user action is required for v0.09.2. Existing project JSON files, timeline bundles, transcript sessions, batch jobs, governance records, and local preferences remain compatible.
-
-# v0.09.1 Help Update
-
-## Repository recovery
-The SQLite project list is secondary. If it is missing or inconsistent, use **Operations Center → Repository → Rebuild project index**. The rebuild reads project JSON and does not replace it.
-
-## Project repairs
-Health repairs affect only explicitly previewed metadata problems. Missing audio cannot be recreated automatically; relink those assets in Timeline Studio.
+No project conversion is required. Existing project JSON, timeline bundles, batch jobs, transcript sessions, governance records, and preferences remain compatible with v0.09.3.
 
 # Help Articles
 ## A timeline clip says the audio changed
