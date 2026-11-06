@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.6 — Local Object Storage Layer
+- Added safe logical object keys and six local namespaces.
+- Added atomic put, verified import, get, copy, move, delete, register, and unregister operations.
+- Added durable object metadata manifest.
+- Added manifest rebuild and hash/size/missing audit.
+- Added migration preview and verified application from legacy directories.
+- Added guarded Objects tab to Operations Center.
+- Reused existing quota enforcement for object writes.
+- Validation: 191 tests passed.
+
+# Changelog
+
 ## v0.10.5 — Storage Quotas & Capacity Policies
 - Added local quota categories for outputs, models, recovery, and worker state.
 - Added configurable limits and warning threshold.

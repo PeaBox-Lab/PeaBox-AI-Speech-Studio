@@ -1,3 +1,11 @@
+# v0.10.6 Help Update
+
+- **Invalid object key:** use letters, numbers, underscores, periods, and hyphens in relative path segments.
+- **Manifest issue:** rebuild the manifest, then audit again.
+- **Hash changed:** the file changed outside the object API; inspect before rebuilding.
+- **Object exists:** choose a new key or deliberately use an overwrite-capable API.
+- **Remote storage:** not configured in this release; all namespaces remain local.
+
 # v0.10.5 Help Update
 
 - **Quota exceeded:** free managed storage or increase the category limit.

@@ -1,3 +1,8 @@
+# v0.10.6 Feature Additions
+
+## Local Object Storage
+Address managed files through stable logical keys, audit them against a metadata manifest, perform verified object operations, and migrate existing local directories through preview-first workflows.
+
 # v0.10.5 Feature Additions
 
 ## Storage Capacity Policies

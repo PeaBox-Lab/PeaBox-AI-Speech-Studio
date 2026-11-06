@@ -1,3 +1,26 @@
+# PeaBox Voice Studio v0.10.6 Detailed Release Notes
+
+## Logical keys and namespaces
+Objects use `<namespace>:<key>` identities. Keys are normalized POSIX-style relative paths and reject empty segments, traversal, absolute paths, spaces, and unsupported characters. Namespaces map to the existing outputs, models, backups, quarantine, support, and worker directories.
+
+## Object operations
+The local backend supports atomic byte writes, verified file imports, reads, copies, moves, and permanent deletion. Imports copy to a temporary target, compare SHA-256 when verification is enabled, atomically replace the target, and remove the source only after successful verification when move mode is requested.
+
+## Metadata manifest
+Registered objects store identity, namespace, key, filename, bytes, SHA-256, detected content type, and timestamps. The manifest is atomically updated under a local lock. Rebuild scans managed namespaces; audit detects missing objects, size changes, and hash changes.
+
+## Migration
+A migration preview lists source path, target namespace/key, file count, and bytes without mutation. Application imports every item through the verified object API and reports completed and failed items.
+
+## Operations interface
+The Objects tab can rebuild or audit the manifest, filter and browse registered objects, copy objects, move them after explicit confirmation, or permanently delete them after separate confirmation.
+
+## Boundary
+This release provides a local abstraction only. It does not configure remote object storage or persist cloud credentials. Existing directory layout and quotas remain intact.
+
+## Verification
+191 tests cover key validation, traversal rejection, namespace safety, atomic put/get, duplicate handling, verified import, move semantics, copy/move/delete, rebuild, audit drift, missing objects, migrations, and UI safeguards.
+
 # PeaBox Voice Studio v0.10.5 Detailed Release Notes
 
 ## Managed categories

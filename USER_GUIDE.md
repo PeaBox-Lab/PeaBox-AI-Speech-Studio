@@ -1,3 +1,7 @@
+# v0.10.6 User Guide Update
+
+Open **Portfolio Operations → Objects**. Select **Rebuild object manifest** to register existing managed files, then audit or browse them. Copy creates a verified second object. Move requires confirmation and removes the source only after the copy verifies. Delete is permanent and requires a separate confirmation.
+
 # v0.10.5 User Guide Update
 
 Open **Portfolio Operations → Capacity** to configure quotas. Set category limits in MB and a warning threshold, then save. The table shows current use and reservations. Use reservations before a planned large local operation, and release them when cancelled or complete.

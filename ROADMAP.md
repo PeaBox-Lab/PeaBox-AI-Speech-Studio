@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.10.6
+- Local object-storage abstraction
+- Safe logical keys and namespaces
+- Verified object operations
+- Durable manifest and integrity audit
+- Legacy-directory migration previews
+- Operations Center object controls
+
+## Recommended next release
+- Pluggable backend contract and in-memory test backend
+- Cloud-provider sandbox integration tests
+- Browser-driven screenshot regression suite
+- Optional remote object backend with explicit credentials and migration approval
+
+# Roadmap
+
 ## Delivered in v0.10.5
 - Local storage quota categories
 - Warning and hard-limit policies

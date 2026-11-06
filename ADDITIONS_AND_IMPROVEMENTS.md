@@ -1,3 +1,23 @@
+# v0.10.6 Additions and Improvements
+
+## Object API
+- Safe logical keys
+- Six managed namespaces
+- Put, get, import, copy, move, and delete
+- Register and unregister
+
+## Integrity
+- SHA-256 verification
+- Durable metadata manifest
+- Rebuild from local storage
+- Missing, size, and hash drift audit
+
+## Migration
+- Read-only preview
+- File and byte totals
+- Verified copy or move application
+- Per-item failure reporting
+
 # v0.10.5 Additions and Improvements
 
 ## Quota categories

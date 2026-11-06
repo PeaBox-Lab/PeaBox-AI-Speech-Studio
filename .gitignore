@@ -23,3 +23,6 @@ data/worker/
 data/storage_policy.json
 data/storage_reservations.json
 data/storage_policy.lock
+
+data/object_manifest.json
+data/object_storage.lock

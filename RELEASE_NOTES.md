@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.6 Release Notes
+
+v0.10.6 delivers the roadmap’s object-storage abstraction milestone as a local backend. Managed files can now be addressed by safe namespace/key pairs, indexed in a durable manifest, audited for drift, and migrated without exposing absolute paths to higher-level workflows.
+
 # PeaBox Voice Studio v0.10.5 Release Notes
 
 v0.10.5 delivers the roadmap’s local storage quota milestone. The application can warn before capacity pressure, block managed writes before they exceed configured limits, and reserve capacity for concurrent planned operations without restricting authoritative project JSON.

@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.6
+Added a local object-storage abstraction with safe keys, namespaces, quota-aware writes, verified operations, durable manifests, integrity audits, migrations, and 191-test validation.
+
+# Version History
+
 ## v0.10.5
 Added configurable local storage quotas, capacity warnings, managed-write enforcement, concurrent reservations, Operations Center capacity controls, and 178-test validation.
 

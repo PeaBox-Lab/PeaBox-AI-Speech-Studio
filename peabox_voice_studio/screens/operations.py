@@ -2,6 +2,7 @@ import streamlit as st
 from peabox_voice_studio.config import DATABASE_PATH
 from peabox_voice_studio.context import AppContext
 from peabox_voice_studio.facades.governance import portfolio_governance
+from peabox_voice_studio.services.object_storage import audit_manifest, copy_object, delete_object, list_objects, move_object, rebuild_manifest
 from peabox_voice_studio.services.maintenance import apply_retention,complete,create,load,retention_preview,save,status
 from peabox_voice_studio.services.recovery import backup_database,inventory,snapshot,validate_database
 from peabox_voice_studio.services.storage_policy import active_reservations,load_policy,policy_status,release_reservation,reserve,save_policy
@@ -14,7 +15,7 @@ def render(ctx:AppContext)->None:
  with cols[2]:kpi_card('Pending approvals',str(sum(x['pending_approvals'] for x in rows)),'Awaiting decisions')
  with cols[3]:kpi_card('Unassigned',str(sum(x['owner']=='Unassigned' for x in rows)),'Projects without owner')
  with cols[4]:kpi_card('Storage',f'{len(files)} files',f"{sum(x['bytes'] for x in files)/1048576:.1f} MB")
- tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity'])
+ tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects'])
  with tabs[0]:
   if rows:st.dataframe(rows,use_container_width=True,hide_index=True)
   else:empty_state('No projects','Create a project to begin portfolio monitoring.','Open Project Workspace','Projects')
@@ -35,6 +36,8 @@ def render(ctx:AppContext)->None:
   if st.button('Apply retention preview',disabled=not confirm):apply_retention(preview);st.rerun()
  with tabs[3]:
   _render_capacity_tab()
+ with tabs[4]:
+  _render_object_storage_tab()
 
 # Capacity policy is rendered as the fourth Operations tab.
 def _render_capacity_tab():
@@ -53,3 +56,34 @@ def _render_capacity_tab():
  if st.button('Create capacity reservation'):
   try:reserve(category,int(amount)*1048576,purpose);st.success('Capacity reserved. Release it when the planned operation is cancelled or complete.');st.rerun()
   except OSError as exc:st.error(str(exc))
+
+def _render_object_storage_tab():
+ st.caption('Logical object keys map to the existing local managed directories. No remote storage is configured in this release.')
+ o1,o2=st.columns(2)
+ if o1.button('Rebuild object manifest'):rebuild_manifest();st.rerun()
+ audit=audit_manifest()
+ if o2.button('Audit object manifest'):st.session_state['object_audit']=audit
+ st.write({'Registered objects':audit['objects'],'Healthy':audit['healthy'],'Issues':len(audit['issues'])})
+ if audit['issues']:st.dataframe(audit['issues'],use_container_width=True,hide_index=True)
+ objects=list_objects()
+ if objects:
+  namespace=st.selectbox('Object namespace',['All','outputs','models','backups','quarantine','support','worker'])
+  visible=objects if namespace=='All' else [x for x in objects if x['namespace']==namespace]
+  st.dataframe(visible,use_container_width=True,hide_index=True)
+  selected=st.selectbox('Selected object',visible,format_func=lambda x:f"{x['namespace']}:{x['key']} · {x['bytes']/1048576:.2f} MB") if visible else None
+  if selected:
+   target_namespace=st.selectbox('Target namespace',['outputs','models','backups','quarantine','support','worker'],index=['outputs','models','backups','quarantine','support','worker'].index(selected['namespace']))
+   target_key=st.text_input('Target object key',value=selected['key'])
+   c1,c2,c3=st.columns(3)
+   if c1.button('Copy object'):
+    try:copy_object(selected['namespace'],selected['key'],target_namespace,target_key);st.rerun()
+    except Exception as exc:st.error(str(exc))
+   move_confirm=st.checkbox('Move removes the source after verified copy')
+   if c2.button('Move object',disabled=not move_confirm):
+    try:move_object(selected['namespace'],selected['key'],target_namespace,target_key);st.rerun()
+    except Exception as exc:st.error(str(exc))
+   delete_confirm=st.checkbox('Permanently delete selected object')
+   if c3.button('Delete object',disabled=not delete_confirm):
+    try:delete_object(selected['namespace'],selected['key']);st.rerun()
+    except Exception as exc:st.error(str(exc))
+ else:st.info('Rebuild the manifest to register existing managed files.')
