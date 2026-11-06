@@ -1,3 +1,10 @@
+# v0.10.0 Help Update
+
+- **Quarantine is not deletion:** files can be restored unless their quarantine copy is manually removed.
+- **SQLite is secondary:** database backup and restore affects the project index, not authoritative project JSON.
+- **Snapshots exclude media:** use timeline bundles for projects that must travel with WAV assets.
+- **Support bundles are sanitized:** review the included JSON before sharing if your organization requires additional controls.
+
 # v0.09.4 Help Update
 
 If upgrading from v0.09.2 or v0.09.3, replace the extracted application folder with v0.09.4. Existing project JSON, timeline bundles, transcript sessions, batch jobs, and preferences remain compatible. The release specifically resolves blank-looking Quick Access controls and navigation exceptions.

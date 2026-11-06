@@ -1,3 +1,25 @@
+# v0.10.0 Additions and Improvements
+
+## Recovery
+- Reversible output quarantine
+- Collision-safe quarantine restore
+- SQLite backup and atomic restore
+- Automatic rollback copy before restore
+- Metadata-only project snapshots
+
+## Operations visibility
+- Storage inventory
+- Category file and size summaries
+- Orphan output detection
+- Database integrity status
+- Backup inventory
+
+## Support and compatibility
+- Sanitized support ZIP
+- Explicit exclusion disclosure
+- Historical migration fixture matrix
+- 167 passing tests
+
 # v0.09.4 Additions and Improvements
 
 ## Visual fixes

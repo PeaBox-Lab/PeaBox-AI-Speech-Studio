@@ -1,3 +1,17 @@
+# v0.10.0 User Guide Update
+
+## Storage
+Open **Overview → Operations Center → Storage** to review category totals and unreferenced outputs. Quarantine requires confirmation and can be reversed from the same tab.
+
+## Backups
+Use **Backups** to create a recovery point for the rebuildable SQLite index. A restore requires confirmation, validates the backup, and retains the previous index as a rollback copy.
+
+## Support
+Use **Support** to download a sanitized ZIP. It excludes credentials, project text, transcripts, audio content, and absolute user paths.
+
+## Project snapshots
+Download a metadata snapshot from **Project health**. It does not contain external audio; use a timeline bundle when media portability is required.
+
 # v0.09.4 User Guide Update
 
 Use Dashboard, Script, Generate, and Timeline under **Quick Access** as before. The controls now have readable labels. Dashboard and Command Center actions may briefly rerun the interface while applying the destination safely; this is expected.

@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.0 Release Notes
+
+v0.10.0 delivers the roadmap’s consolidated recovery milestone. Operations Center now provides storage inventory, reversible quarantine, repository backups and restores, project metadata snapshots, sanitized support evidence, and clear confirmation gates for every mutating recovery action.
+
 # PeaBox Voice Studio v0.09.4 Release Notes
 
 v0.09.4 fixes the screenshot-reported sidebar and navigation failures. Quick Access labels now remain readable against the dark corporate sidebar, programmatic navigation no longer mutates instantiated Streamlit widget keys, and Project Workspace uses the shared application context instead of an unavailable bootstrap helper.

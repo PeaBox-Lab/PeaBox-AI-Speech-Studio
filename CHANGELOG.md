@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.0 — Operations Recovery Toolkit
+- Added storage inventory and category summaries.
+- Added unreferenced output detection, reversible quarantine, and restore.
+- Added SQLite integrity validation, database backups, transactional restore, and rollback copies.
+- Added metadata-only project snapshots.
+- Added sanitized support bundles with explicit data exclusions.
+- Consolidated recovery workflows into Operations Center.
+- Added schema 1/schema 2/future-schema migration fixtures and path-rewrite tests.
+- Validation: 167 tests passed.
+
+# Changelog
+
 ## v0.09.4 — UI & Navigation Reliability
 - Fixed near-invisible labels on the four sidebar Quick Access buttons.
 - Added explicit high-contrast normal, hover, focus, and disabled button styling in the sidebar.

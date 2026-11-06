@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.0
+Introduced the consolidated Operations Recovery Toolkit: storage inventory, reversible quarantine, database backups and rollback-safe restores, metadata snapshots, sanitized support bundles, and historical migration fixtures.
+
+# Version History
+
 ## v0.09.4
 Fixed the four low-contrast sidebar Quick Access controls, eliminated Streamlit navigation-key mutation errors, repaired Project Workspace context resolution, and expanded cumulative validation to 151 tests.
 

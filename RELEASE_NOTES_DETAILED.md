@@ -1,3 +1,23 @@
+# PeaBox Voice Studio v0.10.0 Detailed Release Notes
+
+## Storage inventory and quarantine
+Operations Center summarizes files and bytes by category and detects generated output files that are not referenced by current project records. Selected output files can be moved into quarantine only after confirmation. Quarantine records include origin, reason, size, timestamp, and SHA-256. Restore is reversible and collision-safe.
+
+## Database backup and restore
+The secondary SQLite project index can be integrity-checked and backed up with SQLite’s backup mechanism. Restore validates the selected backup first, preserves the current database as a rollback copy, writes through a temporary file, and atomically replaces the index. Project JSON remains authoritative.
+
+## Metadata snapshots
+An active project can be downloaded as a metadata snapshot containing project JSON and a manifest with version, creation time, project identity, hash, and an explicit `includes_media: false` marker. Timeline bundles remain the media-inclusive portability format.
+
+## Sanitized support bundles
+Support bundles include diagnostics, repository status, aggregate storage evidence, file extensions and sizes, and minimal event identities. They exclude credentials, project text, transcript content, media content, and absolute user paths.
+
+## Migration matrix
+Fixtures now cover legacy schema migration, current schema stability, rejection of unsupported future schemas, nested job identity repair, removal of non-portable paths, and explicit asset-path preservation mode.
+
+## Verification
+167 tests cover cumulative functionality, quarantine safety, reversible restore, corrupt database rejection, rollback creation, support redaction, metadata snapshots, migration compatibility, and Operations Center confirmation controls.
+
 # PeaBox Voice Studio v0.09.4 Detailed Release Notes
 
 ## Sidebar contrast

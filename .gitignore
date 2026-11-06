@@ -11,3 +11,6 @@ outputs/*
 models/*.onnx
 models/*.bin
 models/*.sha256
+
+data/quarantine/
+data/support/

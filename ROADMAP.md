@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.10.0
+- Storage inventory and orphan detection
+- Reversible quarantine and restore
+- Database backup, validation, atomic restore, and rollback
+- Metadata-only project snapshots
+- Sanitized support bundles
+- Historical migration fixture matrix
+
+## Recommended next release
+- Browser-driven screenshot regression suite
+- Cloud-provider sandbox integration tests
+- Retention policies and maintenance-plan automation
+- Governance and project portfolio workflow facades
+
+# Roadmap
+
 ## Delivered in v0.09.4
 - Sidebar Quick Access contrast repair
 - Deferred Streamlit navigation lifecycle

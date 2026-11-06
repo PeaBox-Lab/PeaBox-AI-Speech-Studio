@@ -1,3 +1,8 @@
+# v0.10.0 Feature Additions
+
+## Operations Recovery Toolkit
+Review local storage, identify unreferenced generated files, quarantine and restore outputs safely, create database recovery points, restore validated backups, download project metadata snapshots, and generate sanitized support evidence from one Operations Center.
+
 # v0.09.4 Reliability Improvements
 
 ## Accessible quick navigation

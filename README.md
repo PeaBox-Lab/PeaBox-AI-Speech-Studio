@@ -1,26 +1,28 @@
-# PeaBox Voice Studio v0.09.4
-A local-first corporate voice-production workspace with modular screens, bounded workflow APIs, project operations, governance, multi-provider speech generation, transcription, audio quality tools, resumable jobs, and portable timelines.
+# PeaBox Voice Studio v0.10.0
+A local-first corporate voice-production workspace with modular screens, bounded workflow APIs, governance, multi-provider speech generation, transcription, audio quality tools, portable timelines, and an integrated operations recovery toolkit.
 
-## v0.09.4 UI & Navigation Reliability
-- Fixed four low-contrast Quick Access buttons in the sidebar
-- Added explicit readable styles for normal, hover, focus, and disabled sidebar button states
-- Replaced unsafe same-run navigation-key mutation with deferred navigation applied before widget creation
-- Fixed Project Workspace `current_project` NameError after modular extraction
-- Preserved all 19 registry-driven screens and three bounded production facades
-- Added screenshot-driven UI, navigation lifecycle, and modular dependency regression tests
+## v0.10.0 Operations Recovery Toolkit
+- Storage inventory and category-level capacity summaries
+- Unreferenced-output detection with reversible quarantine
+- Quarantine restore with collision-safe destination naming
+- SQLite integrity checks, local backups, transactional restore, and rollback preservation
+- Project metadata snapshots with explicit media exclusion
+- Sanitized support bundles excluding credentials, project text, transcripts, media, and absolute user paths
+- Historical project schema fixture matrix and nested-reference portability tests
+- Consolidated Operations Center tabs for health, repository, storage, backups, and support
 
 ## Validation
-- 151 automated tests passed
+- 167 automated tests passed
 - All Python sources compile successfully
-- Every navigation page smoke-renders without an active project
-- Project Workspace and programmatic navigation regressions are explicitly covered
-- Archive contents are verified byte-for-byte against the source tree
+- Recovery actions are confirmation-gated in the interface
+- Invalid database backups are rejected before mutation
+- All ZIP entries are verified byte-for-byte against the source tree
 
 ## Windows setup
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the launcher and sidebar display v0.09.4.
+4. Confirm the launcher and sidebar display v0.10.0.
 5. Keep the `data`, `outputs`, and `models` folders writable.
 ## Validation
 ```bash
