@@ -1,16 +1,10 @@
 import html
 import re
 from uuid import uuid4
-
 from peabox_voice_studio.models import Project, utc_now
-
 PAUSE_PATTERN = re.compile(r"\[\[pause:(\d+(?:\.\d+)?)\]\]", re.IGNORECASE)
-
-
 def list_pronunciations(project: Project) -> list[dict]:
     return project.settings.setdefault("pronunciation_dictionary", [])
-
-
 def add_pronunciation(project: Project, source: str, replacement: str, case_sensitive: bool = False, whole_word: bool = True) -> dict:
     source = source.strip()
     replacement = replacement.strip()
@@ -24,15 +18,11 @@ def add_pronunciation(project: Project, source: str, replacement: str, case_sens
     entries.insert(0, item)
     del entries[200:]
     return item
-
-
 def delete_pronunciation(project: Project, item_id: str) -> bool:
     entries = list_pronunciations(project)
     before = len(entries)
     project.settings["pronunciation_dictionary"] = [item for item in entries if item.get("id") != item_id]
     return len(project.settings["pronunciation_dictionary"]) < before
-
-
 def apply_pronunciations(text: str, entries: list[dict]) -> str:
     result = text
     for item in entries:
@@ -45,8 +35,6 @@ def apply_pronunciations(text: str, entries: list[dict]) -> str:
         flags = 0 if item.get("case_sensitive") else re.IGNORECASE
         result = re.sub(pattern, lambda _: item.get("replacement", ""), result, flags=flags)
     return result
-
-
 def insert_pause(text: str, seconds: float, position: int | None = None) -> str:
     seconds = max(0.1, min(float(seconds), 10.0))
     marker = f"[[pause:{seconds:g}]]"
@@ -54,8 +42,6 @@ def insert_pause(text: str, seconds: float, position: int | None = None) -> str:
         return f"{text.rstrip()} {marker}".strip()
     position = max(0, min(position, len(text)))
     return text[:position] + marker + text[position:]
-
-
 def validate_pause_markers(text: str) -> list[str]:
     issues = []
     for raw in re.findall(r"\[\[pause:([^\]]+)\]\]", text, flags=re.IGNORECASE):
@@ -69,20 +55,14 @@ def validate_pause_markers(text: str) -> list[str]:
     if "[[pause:" in malformed.lower():
         issues.append("One or more pause markers are malformed")
     return issues
-
-
 def prepare_text(text: str, project: Project, provider: str) -> str:
     prepared = apply_pronunciations(text, list_pronunciations(project))
     if provider == "Kokoro local":
         return PAUSE_PATTERN.sub(lambda match: _local_pause(float(match.group(1))), prepared)
     return prepared
-
-
 def _local_pause(seconds: float) -> str:
     count = max(1, min(8, round(seconds * 2)))
     return " " + ("... " * count)
-
-
 def compile_ssml_text(text: str) -> str:
     parts = []
     cursor = 0
@@ -93,8 +73,6 @@ def compile_ssml_text(text: str) -> str:
         cursor = match.end()
     parts.append(html.escape(text[cursor:]))
     return "".join(parts)
-
-
 def pronunciation_conflicts(entries: list[dict]) -> list[dict]:
     issues = []
     seen = {}
@@ -116,8 +94,6 @@ def pronunciation_conflicts(entries: list[dict]) -> list[dict]:
             if first_source and second_source and first_source.lower() != second_source.lower() and (first_source.lower() in second_source.lower() or second_source.lower() in first_source.lower()):
                 issues.append({"severity": "info", "rule": second_index, "message": f"'{second_source}' overlaps rule {first_index} source '{first_source}'; order may affect output"})
     return issues
-
-
 def pronunciation_preview(text: str, entries: list[dict]) -> dict:
     prepared = apply_pronunciations(text, entries)
     return {"original": text, "prepared": prepared, "changed": prepared != text, "conflicts": pronunciation_conflicts(entries)}

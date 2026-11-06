@@ -7,13 +7,9 @@ import time
 import zipfile
 from pathlib import Path
 from typing import Any
-
-
 def safe_filename(value: str, fallback: str = "audio", limit: int = 80) -> str:
     clean = re.sub(r"[^A-Za-z0-9_.-]+", "_", (value or "").strip()).strip("._")[:limit]
     return clean or fallback
-
-
 def atomic_write_bytes(path: Path, content: bytes) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temp_name = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
@@ -27,15 +23,11 @@ def atomic_write_bytes(path: Path, content: bytes) -> Path:
         Path(temp_name).unlink(missing_ok=True)
         raise
     return path
-
-
 def temporary_upload(raw: bytes, suffix: str) -> Path:
     fd, name = tempfile.mkstemp(suffix=suffix)
     with os.fdopen(fd, "wb") as handle:
         handle.write(raw)
     return Path(name)
-
-
 def delete_with_retry(path: Path, attempts: int = 10, delay: float = 0.3) -> None:
     for attempt in range(attempts):
         try:
@@ -45,8 +37,6 @@ def delete_with_retry(path: Path, attempts: int = 10, delay: float = 0.3) -> Non
             if attempt == attempts - 1:
                 raise
             time.sleep(delay)
-
-
 def build_render_zip(files: list[Path], manifest: dict[str, Any]) -> bytes:
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -55,8 +45,6 @@ def build_render_zip(files: list[Path], manifest: dict[str, Any]) -> bytes:
             if path.exists():
                 archive.write(path, f"audio/{path.name}")
     return buffer.getvalue()
-
-
 def collision_safe_path(directory: Path, filename: str) -> Path:
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
@@ -67,8 +55,6 @@ def collision_safe_path(directory: Path, filename: str) -> Path:
         candidate = directory / f"{stem}_{counter}{suffix}"
         counter += 1
     return candidate
-
-
 def user_safe_error(exc: Exception, fallback: str = "The operation could not be completed") -> str:
     safe_types = (ValueError, FileNotFoundError, PermissionError, TimeoutError)
     if isinstance(exc, safe_types):
@@ -76,8 +62,6 @@ def user_safe_error(exc: Exception, fallback: str = "The operation could not be 
         if text:
             return text[:300]
     return fallback
-
-
 class FileLock:
     def __init__(self, path: Path, timeout: float = 5.0, delay: float = 0.05):
         self.path = Path(path); self.timeout = timeout; self.delay = delay; self.fd = None

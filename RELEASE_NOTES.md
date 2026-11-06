@@ -1,7 +1,5 @@
-# PeaBox Voice Studio v0.07.4 Release Notes
+# PeaBox Voice Studio v0.08.0 Release Notes
 
-This release implements the highest-priority findings from the v0.07.3 audit. Generated outputs no longer silently replace files with the same name. Timeline readiness now checks the stored audio content hash, not only file existence and script-block state.
+This release begins the operations and scale foundation without replacing portable JSON projects. A local SQLite database indexes project metadata and can be rebuilt from JSON at any time.
 
-Project imports migrate to schema 2, receive repaired nested references, and clear absolute paths that cannot safely move between machines. Timeline bundle import stages all validated media before committing and rolls back committed files if a commit step fails.
-
-Audio processing is more memory efficient and timeline mixing is bounded. Model instances are reused, Kokoro downloads gain integrity sidecars, unknown errors are sanitized, the launcher version is corrected, and direct dependencies are constrained.
+Operations Center provides repository health, index rebuild, project snapshots, restore workflows, operational-event history, and log download. Snapshots are local metadata recovery points; timeline bundles remain the correct choice when WAV portability is required.

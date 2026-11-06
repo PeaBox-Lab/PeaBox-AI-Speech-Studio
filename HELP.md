@@ -1,21 +1,21 @@
 # Help Articles
 
-## A timeline clip says the audio changed
+## The repository health check fails
 
-The WAV content no longer matches the hash recorded when the clip was added. Review the file, then use Refresh Audio Metadata or relink the intended WAV.
+Choose **Rebuild project index**. JSON project files remain the source-of-truth. If integrity still fails, close PeaBox, back up `data/projects`, delete `data/peabox.db`, and restart.
 
-## My output filename has `_2` or another number
+## A project is missing from the index
 
-PeaBox preserves existing output files. When a filename already exists, it creates a numbered filename instead of overwriting it.
+Open Project Workspace once or rebuild the index. Project JSON remains available even if it is not indexed.
 
-## An imported job needs to be rerun
+## I need to undo a major change
 
-Direct project JSON does not carry media files. Rendered output paths are cleared during import and affected items are marked for rerun. Use a portable timeline bundle when WAV portability is required.
+Restore a project snapshot. Use restore-as-copy when you want to preserve the current version.
 
-## A large timeline cannot be mixed
+## My restored snapshot has missing audio
 
-The in-memory safety limit prevents the application from exhausting system memory. Shorten the timeline, export sections, or wait for the future worker/streaming mixer architecture.
+Snapshots do not copy audio. Relink the WAV file or restore/import a portable timeline bundle.
 
-## A Kokoro integrity check fails
+## Operation logs are large
 
-Delete the named model and its `.sha256` sidecar, then generate again to download a fresh copy.
+PeaBox rotates the log automatically. Download it for support before removing old rotated files.

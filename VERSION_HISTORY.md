@@ -1,5 +1,4 @@
 # Cumulative Version History
-
 - **v0.02.01** — Modular project workspace foundation
 - **v0.02.02** — Flexible Python 3.10–3.12 launcher
 - **v0.03.00** — Multi-block production and Kokoro batch rendering
@@ -17,5 +16,4 @@
 - **v0.07.1** — Responsive contrast, banner, and navigation patch
 - **v0.07.2** — Quick actions, favorites, recents, and interface preferences
 - **v0.07.3** — Workspace Command Center, onboarding, and actionable empty states
-
-- **v0.07.4** — Reliability, integrity, migration, and runtime hardening
+- **v0.07.4** — Reliability, integrity, migration, and runtime hardening- **v0.08.0** — SQLite project index, Operations Center, snapshots, recovery, and structured logs

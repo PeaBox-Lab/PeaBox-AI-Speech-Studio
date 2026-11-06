@@ -1,10 +1,8 @@
 import json
 from pathlib import Path
 from typing import Any
-
 from peabox_voice_studio.config import DATA_DIR
 from peabox_voice_studio.services.files import atomic_write_bytes
-
 PREFERENCES_PATH = DATA_DIR / "ui_preferences.json"
 DEFAULTS = {
     "default_area": "Overview",
@@ -16,8 +14,6 @@ DEFAULTS = {
     "recent_command_ids": [],
     "onboarding_dismissed": False,
 }
-
-
 def load_preferences(path: Path = PREFERENCES_PATH) -> dict[str, Any]:
     preferences = dict(DEFAULTS)
     try:
@@ -27,14 +23,10 @@ def load_preferences(path: Path = PREFERENCES_PATH) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError, TypeError):
         pass
     return sanitize_preferences(preferences)
-
-
 def save_preferences(preferences: dict[str, Any], path: Path = PREFERENCES_PATH) -> dict[str, Any]:
     clean = sanitize_preferences(preferences)
     atomic_write_bytes(Path(path), json.dumps(clean, ensure_ascii=False, indent=2).encode("utf-8"))
     return clean
-
-
 def sanitize_preferences(preferences: dict[str, Any]) -> dict[str, Any]:
     clean = dict(DEFAULTS)
     clean["default_area"] = str(preferences.get("default_area", "Overview"))[:80]
@@ -47,15 +39,11 @@ def sanitize_preferences(preferences: dict[str, Any]) -> dict[str, Any]:
     clean["recent_command_ids"] = _clean_command_ids(preferences.get("recent_command_ids", []), 10)
     clean["onboarding_dismissed"] = bool(preferences.get("onboarding_dismissed", False))
     return clean
-
-
 def mark_project_opened(preferences: dict[str, Any], project_id: str) -> dict[str, Any]:
     recent = [item for item in preferences.get("recent_project_ids", []) if item != project_id]
     preferences["recent_project_ids"] = [project_id] + recent
     preferences.update(sanitize_preferences(preferences))
     return preferences
-
-
 def toggle_favorite(preferences: dict[str, Any], project_id: str) -> bool:
     favorites = list(preferences.get("favorite_project_ids", []))
     if project_id in favorites:
@@ -67,13 +55,9 @@ def toggle_favorite(preferences: dict[str, Any], project_id: str) -> bool:
     preferences["favorite_project_ids"] = favorites
     preferences.update(sanitize_preferences(preferences))
     return active
-
-
 def resolve_projects(projects: list[Any], project_ids: list[str]) -> list[Any]:
     mapping = {project.id: project for project in projects}
     return [mapping[project_id] for project_id in project_ids if project_id in mapping]
-
-
 def _clean_ids(values: Any, limit: int) -> list[str]:
     result = []
     if not isinstance(values, list):
@@ -85,8 +69,6 @@ def _clean_ids(values: Any, limit: int) -> list[str]:
         if len(result) >= limit:
             break
     return result
-
-
 def _clean_command_ids(values: Any, limit: int) -> list[str]:
     result = []
     if not isinstance(values, list):

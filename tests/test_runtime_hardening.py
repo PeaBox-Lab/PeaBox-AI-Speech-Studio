@@ -4,14 +4,11 @@ from pathlib import Path
 from unittest.mock import patch
 from peabox_voice_studio.models import Project
 from peabox_voice_studio.services.timeline import add_clip,mix_timeline
-
-
 def wav(frames=100,rate=1000):
  b=io.BytesIO()
  with wave.open(b,'wb') as w:
   w.setnchannels(1);w.setsampwidth(2);w.setframerate(rate);w.writeframes(array('h',[1]*frames).tobytes())
  return b.getvalue()
-
 class RuntimeHardeningTests(unittest.TestCase):
  def test_timeline_memory_guard(self):
   with tempfile.TemporaryDirectory() as folder:

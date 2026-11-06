@@ -1,8 +1,5 @@
 from copy import deepcopy
-
 CURRENT_PROJECT_SCHEMA = 2
-
-
 def migrate_project_payload(payload: dict) -> tuple[dict, list[str]]:
     if not isinstance(payload, dict):
         raise ValueError("Project payload must be an object")
@@ -17,8 +14,6 @@ def migrate_project_payload(payload: dict) -> tuple[dict, list[str]]:
     if schema < 2:
         notes.append("Migrated legacy project payload to schema 2")
     return data, notes
-
-
 def rewrite_import_references(project_data: dict, new_project_id: str, preserve_asset_paths: bool = False) -> list[str]:
     notes = []
     settings = project_data.setdefault("settings", {})

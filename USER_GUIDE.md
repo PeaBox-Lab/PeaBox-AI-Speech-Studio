@@ -1,20 +1,20 @@
 # User Guide
 
-## Preserve output history
+## Daily workflow
 
-PeaBox automatically creates numbered filenames when output names repeat. Existing files remain untouched.
+1. Open a favorite or recent project from Dashboard.
+2. Prepare scripts and quality settings.
+3. Generate audio or run batch jobs.
+4. Assemble WAV clips in Timeline Studio.
+5. Review governance and approvals.
+6. Create a snapshot before major changes.
 
-## Move a project
+## Operations Center
 
-- Use Project JSON for scripts, settings, governance, and metadata. Non-portable media paths are removed on import.
-- Use a timeline bundle to move validated WAV assets with the project.
+Use Operations Center to check repository health, rebuild the index, create/restore snapshots, download the operation log, and review recent operational events.
 
-## Resolve timeline integrity warnings
+## Backup choices
 
-- **Audio changed:** refresh metadata only after confirming the current file is correct.
-- **Source stale:** regenerate or acknowledge the current script-block version after review.
-- **File missing:** relink a replacement WAV.
-
-## Monitor costs
-
-Recorded planning-rate usage is an estimate based on successfully generated characters. It is not the provider invoice.
+- Choose **Project JSON** for portable settings without media.
+- Choose **Timeline bundle** to include WAV assets.
+- Choose **Snapshot** for a quick local recovery point.

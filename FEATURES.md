@@ -1,43 +1,31 @@
 # Features Guide
 
+## Operations and recovery
+
+- Rebuildable SQLite project index
+- Repository integrity checks
+- Structured operational event log
+- Project snapshots and retention
+- Restore in place or as a copy
+- Indexed project catalog
+
 ## Workspace productivity
 
-- Executive Dashboard
-- Workspace Command Center
-- Grouped corporate navigation
-- Sidebar Quick Access
-- Favorite and recent projects
-- Recent command history
-- First-run onboarding
-- Interface density, motion, startup, and dashboard preferences
+- Executive dashboard and Command Center
+- Grouped navigation and quick actions
+- Favorites, recent projects, and recent commands
+- First-run onboarding and interface preferences
 
-## Projects and production
+## Production and audio
 
-- Portable project workspace and master script
-- Provider-aware script blocks
-- Single speech generation and resumable batch jobs
-- Multi-provider voice discovery
-- Non-destructive Timeline Studio and merged WAV exports
-
-## Audio, quality, and transcription
-
-- Voice Library and presets
-- Pronunciation dictionary and safe pause markers
-- WAV analysis, normalization, silence trimming, and A/B comparisons
-- Local transcription with editable segments and TXT/SRT/VTT export
+- Script blocks, local/cloud speech, and resumable batches
+- Voice Library, presets, pronunciation, and SSML pause controls
+- WAV quality lab and A/B comparisons
+- Timeline Studio and portable WAV bundles
+- Local transcription and subtitle export
 
 ## Governance
 
-- Owners, contributors, risk, target date, and workflow states
-- Review comments and resolutions
-- Decision register
-- Approval Queue
-- Application governance audit log
-
-## Portability and safety
-
-- Project JSON import/export
-- Secure timeline bundles with copied WAV assets
-- Missing-asset relinking
-- Session-only cloud credentials
-- Setup diagnostics and visual regression protections
+- Owners, contributors, risk, workflow states
+- Review comments and decisions
+- Approval Queue and application audit log

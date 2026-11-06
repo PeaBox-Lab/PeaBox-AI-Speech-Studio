@@ -3,26 +3,20 @@ import sys
 import types
 import unittest
 from pathlib import Path
-
-
 ROOT = Path(__file__).resolve().parents[1]
-PAGES = ["Dashboard", "Projects", "Command Center", "Preferences", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
+PAGES = ["Dashboard", "Projects", "Command Center", "Preferences", "Operations", "Governance", "Approvals", "System Check", "Provider Setup", "Voice Library", "Quality Studio", "Audio Quality Lab", "Timeline Studio", "Script Blocks", "Batch Production", "Create Speech", "Transcription", "Render History", "Roadmap & Help"]
 NAVIGATION = {
     "Overview": [("Executive Dashboard", "Dashboard", "▦"), ("Project Workspace", "Projects", "▣"), ("Command Center", "Command Center", "⌕"), ("Interface Preferences", "Preferences", "◐")],
     "Production": [("Script Editor", "Script Blocks", "✎"), ("Speech Generator", "Create Speech", "◉"), ("Batch Jobs", "Batch Production", "⇄"), ("Timeline Studio", "Timeline Studio", "≡")],
     "Audio & Quality": [("Voice Library", "Voice Library", "◫"), ("Quality Studio", "Quality Studio", "✓"), ("Audio Quality Lab", "Audio Quality Lab", "∿"), ("Transcription Studio", "Transcription", "▤")],
-    "Administration": [("Governance Center", "Governance", "◆"), ("Approval Queue", "Approvals", "✓"), ("Provider Setup", "Provider Setup", "⚙"), ("System Check", "System Check", "◇"), ("Activity & History", "Render History", "◷")],
+    "Administration": [("Operations Center", "Operations", "▥"), ("Governance Center", "Governance", "◆"), ("Approval Queue", "Approvals", "✓"), ("Provider Setup", "Provider Setup", "⚙"), ("System Check", "System Check", "◇"), ("Activity & History", "Render History", "◷")],
     "Support": [("Roadmap & Help", "Roadmap & Help", "?")],
 }
-
-
 class SessionState(dict):
     def __getattr__(self, name):
         try: return self[name]
         except KeyError as exc: raise AttributeError(name) from exc
     def __setattr__(self, name, value): self[name] = value
-
-
 class DummyContainer:
     def __init__(self, owner): self.owner = owner
     def __enter__(self): return self
@@ -61,8 +55,6 @@ class DummyContainer:
     def __getattr__(self, name):
         def no_op(*args, **kwargs): return None
         return no_op
-
-
 class FakeStreamlit(types.ModuleType):
     def __init__(self, page):
         super().__init__("streamlit")
@@ -71,8 +63,6 @@ class FakeStreamlit(types.ModuleType):
         self.sidebar = DummyContainer(self)
         self._container = DummyContainer(self)
     def __getattr__(self, name): return getattr(self._container, name)
-
-
 class PageSmokeTests(unittest.TestCase):
     def test_every_navigation_page_executes_without_project(self):
         original = sys.modules.get("streamlit")
@@ -84,6 +74,4 @@ class PageSmokeTests(unittest.TestCase):
         finally:
             if original is None: sys.modules.pop("streamlit", None)
             else: sys.modules["streamlit"] = original
-
-
 if __name__ == "__main__": unittest.main()

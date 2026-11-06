@@ -3,10 +3,7 @@ import math
 import wave
 from array import array
 from pathlib import Path
-
 from peabox_voice_studio.services.files import atomic_write_bytes, collision_safe_path, safe_filename
-
-
 def _read_pcm16(raw: bytes) -> tuple[wave._wave_params, array]:
     with wave.open(io.BytesIO(raw), "rb") as reader:
         params = reader.getparams()
@@ -20,8 +17,6 @@ def _read_pcm16(raw: bytes) -> tuple[wave._wave_params, array]:
     if samples.itemsize != 2:
         raise ValueError("16-bit PCM is unavailable on this platform")
     return params, samples
-
-
 def _write_pcm16(params: wave._wave_params, samples: array) -> bytes:
     buffer = io.BytesIO()
     with wave.open(buffer, "wb") as writer:
@@ -31,8 +26,6 @@ def _write_pcm16(params: wave._wave_params, samples: array) -> bytes:
         writer.setcomptype("NONE", "not compressed")
         writer.writeframes(samples.tobytes())
     return buffer.getvalue()
-
-
 def inspect_wav(raw: bytes) -> dict:
     params, samples = _read_pcm16(raw)
     peak = 0; square_sum = 0; clipped = 0
@@ -52,8 +45,6 @@ def inspect_wav(raw: bytes) -> dict:
         "clipped_samples": clipped,
         "bytes": len(raw),
     }
-
-
 def normalize_wav(raw: bytes, target_peak_dbfs: float = -1.0) -> tuple[bytes, dict]:
     if target_peak_dbfs > 0 or target_peak_dbfs < -30:
         raise ValueError("Target peak must be between -30 and 0 dBFS")
@@ -66,8 +57,6 @@ def normalize_wav(raw: bytes, target_peak_dbfs: float = -1.0) -> tuple[bytes, di
     processed = array("h", (max(-32768, min(32767, round(sample * gain))) for sample in samples))
     gain_db = 20 * math.log10(gain) if gain > 0 else 0.0
     return _write_pcm16(params, processed), {"gain_db": round(gain_db, 3), "changed": abs(gain_db) >= 0.01, "target_peak_dbfs": target_peak_dbfs}
-
-
 def trim_silence_wav(raw: bytes, threshold_dbfs: float = -40.0, padding_ms: int = 100) -> tuple[bytes, dict]:
     if threshold_dbfs > 0 or threshold_dbfs < -90:
         raise ValueError("Silence threshold must be between -90 and 0 dBFS")
@@ -97,13 +86,9 @@ def trim_silence_wav(raw: bytes, threshold_dbfs: float = -40.0, padding_ms: int 
         "threshold_dbfs": threshold_dbfs,
         "padding_ms": padding_ms,
     }
-
-
 def save_processed_wav(raw: bytes, name: str, suffix: str, output_dir: Path) -> Path:
     filename = f"{safe_filename(name)}_{safe_filename(suffix)}.wav"
     return atomic_write_bytes(collision_safe_path(output_dir, filename), raw)
-
-
 def _dbfs(value: float) -> float | None:
     if value <= 0:
         return None

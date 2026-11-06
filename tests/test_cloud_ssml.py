@@ -1,9 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
-
 from peabox_voice_studio.providers.cloud import generate_azure
-
-
 class CloudSsmlTests(unittest.TestCase):
     @patch("requests.post")
     def test_azure_payload_contains_compiled_break(self, post):
@@ -17,6 +14,4 @@ class CloudSsmlTests(unittest.TestCase):
         payload = post.call_args.kwargs["data"].decode("utf-8")
         self.assertIn('<break time="1s"/>', payload)
         self.assertNotIn("[[pause:", payload)
-
-
 if __name__ == "__main__": unittest.main()

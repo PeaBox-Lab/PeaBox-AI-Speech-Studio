@@ -6,19 +6,15 @@ import tempfile
 import shutil
 from pathlib import Path, PurePosixPath
 from uuid import uuid4
-
 from peabox_voice_studio.models import Project, utc_now
 from peabox_voice_studio.config import MAX_BUNDLE_INPUT_BYTES, MAX_BUNDLE_UNCOMPRESSED_BYTES
 from peabox_voice_studio.services.audio import inspect_wav
 from peabox_voice_studio.services.files import atomic_write_bytes, safe_filename
 from peabox_voice_studio.services.timeline import refresh_clip
 from peabox_voice_studio.services.migrations import migrate_project_payload, rewrite_import_references
-
 BUNDLE_SCHEMA = 1
 MAX_BUNDLE_FILES = 500
 MAX_BUNDLE_UNCOMPRESSED = MAX_BUNDLE_UNCOMPRESSED_BYTES
-
-
 def export_timeline_bundle(project: Project) -> bytes:
     buffer = io.BytesIO()
     project_data = project.to_dict()
@@ -50,8 +46,6 @@ def export_timeline_bundle(project: Project) -> bytes:
         archive.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2))
         archive.writestr("project.json", json.dumps({"schema_version": 1, "exported_at": utc_now(), "project": project_data}, ensure_ascii=False, indent=2))
     return buffer.getvalue()
-
-
 def import_timeline_bundle(raw: bytes, output_dir: Path) -> Project:
     if len(raw) > MAX_BUNDLE_INPUT_BYTES:
         raise ValueError("Compressed bundle exceeds the safe import limit")
@@ -114,16 +108,12 @@ def import_timeline_bundle(raw: bytes, output_dir: Path) -> Project:
             if migration_notes:
                 project.settings["last_import_migration"] = {"at": project.updated_at, "notes": migration_notes}
             return project
-
-
 def _validate_member(name: str) -> None:
     path = PurePosixPath(name)
     if path.is_absolute() or ".." in path.parts or "\\" in name or ":" in name:
         raise ValueError("Bundle contains an unsafe path")
     if name.startswith("/"):
         raise ValueError("Bundle contains an unsafe path")
-
-
 def _collision_safe_path(directory: Path, filename: str) -> Path:
     safe = safe_filename(filename, fallback="asset.wav")
     candidate = directory / safe

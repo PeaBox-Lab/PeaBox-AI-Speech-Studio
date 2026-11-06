@@ -1,11 +1,8 @@
 from uuid import uuid4
-
 from peabox_voice_studio.models import Project, utc_now
-
 WORKFLOW_STATES = ["Draft", "In Review", "Changes Requested", "Approved", "Published", "Archived"]
 RISK_LEVELS = ["Low", "Medium", "High", "Critical"]
 APPROVAL_STATES = ["Pending", "Approved", "Rejected", "Withdrawn"]
-
 ALLOWED_TRANSITIONS = {
     "Draft": {"In Review", "Archived"},
     "In Review": {"Draft", "Changes Requested", "Approved", "Archived"},
@@ -14,8 +11,6 @@ ALLOWED_TRANSITIONS = {
     "Published": {"In Review", "Archived"},
     "Archived": {"Draft"},
 }
-
-
 def governance(project: Project) -> dict:
     data = project.settings.setdefault("governance", {})
     data.setdefault("owner", "")
@@ -30,8 +25,6 @@ def governance(project: Project) -> dict:
     data.setdefault("approvals", [])
     data.setdefault("audit_log", [])
     return data
-
-
 def update_project_governance(project: Project, actor: str, owner: str, contributors: list[str], risk_level: str, due_date: str, review_required: bool, approval_required: bool) -> dict:
     data = governance(project)
     if risk_level not in RISK_LEVELS:
@@ -47,8 +40,6 @@ def update_project_governance(project: Project, actor: str, owner: str, contribu
     })
     append_audit(project, actor, "governance.updated", "project", project.id, {"before": before, "after": {key: data.get(key) for key in before}})
     return data
-
-
 def transition_status(project: Project, target: str, actor: str, note: str = "") -> str:
     data = governance(project)
     current = data.get("status", "Draft")
@@ -68,8 +59,6 @@ def transition_status(project: Project, target: str, actor: str, note: str = "")
     data["status"] = target
     append_audit(project, actor, "workflow.transitioned", "project", project.id, {"from": previous, "to": target, "note": note[:1000]})
     return target
-
-
 def add_comment(project: Project, author: str, body: str, target_type: str = "Project", target_id: str = "", priority: str = "Normal", parent_id: str | None = None) -> dict:
     author = author.strip(); body = body.strip()
     if not author or not body:
@@ -84,8 +73,6 @@ def add_comment(project: Project, author: str, body: str, target_type: str = "Pr
     governance(project)["comments"].append(comment)
     append_audit(project, author, "comment.created", target_type, target_id or project.id, {"comment_id": comment["id"], "priority": priority, "parent_id": parent_id})
     return comment
-
-
 def resolve_comment(project: Project, comment_id: str, actor: str, resolution: str = "") -> bool:
     for comment in governance(project)["comments"]:
         if comment.get("id") == comment_id:
@@ -96,8 +83,6 @@ def resolve_comment(project: Project, comment_id: str, actor: str, resolution: s
             append_audit(project, actor, "comment.resolved", comment.get("target_type", "Project"), comment.get("target_id") or project.id, {"comment_id": comment_id, "resolution": comment["resolution"]})
             return True
     return False
-
-
 def reopen_comment(project: Project, comment_id: str, actor: str) -> bool:
     for comment in governance(project)["comments"]:
         if comment.get("id") == comment_id:
@@ -106,8 +91,6 @@ def reopen_comment(project: Project, comment_id: str, actor: str) -> bool:
             append_audit(project, actor, "comment.reopened", comment.get("target_type", "Project"), comment.get("target_id") or project.id, {"comment_id": comment_id})
             return True
     return False
-
-
 def add_decision(project: Project, actor: str, title: str, decision: str, rationale: str = "", status: str = "Decided") -> dict:
     if status not in {"Proposed", "Decided", "Superseded"}:
         raise ValueError("Invalid decision status")
@@ -120,8 +103,6 @@ def add_decision(project: Project, actor: str, title: str, decision: str, ration
     governance(project)["decisions"].insert(0, item)
     append_audit(project, actor, "decision.created", "Decision", item["id"], {"title": item["title"], "status": status})
     return item
-
-
 def supersede_decision(project: Project, decision_id: str, actor: str, reason: str = "") -> bool:
     for item in governance(project)["decisions"]:
         if item.get("id") == decision_id:
@@ -130,8 +111,6 @@ def supersede_decision(project: Project, decision_id: str, actor: str, reason: s
             append_audit(project, actor, "decision.superseded", "Decision", decision_id, {"reason": item["supersede_reason"]})
             return True
     return False
-
-
 def request_approval(project: Project, requester: str, reviewer: str, scope: str, attestation: str = "") -> dict:
     if not requester.strip() or not reviewer.strip() or not scope.strip():
         raise ValueError("Requester, reviewer, and scope are required")
@@ -142,8 +121,6 @@ def request_approval(project: Project, requester: str, reviewer: str, scope: str
     governance(project)["approvals"].insert(0, item)
     append_audit(project, requester, "approval.requested", "Approval", item["id"], {"reviewer": item["reviewer"], "scope": item["scope"]})
     return item
-
-
 def decide_approval(project: Project, approval_id: str, actor: str, status: str, note: str = "") -> bool:
     if status not in {"Approved", "Rejected", "Withdrawn"}:
         raise ValueError("Invalid approval decision")
@@ -154,8 +131,6 @@ def decide_approval(project: Project, approval_id: str, actor: str, status: str,
             append_audit(project, actor, f"approval.{status.lower()}", "Approval", approval_id, {"note": item["decision_note"]})
             return True
     return False
-
-
 def governance_summary(project: Project) -> dict:
     data = governance(project)
     comments = data["comments"]
@@ -172,8 +147,6 @@ def governance_summary(project: Project) -> dict:
         "decisions": len(data["decisions"]),
         "audit_entries": len(data["audit_log"]),
     }
-
-
 def governance_readiness(project: Project) -> dict:
     data = governance(project); summary = governance_summary(project); issues = []
     if not data["owner"]:
@@ -187,8 +160,6 @@ def governance_readiness(project: Project) -> dict:
     errors = sum(item["severity"] == "error" for item in issues)
     warnings = sum(item["severity"] == "warning" for item in issues)
     return {"ready": errors == 0, "errors": errors, "warnings": warnings, "issues": issues, "summary": summary}
-
-
 def append_audit(project: Project, actor: str, action: str, target_type: str, target_id: str, details: dict | None = None) -> dict:
     entry = {
         "id": uuid4().hex, "timestamp": utc_now(), "actor": (actor.strip() or "Unspecified")[:120],
@@ -199,8 +170,6 @@ def append_audit(project: Project, actor: str, action: str, target_type: str, ta
     if len(log) > 2000:
         del log[:-2000]
     return entry
-
-
 def _clean_names(names: list[str]) -> list[str]:
     result = []
     for name in names:

@@ -1,10 +1,7 @@
 from pathlib import Path
 from typing import Callable
-
 from peabox_voice_studio.models import Project, ScriptBlock, utc_now
 from peabox_voice_studio.services.files import safe_filename
-
-
 def validate_block(block: ScriptBlock, index: int, configured_providers: set[str] | None = None) -> list[dict]:
     issues: list[dict] = []
     configured_providers = configured_providers or {"Kokoro local"}
@@ -17,8 +14,6 @@ def validate_block(block: ScriptBlock, index: int, configured_providers: set[str
     if block.enabled and block.provider not in configured_providers:
         issues.append({"severity": "error", "block": index, "block_id": block.id, "message": f"{block.provider} is not configured for this session"})
     return issues
-
-
 def validate_batch(project: Project, configured_providers: set[str] | None = None) -> dict:
     issues = [issue for index, block in enumerate(project.blocks, 1) for issue in validate_block(block, index, configured_providers)]
     enabled = [block for block in project.blocks if block.enabled]
@@ -29,15 +24,11 @@ def validate_batch(project: Project, configured_providers: set[str] | None = Non
     errors = sum(issue["severity"] == "error" for issue in issues)
     warnings = sum(issue["severity"] == "warning" for issue in issues)
     return {"ready": errors == 0, "errors": errors, "warnings": warnings, "issues": issues}
-
-
 def estimate_block(block: ScriptBlock, rates: dict[str, float]) -> dict:
     characters = len(block.text)
     words = len(block.text.split())
     rate = rates.get(block.provider, 0.0)
     return {"id": block.id, "title": block.title, "provider": block.provider, "voice": block.voice, "characters": characters, "words": words, "estimated_minutes": round(words / 150, 2), "estimated_cost_usd": round(characters / 1_000_000 * rate, 6), "enabled": block.enabled}
-
-
 def build_manifest(project: Project, rates: dict[str, float], configured_providers: set[str] | None = None) -> dict:
     rows = [estimate_block(block, rates) for block in project.blocks]
     validation = validate_batch(project, configured_providers)
@@ -56,8 +47,6 @@ def build_manifest(project: Project, rates: dict[str, float], configured_provide
             "estimated_cost_usd": round(sum(row["estimated_cost_usd"] for row in rows if row["enabled"]), 6),
         },
     }
-
-
 def render_local_blocks(project: Project, generate: Callable[..., Path]) -> tuple[list[Path], list[dict]]:
     files: list[Path] = []
     results: list[dict] = []
@@ -78,7 +67,5 @@ def render_local_blocks(project: Project, generate: Callable[..., Path]) -> tupl
         except Exception as exc:
             results.append({"block_id": block.id, "title": block.title, "status": "failed", "reason": str(exc)})
     return files, results
-
-
 def summarize_results(results: list[dict]) -> dict:
     return {status: sum(row.get("status") == status for row in results) for status in ("rendered", "skipped", "failed")}

@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
 import streamlit as st
-
 from peabox_voice_studio.config import APP_NAME, MAX_BLOCK_CHARS, MAX_SCRIPT_CHARS, MAX_UPLOAD_BYTES, OUTPUTS_DIR, VERSION
 from peabox_voice_studio.models import Project, ScriptBlock
 from peabox_voice_studio.providers.catalog import KOKORO_LANGS, KOKORO_VOICES, PROVIDER_RATES
 from peabox_voice_studio.services.audio import inspect_wav, normalize_wav, save_processed_wav, trim_silence_wav
+from peabox_voice_studio.services.backups import create_snapshot, delete_snapshot, list_snapshots, load_snapshot
 from peabox_voice_studio.services.batch import build_manifest
 from peabox_voice_studio.services.commands import onboarding_status, record_command, resolve_commands, search_commands
 from peabox_voice_studio.services.comparisons import create_comparison_record, delete_comparison, set_comparison_preference
@@ -15,16 +15,17 @@ from peabox_voice_studio.services.governance import ALLOWED_TRANSITIONS, APPROVA
 from peabox_voice_studio.services.history import record_render
 from peabox_voice_studio.services.catalogs import capability_rows, catalog_facets, filter_voices
 from peabox_voice_studio.services.jobs import add_job, create_job, delete_job, duplicate_job, reopen_cancelled, replace_job, request_cancel, retry_failed, run_job
+from peabox_voice_studio.services.operations import operation_log_health, read_operations, record_operation
 from peabox_voice_studio.services.preferences import load_preferences, mark_project_opened, resolve_projects, save_preferences, toggle_favorite
 from peabox_voice_studio.services.presets import apply_preset, create_preset, delete_preset, list_presets
 from peabox_voice_studio.services.projects import ProjectStore, export_project, move_block, set_all_blocks_enabled, split_script_into_blocks
+from peabox_voice_studio.services.repository import list_indexed_projects, rebuild_index, repository_health
 from peabox_voice_studio.services.diagnostics import system_diagnostics, transcription_readiness
 from peabox_voice_studio.services.quality import add_pronunciation, delete_pronunciation, insert_pause, list_pronunciations, prepare_text, pronunciation_conflicts, pronunciation_preview, validate_pause_markers
 from peabox_voice_studio.services.timeline import acknowledge_clip_source, add_clip, arrange_sequential, cleanup_invalid_clips, clip_status, duplicate_timeline, list_clips, mix_timeline, move_clip, refresh_clip, relink_clip, remove_clip, timeline_manifest, validate_timeline
 from peabox_voice_studio.services.transcripts import delete_transcript_session, export_transcript_bundle, filter_segments, normalize_segments, repair_segment_timing, save_transcript_session, update_transcript_session, validate_segments
 from peabox_voice_studio.services.subtitles import to_srt, to_vtt
 from peabox_voice_studio.ui import callout, empty_state, inject_corporate_theme, kpi_card, navigate_to, page_header, section, sidebar_navigation, status_badge, workflow_step
-
 st.set_page_config(page_title=f"{APP_NAME} {VERSION}", page_icon="🎙️", layout="wide", initial_sidebar_state="expanded")
 ui_preferences = st.session_state.setdefault("ui_preferences", load_preferences())
 inject_corporate_theme(ui_preferences)
@@ -32,31 +33,20 @@ store = ProjectStore()
 profiles = st.session_state.setdefault("provider_profiles", {})
 voice_catalogs = st.session_state.setdefault("voice_catalogs", {})
 governance_actor = st.session_state.setdefault("governance_actor", "Local User")
-
 def configured_providers() -> set[str]:
     return {"Kokoro local", *profiles.keys()}
-
-
 def current_project() -> Project | None:
     return st.session_state.get("project")
-
-
 def save_project(project: Project) -> None:
     store.save(project); st.session_state.project = project
-
-
 def open_project(project_id: str) -> None:
     st.session_state.project = store.load(project_id)
     mark_project_opened(ui_preferences, project_id)
     save_preferences(ui_preferences)
-
-
 def set_active_project(project: Project) -> None:
     st.session_state.project = project
     mark_project_opened(ui_preferences, project.id)
     save_preferences(ui_preferences)
-
-
 def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
     label = f"{index + 1:02}. {block.title} · {len(block.text):,} chars · {block.provider}"
     with st.expander(label, expanded=st.session_state.get("expand_block") == block.id):
@@ -112,12 +102,9 @@ def block_editor(project: Project, index: int, block: ScriptBlock) -> None:
             project.blocks.insert(index + 1, ScriptBlock(title=f"{block.title} copy", text=block.text, provider=block.provider, language=block.language, voice=block.voice, speed=block.speed, notes=block.notes)); save_project(project); st.rerun()
         if delete.button("Delete", key=f"delete_{block.id}"):
             project.blocks.pop(index); save_project(project); st.rerun()
-
-
 project = current_project()
 page = sidebar_navigation(VERSION, project, ui_preferences)
 page_header(page, VERSION, project)
-
 if page == "Dashboard":
     projects = store.list()
     diagnostics = system_diagnostics()
@@ -159,6 +146,7 @@ if page == "Dashboard":
             {"Area": "Providers", "Status": "Ready" if configured_providers() else "Needs setup", "Detail": f"{len(configured_providers())} provider paths available"},
             {"Area": "Timeline", "Status": "Ready" if validation.get("valid") else "Needs review", "Detail": f"{validation.get('enabled_clips', 0)} enabled clips; {validation.get('errors', 0)} errors"},
             {"Area": "Governance", "Status": "Ready" if governance_readiness(project)["ready"] else "Needs review", "Detail": f"{gov_summary['open_comments']} open comments; {gov_summary['pending_approvals']} pending approvals"},
+            {"Area": "Repository", "Status": "Ready" if repository_health()["ready"] else "Needs repair", "Detail": f"{repository_health()['indexed_projects']} indexed projects"},
             {"Area": "System", "Status": f"{ready_checks}/{total_checks} ready", "Detail": "Open System Check for details"},
         ]
         st.dataframe(readiness_rows, use_container_width=True, hide_index=True)
@@ -201,7 +189,6 @@ if page == "Dashboard":
         with c1: workflow_step(1, "Create a project", "Name the production and write or import its master script.")
         with c2: workflow_step(2, "Configure production", "Prepare script blocks, providers, voices, pronunciation, and presets.")
         with c3: workflow_step(3, "Generate and assemble", "Render audio, validate quality, and create a timeline master.")
-
 elif page == "Command Center":
     section("Search workspace commands", "Commands navigate to safe screens and never execute destructive project actions.")
     command_query = st.text_input("Search screens and workflows", placeholder="Try: transcript, batch, provider, approval, timeline")
@@ -223,7 +210,6 @@ elif page == "Command Center":
             column = recent_columns[index % len(recent_columns)]
             if column.button(command["label"], key=f"recent_command_{command['id']}", use_container_width=True):
                 record_command(ui_preferences, command["id"]); save_preferences(ui_preferences); navigate_to(command["page"]); st.rerun()
-
 elif page == "Preferences":
     section("Personal workspace preferences", "These preferences are stored locally on this device and are not included in project exports.")
     area_options = ["Overview", "Production", "Audio & Quality", "Administration", "Support"]
@@ -247,7 +233,6 @@ elif page == "Preferences":
     if c4.button("Show onboarding again", disabled=not ui_preferences.get("onboarding_dismissed", False)):
         ui_preferences["onboarding_dismissed"] = False; save_preferences(ui_preferences); st.rerun()
     st.json({"default_area": ui_preferences.get("default_area"), "dashboard_detail": ui_preferences.get("dashboard_detail"), "compact_navigation": ui_preferences.get("compact_navigation"), "reduced_motion": ui_preferences.get("reduced_motion"), "recent_projects": len(ui_preferences.get("recent_project_ids", [])), "favorites": len(ui_preferences.get("favorite_project_ids", [])), "recent_commands": len(ui_preferences.get("recent_command_ids", [])), "onboarding_dismissed": ui_preferences.get("onboarding_dismissed", False)})
-
 elif page == "Projects":
     section("Project portfolio", "Create, open, import, and maintain the production workspace and master script.")
     left, right = st.columns([1, 2])
@@ -311,7 +296,45 @@ elif page == "Projects":
             with st.expander("Delete project"):
                 confirm = st.checkbox("I understand this permanently deletes the project")
                 if st.button("Delete permanently", disabled=not confirm): store.delete(project.id); st.session_state.pop("project", None); st.rerun()
-
+elif page == "Operations":
+    section("Operational health", "JSON projects remain portable source-of-truth; SQLite provides a rebuildable local index.")
+    health = repository_health(); log_health = operation_log_health(); projects = store.list()
+    o1, o2, o3, o4 = st.columns(4)
+    with o1: kpi_card("Repository", "Ready" if health["ready"] else "Repair", f"Schema {health['schema_version']}")
+    with o2: kpi_card("Indexed projects", str(health["indexed_projects"]), f"{health['bytes']:,} database bytes")
+    with o3: kpi_card("Operation events", str(log_health["entries"]), f"{log_health['bytes']:,} log bytes")
+    with o4: kpi_card("Snapshots", str(len(list_snapshots(project.id)) if project else 0), "Active-project recovery points")
+    r1, r2 = st.columns(2)
+    if r1.button("Rebuild project index", use_container_width=True):
+        result = rebuild_index([(item, store._path(item.id)) for item in projects]); record_operation("repository.rebuilt", details=result); st.success(f"Indexed {result['indexed']} projects"); st.rerun()
+    r2.download_button("Download operation log", "\n".join(json.dumps(item, ensure_ascii=False) for item in reversed(read_operations(2000))), "peabox_operations.jsonl", "application/jsonl", use_container_width=True)
+    section("Indexed project catalog", "The index can be deleted and rebuilt from project JSON at any time.")
+    indexed = list_indexed_projects()
+    if indexed: st.dataframe(indexed, use_container_width=True, hide_index=True)
+    else: empty_state("No projects indexed", "Rebuild the project index after creating or importing projects.")
+    section("Project snapshots", "Snapshots preserve project JSON and metadata but do not copy external audio assets.")
+    if not project:
+        empty_state("No active project", "Open a project before creating or restoring snapshots.", "Open Project Workspace", "Projects")
+    else:
+        snapshot_label = st.text_input("Snapshot label", placeholder="Before timeline changes")
+        if st.button("Create project snapshot", type="primary"):
+            path = create_snapshot(project, snapshot_label); record_operation("snapshot.created", project_id=project.id, details={"file": path.name}); st.success(f"Created {path.name}"); st.rerun()
+        snapshots = list_snapshots(project.id)
+        if snapshots:
+            selected_snapshot = st.selectbox("Saved snapshots", snapshots, format_func=lambda item: f"{item['created_at']} · {item['label'] or item['name']}")
+            s1, s2, s3 = st.columns(3)
+            if s1.button("Restore over active project", use_container_width=True):
+                restored = load_snapshot(Path(selected_snapshot["path"]), new_identity=False); restored.id = project.id; set_active_project(store.save(restored)); record_operation("snapshot.restored", project_id=project.id, details={"file": selected_snapshot["name"]}); st.rerun()
+            if s2.button("Restore as new project", use_container_width=True):
+                restored = load_snapshot(Path(selected_snapshot["path"]), new_identity=True); set_active_project(store.save(restored)); record_operation("snapshot.restored_copy", project_id=restored.id, details={"file": selected_snapshot["name"]}); st.rerun()
+            if s3.button("Delete snapshot", use_container_width=True):
+                delete_snapshot(Path(selected_snapshot["path"]), project.id); record_operation("snapshot.deleted", project_id=project.id, details={"file": selected_snapshot["name"]}); st.rerun()
+            st.dataframe(snapshots, use_container_width=True, hide_index=True)
+        else: empty_state("No snapshots", "Create a recovery point before major script, timeline, or governance changes.")
+    section("Recent operational events")
+    operations = read_operations(200)
+    if operations: st.dataframe(operations, use_container_width=True, hide_index=True)
+    else: st.info("No operational events have been recorded.")
 
 elif page == "Governance":
     if not project:
@@ -403,7 +426,6 @@ elif page == "Governance":
                 audit = [item for item in audit if audit_query.lower() in json.dumps(item, ensure_ascii=False).lower()]
             if audit: st.dataframe(audit, use_container_width=True, hide_index=True)
             else: st.info("No governance actions have been recorded.")
-
 elif page == "Approvals":
     if not project:
         empty_state("No active project", "Open a project before requesting or deciding approvals.", "Open Project Workspace", "Projects")
@@ -447,7 +469,6 @@ elif page == "Approvals":
                         st.write(f"Decision by {item.get('decided_by')} at {item.get('decision_at')}: {item.get('decision_note', '')}")
         else:
             st.info("No approval requests have been created.")
-
 elif page == "System Check":
     diagnostics = system_diagnostics()
     st.dataframe(diagnostics, use_container_width=True, hide_index=True)
@@ -463,7 +484,6 @@ elif page == "System Check":
 - **Kokoro files:** Download automatically during the first local generation.
 - **Storage:** Projects and generated audio must remain writable.
 """)
-
 elif page == "Provider Setup":
     st.warning("Credentials are held only in this Streamlit session. They are not saved in projects, exports, manifests, or logs.")
     tabs = st.tabs(["Azure Speech", "Amazon Polly", "Google Cloud TTS"])
@@ -523,7 +543,6 @@ elif page == "Provider Setup":
     counts = {name: len(items) for name, items in voice_catalogs.items()}
     st.subheader("Provider capabilities and readiness")
     st.dataframe(capability_rows(configured_providers(), counts), use_container_width=True, hide_index=True)
-
 elif page == "Voice Library":
     all_voices = [{"provider": "Kokoro local", "id": voice, "name": voice, "language": language, "gender": "", "styles": []} for language, voices in KOKORO_VOICES.items() for voice in voices]
     for items in voice_catalogs.values(): all_voices.extend(items)
@@ -544,7 +563,6 @@ elif page == "Voice Library":
             if st.button("Delete selected preset"):
                 delete_preset(project, preset_to_delete["id"]); save_project(project); st.rerun()
         else: st.info("Save a preset from any script block to reuse its provider, voice, speed, and direction notes.")
-
 elif page == "Quality Studio":
     if not project:
         st.info("Open a project to manage pronunciation and direction rules.")
@@ -588,7 +606,6 @@ elif page == "Quality Studio":
         else: st.info("No pronunciation rule matched the preview text.")
         st.code(prepared_preview)
         st.caption("Cloud providers compile valid pause markers to SSML breaks. Kokoro receives punctuation-based pause approximations.")
-
 elif page == "Audio Quality Lab":
     mode = st.radio("Workflow", ["Analyze and process WAV", "A/B Kokoro comparison"], horizontal=True)
     if mode == "Analyze and process WAV":
@@ -673,7 +690,6 @@ elif page == "Audio Quality Lab":
                 set_comparison_preference(project, selected_comparison["id"], preference, comparison_notes); save_project(project); st.success("Comparison preference saved")
             if h2.button("Delete comparison record"):
                 delete_comparison(project, selected_comparison["id"]); save_project(project); st.rerun()
-
 elif page == "Timeline Studio":
     section("Non-destructive audio assembly", "Arrange compatible WAV assets, inspect readiness, and export a mixed production master.")
     if not project:
@@ -770,7 +786,6 @@ elif page == "Timeline Studio":
                 except Exception as exc: st.error("Timeline export failed: " + user_safe_error(exc))
         else:
             st.info("Add at least one WAV clip to begin arranging the timeline.")
-
 elif page == "Script Blocks":
     section("Structured script production", "Each block carries independent provider, voice, pacing, pronunciation, and inclusion settings.")
     if not project:
@@ -792,7 +807,6 @@ elif page == "Script Blocks":
         if not project.blocks: st.info("Add a block or import paragraphs from the Master Script.")
         elif not visible: st.info("No blocks match the filter.")
         for index, block in visible: block_editor(project, index, block)
-
 elif page == "Batch Production":
     section("Production jobs", "Validate provider readiness, create resumable jobs, and recover partial or failed work.")
     if not project:
@@ -855,7 +869,6 @@ elif page == "Batch Production":
             if rendered_files:
                 job_manifest = {"project": project.name, "job": selected_job}
                 st.download_button("Download job outputs", build_render_zip(rendered_files, job_manifest), f"{safe_filename(project.name)}_{selected_job['id'][:8]}_job.zip", "application/zip")
-
 elif page == "Create Speech":
     text = st.text_area("Text", project.script if project else "", height=280, max_chars=MAX_SCRIPT_CHARS)
     output_name = st.text_input("Output name", safe_filename(project.name if project else "narration"))
@@ -872,7 +885,6 @@ elif page == "Create Speech":
             if project:
                 record_render(project, "Kokoro local", path, len(text), {"language": language, "voice": voice, "speed": speed}); save_project(project)
         except Exception as exc: st.error("Generation failed: " + user_safe_error(exc))
-
 elif page == "Transcription":
     section("Local media transcription", "Transcribe privately, edit timestamped segments, validate timing, and export TXT, SRT, or VTT.")
     upload = st.file_uploader("Audio or video", type=["wav", "mp3", "m4a", "flac", "ogg", "mp4", "mov", "mkv", "webm"])
@@ -936,7 +948,6 @@ elif page == "Transcription":
                     update_transcript_session(project, selected_session["id"], working["segments"]); save_project(project); st.success("Saved transcript updated")
                 if l3.button("Delete selected transcript"):
                     delete_transcript_session(project, selected_session["id"]); save_project(project); st.rerun()
-
 elif page == "Render History":
     if not project:
         st.info("Open a project to review activity and history.")
@@ -975,24 +986,22 @@ elif page == "Render History":
             st.subheader("Recent governance audit")
             if gov.get("audit_log"): st.dataframe(list(reversed(gov["audit_log"][-100:])), use_container_width=True, hide_index=True)
             else: st.info("No governance actions have been recorded.")
-
 else:
     section("Product roadmap and operating guidance", "Delivered capabilities, planned architecture, and setup notes for this release.")
     st.markdown("""
 ### Current release
+- Operations Center with SQLite project index, snapshots, structured logs, and rebuildable health
 - Governance Center with ownership, contributors, risk, due dates, and controlled workflow status
 - Persistent review comments with priority, targets, resolution, and reopening
 - Decision register with rationale and supersession history
 - Approval Queue with local attestations and workflow gates
 - Append-only application audit entries included in project exports
 - Corporate dashboard governance readiness and consolidated activity history
-
 ### Planned next
 1. Authenticated identity, role-based permissions, and shared projects
 2. SQLite repository and background worker process
 3. Interactive waveform dragging in a React/Web Audio frontend
 4. Optional speaker diarization and speaker alignment
-
 ### Setup
 Run `start_windows.bat`. The launcher accepts installed Python 3.10, 3.11, or 3.12 and creates or reuses `.venv`. Install FFmpeg for compressed media transcription.
 """)

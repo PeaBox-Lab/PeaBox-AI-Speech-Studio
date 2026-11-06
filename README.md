@@ -1,33 +1,38 @@
-# PeaBox Voice Studio v0.07.4
+# PeaBox Voice Studio v0.08.0
 
-A reliability-hardened, governed, corporate voice-production workspace with collision-safe outputs, asset integrity verification, project migrations, transactional bundle imports, bounded audio mixing, command discovery, multi-provider generation, transcription, quality processing, portable timelines, and local review workflows.
+A local-first enterprise voice-production workspace with a rebuildable SQLite project index, project snapshots, structured operational logs, repository health, governed review, multi-provider speech, transcription, audio quality, portable timelines, and command-driven navigation.
 
-## v0.07.4 Reliability & Integrity
+## v0.08.0 Operations & Repository Foundation
 
-- Collision-safe generated WAV, MP3, processed WAV, and timeline output names
-- Live timeline asset SHA-256 verification
-- Project schema version 2 and legacy migration
-- Imported nested job-ID repair and non-portable path cleanup
-- Transactional timeline bundle staging and rollback
-- Local project write locks
-- Bounded timeline mixing with compact float buffers
-- Atomic Kokoro downloads, minimum-size validation, and checksum sidecars
-- Cached Kokoro and Faster-Whisper model instances
-- Sanitized user-facing errors
-- Honest recorded planning-rate usage separate from actual invoice cost
-- Correct v0.07.4 launcher banner and constrained direct dependencies
+- SQLite metadata index while JSON remains portable source-of-truth
+- Automatic index updates on project save/list/delete
+- One-click project-index rebuild
+- Repository integrity and schema health
+- Project snapshots with retention
+- Restore over active project or restore as a new project
+- Structured JSONL operational events with rotation
+- Downloadable operation log
+- Operations Center dashboard and indexed project catalog
+
+## Recovery model
+
+- **Project JSON:** portable project metadata and settings
+- **Timeline bundle:** portable project plus WAV assets
+- **Project snapshot:** local JSON recovery point
+- **SQLite index:** disposable, rebuildable local catalog
+- **Operation log:** local support and troubleshooting evidence
 
 ## Cumulative capabilities
 
-The release retains Command Center, onboarding, preferences, corporate navigation, governance, approvals, projects, script blocks, cloud/local providers, voice discovery, quality controls, transcription, resumable jobs, Audio Quality Lab, Timeline Studio, secure bundles, and activity history.
+The release retains v0.07.4 integrity hardening, Command Center, onboarding, preferences, corporate UI, governance and approvals, cloud/local speech, transcription, audio quality, resumable jobs, Timeline Studio, secure bundles, and all cumulative documentation.
 
 ## Windows setup
 
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the launcher and sidebar display v0.07.4.
-5. Keep the `data`, `outputs`, and `models` folders writable.
+4. Confirm the sidebar displays `Enterprise workspace · v0.08.0`.
+5. Open **Administration → Operations Center** to verify repository health.
 
 ## Validation
 

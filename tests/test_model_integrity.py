@@ -2,7 +2,6 @@ import hashlib,tempfile,unittest
 from pathlib import Path
 from unittest.mock import MagicMock,patch
 from peabox_voice_studio.providers.kokoro import _download
-
 class ModelIntegrityTests(unittest.TestCase):
  def test_download_creates_checksum_sidecar(self):
   with tempfile.TemporaryDirectory() as folder:

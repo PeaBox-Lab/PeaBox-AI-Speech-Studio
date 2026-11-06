@@ -3,10 +3,14 @@ __pycache__/
 *.py[cod]
 models/*.onnx
 models/*.bin
+models/*.sha256
 outputs/*
 !outputs/.gitkeep
 data/projects/*.json
 !data/projects/.gitkeep
-*.log
-models/*.sha256
 data/ui_preferences.json
+*.log
+data/peabox.db
+data/peabox.db-*
+data/operations*.jsonl
+data/backups/

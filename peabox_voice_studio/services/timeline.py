@@ -6,22 +6,15 @@ import wave
 from array import array
 from pathlib import Path
 from uuid import uuid4
-
 from peabox_voice_studio.models import Project, ScriptBlock, utc_now
 from peabox_voice_studio.config import MAX_TIMELINE_MIX_SAMPLES
 from peabox_voice_studio.services.audio import inspect_wav
 from peabox_voice_studio.services.files import atomic_write_bytes, collision_safe_path, safe_filename
-
-
 def source_hash(text: str, provider: str = "", voice: str = "", speed: float = 1.0) -> str:
     payload = json.dumps({"text": text, "provider": provider, "voice": voice, "speed": float(speed)}, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
-
-
 def block_hash(block: ScriptBlock) -> str:
     return source_hash(block.text, block.provider, block.voice, block.speed)
-
-
 def waveform_peaks(raw: bytes, buckets: int = 120) -> list[float]:
     params, samples = _read_wav(raw)
     channels = params.nchannels
@@ -40,12 +33,8 @@ def waveform_peaks(raw: bytes, buckets: int = 120) -> list[float]:
             peak = max(peak, *(abs(samples[offset + channel]) for channel in range(channels)))
         peaks.append(round(peak / 32767, 4))
     return peaks
-
-
 def list_clips(project: Project) -> list[dict]:
     return project.settings.setdefault("audio_clips", [])
-
-
 def add_clip(project: Project, path: Path, title: str = "", track: str = "Voiceover", start_seconds: float = 0.0, gain_db: float = 0.0, block: ScriptBlock | None = None) -> dict:
     path = Path(path)
     if not path.exists():
@@ -72,15 +61,11 @@ def add_clip(project: Project, path: Path, title: str = "", track: str = "Voiceo
     }
     list_clips(project).append(clip)
     return clip
-
-
 def remove_clip(project: Project, clip_id: str) -> bool:
     clips = list_clips(project)
     before = len(clips)
     project.settings["audio_clips"] = [clip for clip in clips if clip.get("id") != clip_id]
     return len(project.settings["audio_clips"]) < before
-
-
 def move_clip(project: Project, index: int, direction: int) -> list[dict]:
     clips = list_clips(project)
     target = index + direction
@@ -88,8 +73,6 @@ def move_clip(project: Project, index: int, direction: int) -> list[dict]:
         return clips
     clips[index], clips[target] = clips[target], clips[index]
     return clips
-
-
 def arrange_sequential(project: Project, gap_seconds: float = 0.25, track: str | None = None) -> None:
     cursor = 0.0
     gap_seconds = max(0.0, float(gap_seconds))
@@ -98,8 +81,6 @@ def arrange_sequential(project: Project, gap_seconds: float = 0.25, track: str |
             continue
         clip["start_seconds"] = round(cursor, 3)
         cursor += float(clip.get("duration_seconds", 0)) + gap_seconds
-
-
 def clip_status(project: Project, clip: dict) -> dict:
     path = Path(clip.get("file", ""))
     missing = not path.exists()
@@ -109,8 +90,6 @@ def clip_status(project: Project, clip: dict) -> dict:
     block = next((item for item in project.blocks if item.id == clip.get("source_block_id")), None)
     stale = bool(block and clip.get("source_hash") and clip.get("source_hash") != block_hash(block))
     return {"missing": missing, "stale": stale, "asset_changed": asset_changed, "ready": not missing and not stale and not asset_changed}
-
-
 def validate_timeline(project: Project) -> dict:
     issues = []
     enabled = [clip for clip in list_clips(project) if clip.get("enabled", True)]
@@ -134,8 +113,6 @@ def validate_timeline(project: Project) -> dict:
     errors = sum(item["severity"] == "error" for item in issues)
     warnings = sum(item["severity"] == "warning" for item in issues)
     return {"valid": errors == 0, "errors": errors, "warnings": warnings, "issues": issues, "enabled_clips": len(enabled)}
-
-
 def mix_timeline(project: Project, output_name: str, output_dir: Path) -> tuple[Path, dict]:
     validation = validate_timeline(project)
     if not validation["valid"]:
@@ -172,8 +149,6 @@ def mix_timeline(project: Project, output_name: str, output_dir: Path) -> tuple[
     project.settings.setdefault("timeline_exports", []).insert(0, {"created_at": utc_now(), "output": output.name, "manifest": manifest})
     project.settings["timeline_exports"] = project.settings["timeline_exports"][:20]
     return output, manifest
-
-
 def timeline_manifest(project: Project, output_name: str = "") -> dict:
     clips = []
     for order, clip in enumerate(list_clips(project), 1):
@@ -184,8 +159,6 @@ def timeline_manifest(project: Project, output_name: str = "") -> dict:
             "source_hash": clip.get("source_hash"), "status": clip_status(project, clip),
         })
     return {"schema_version": 1, "project_id": project.id, "project_name": project.name, "created_at": utc_now(), "output": output_name, "clips": clips}
-
-
 def _read_wav(raw: bytes) -> tuple[wave._wave_params, array]:
     with wave.open(io.BytesIO(raw), "rb") as reader:
         params = reader.getparams()
@@ -194,16 +167,12 @@ def _read_wav(raw: bytes) -> tuple[wave._wave_params, array]:
         frames = reader.readframes(params.nframes)
     samples = array("h"); samples.frombytes(frames)
     return params, samples
-
-
 def _write_wav(params: wave._wave_params, samples: array) -> bytes:
     buffer = io.BytesIO()
     with wave.open(buffer, "wb") as writer:
         writer.setnchannels(params.nchannels); writer.setsampwidth(2); writer.setframerate(params.framerate)
         writer.setcomptype("NONE", "not compressed"); writer.writeframes(samples.tobytes())
     return buffer.getvalue()
-
-
 def refresh_clip(clip: dict, path: Path | None = None) -> dict:
     resolved = Path(path) if path is not None else Path(clip.get("file", ""))
     if not resolved.exists():
@@ -219,12 +188,8 @@ def refresh_clip(clip: dict, path: Path | None = None) -> dict:
     clip["asset_hash"] = hashlib.sha256(raw).hexdigest()
     clip["updated_at"] = utc_now()
     return clip
-
-
 def relink_clip(clip: dict, new_path: Path) -> dict:
     return refresh_clip(clip, new_path)
-
-
 def acknowledge_clip_source(project: Project, clip: dict) -> bool:
     block = next((item for item in project.blocks if item.id == clip.get("source_block_id")), None)
     if block is None:
@@ -232,8 +197,6 @@ def acknowledge_clip_source(project: Project, clip: dict) -> bool:
     clip["source_hash"] = block_hash(block)
     clip["updated_at"] = utc_now()
     return True
-
-
 def cleanup_invalid_clips(project: Project, remove_missing: bool = False) -> dict:
     clips = list_clips(project)
     kept = []
@@ -257,8 +220,6 @@ def cleanup_invalid_clips(project: Project, remove_missing: bool = False) -> dic
         kept.append(clip)
     project.settings["audio_clips"] = kept
     return {"kept": len(kept), "removed": len(removed), "repaired_ids": repaired}
-
-
 def duplicate_timeline(project: Project) -> list[dict]:
     import copy
     original = list(list_clips(project))

@@ -1,12 +1,9 @@
 import html
 import json
 from pathlib import Path
-
 from peabox_voice_studio.config import OUTPUTS_DIR
 from peabox_voice_studio.services.files import atomic_write_bytes, collision_safe_path, safe_filename
 from peabox_voice_studio.services.quality import compile_ssml_text
-
-
 def generate_azure(text: str, profile: dict, voice: str, speed: float, output_name: str) -> Path:
     import requests
     key = profile["key"]
@@ -25,8 +22,6 @@ def generate_azure(text: str, profile: dict, voice: str, speed: float, output_na
     )
     response.raise_for_status()
     return atomic_write_bytes(collision_safe_path(OUTPUTS_DIR, f"{safe_filename(output_name)}.mp3"), response.content)
-
-
 def generate_polly(text: str, profile: dict, voice: str, engine: str, output_name: str) -> Path:
     import boto3
     client = boto3.client(
@@ -36,8 +31,6 @@ def generate_polly(text: str, profile: dict, voice: str, engine: str, output_nam
     ssml = f"<speak>{compile_ssml_text(text)}</speak>"
     data = client.synthesize_speech(Text=ssml, TextType="ssml", OutputFormat="mp3", VoiceId=voice, Engine=engine)["AudioStream"].read()
     return atomic_write_bytes(collision_safe_path(OUTPUTS_DIR, f"{safe_filename(output_name)}.mp3"), data)
-
-
 def generate_google(text: str, profile: dict, voice: str, language: str, output_name: str) -> Path:
     from google.cloud import texttospeech
     from google.oauth2 import service_account
@@ -50,8 +43,6 @@ def generate_google(text: str, profile: dict, voice: str, language: str, output_
         audio_config=texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3),
     ).audio_content
     return atomic_write_bytes(collision_safe_path(OUTPUTS_DIR, f"{safe_filename(output_name)}.mp3"), data)
-
-
 def discover_azure_voices(profile: dict) -> list[dict]:
     import requests
     response = requests.get(
@@ -60,8 +51,6 @@ def discover_azure_voices(profile: dict) -> list[dict]:
     )
     response.raise_for_status()
     return normalize_azure_voices(response.json())
-
-
 def discover_polly_voices(profile: dict, engine: str) -> list[dict]:
     import boto3
     client = boto3.client(
@@ -70,8 +59,6 @@ def discover_polly_voices(profile: dict, engine: str) -> list[dict]:
     )
     voices = client.describe_voices(Engine=engine, IncludeAdditionalLanguageCodes=True).get("Voices", [])
     return normalize_polly_voices(voices, engine)
-
-
 def discover_google_voices(profile: dict, language: str = "") -> list[dict]:
     from google.cloud import texttospeech
     from google.oauth2 import service_account
@@ -80,23 +67,17 @@ def discover_google_voices(profile: dict, language: str = "") -> list[dict]:
     client = texttospeech.TextToSpeechClient(credentials=credentials)
     voices = client.list_voices(language_code=language or None).voices
     return normalize_google_voices(voices)
-
-
 def normalize_azure_voices(voices: list[dict]) -> list[dict]:
     return sorted([{
         "provider": "Azure Speech", "id": item.get("ShortName", ""), "name": item.get("DisplayName", item.get("ShortName", "")),
         "language": item.get("Locale", ""), "gender": item.get("Gender", ""), "styles": item.get("StyleList", []),
     } for item in voices if item.get("ShortName")], key=lambda item: (item["language"], item["name"]))
-
-
 def normalize_polly_voices(voices: list[dict], engine: str) -> list[dict]:
     provider = "Amazon Polly neural" if engine == "neural" else "Amazon Polly standard"
     return sorted([{
         "provider": provider, "id": item.get("Id", ""), "name": item.get("Name", item.get("Id", "")),
         "language": item.get("LanguageCode", ""), "gender": item.get("Gender", ""), "styles": [],
     } for item in voices if item.get("Id")], key=lambda item: (item["language"], item["name"]))
-
-
 def normalize_google_voices(voices) -> list[dict]:
     result = []
     for item in voices:

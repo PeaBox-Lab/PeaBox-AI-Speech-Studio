@@ -2,14 +2,10 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
-
 from peabox_voice_studio.models import Project, utc_now
 from peabox_voice_studio.services.batch import estimate_block, validate_batch
 from peabox_voice_studio.services.files import safe_filename
-
 TERMINAL_ITEM_STATES = {"rendered", "failed", "cancelled"}
-
-
 def create_job(project: Project, rates: dict[str, float], configured_providers: set[str], text_processor: Callable[[str, str], str] | None = None) -> dict[str, Any]:
     validation = validate_batch(project, configured_providers)
     if not validation["ready"]:
@@ -31,8 +27,6 @@ def create_job(project: Project, rates: dict[str, float], configured_providers: 
         "created_at": utc_now(), "updated_at": utc_now(), "status": "queued", "cancel_requested": False,
         "items": items, "summary": summarize_job_items(items),
     }
-
-
 def summarize_job_items(items: list[dict]) -> dict:
     states = ("queued", "running", "rendered", "failed", "cancelled")
     summary = {state: sum(item["status"] == state for item in items) for state in states}
@@ -40,8 +34,6 @@ def summarize_job_items(items: list[dict]) -> dict:
     summary["recorded_usage_cost_usd"] = round(sum(float(item.get("recorded_usage_cost_usd") or 0) for item in items), 6)
     summary["actual_cost_usd"] = round(sum(float(item.get("actual_cost_usd") or 0) for item in items), 6)
     return summary
-
-
 def refresh_job_status(job: dict) -> dict:
     states = {item["status"] for item in job["items"]}
     if job.get("cancel_requested") and states.issubset(TERMINAL_ITEM_STATES):
@@ -63,8 +55,6 @@ def refresh_job_status(job: dict) -> dict:
     job["summary"] = summarize_job_items(job["items"])
     job["updated_at"] = utc_now()
     return job
-
-
 def run_job(job: dict, renderers: dict[str, Callable[..., Path]]) -> tuple[list[Path], dict]:
     files: list[Path] = []
     job["status"] = "running"
@@ -92,29 +82,21 @@ def run_job(job: dict, renderers: dict[str, Callable[..., Path]]) -> tuple[list[
         except Exception as exc:
             item["status"] = "failed"; item["error"] = str(exc)[:500]
     return files, refresh_job_status(job)
-
-
 def retry_failed(job: dict) -> dict:
     for item in job["items"]:
         if item["status"] == "failed":
             item["status"] = "queued"; item["error"] = None
     job["cancel_requested"] = False
     return refresh_job_status(job)
-
-
 def request_cancel(job: dict) -> dict:
     job["cancel_requested"] = True
     for item in job["items"]:
         if item["status"] == "queued": item["status"] = "cancelled"
     return refresh_job_status(job)
-
-
 def add_job(project: Project, job: dict, keep: int = 20) -> None:
     jobs = project.settings.setdefault("batch_jobs", [])
     jobs.insert(0, job)
     del jobs[keep:]
-
-
 def replace_job(project: Project, job: dict) -> None:
     jobs = project.settings.setdefault("batch_jobs", [])
     for index, existing in enumerate(jobs):
@@ -122,8 +104,6 @@ def replace_job(project: Project, job: dict) -> None:
             jobs[index] = job
             return
     jobs.insert(0, job)
-
-
 def duplicate_job(job: dict) -> dict:
     import copy
     duplicate = copy.deepcopy(job)
@@ -142,8 +122,6 @@ def duplicate_job(job: dict) -> dict:
         item["actual_cost_usd"] = None
     duplicate["summary"] = summarize_job_items(duplicate["items"])
     return duplicate
-
-
 def reopen_cancelled(job: dict) -> dict:
     for item in job["items"]:
         if item["status"] == "cancelled":
@@ -151,8 +129,6 @@ def reopen_cancelled(job: dict) -> dict:
             item["error"] = None
     job["cancel_requested"] = False
     return refresh_job_status(job)
-
-
 def delete_job(project: Project, job_id: str) -> bool:
     jobs = project.settings.setdefault("batch_jobs", [])
     before = len(jobs)

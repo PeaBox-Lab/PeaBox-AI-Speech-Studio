@@ -1,10 +1,7 @@
 import shutil
 import sys
 from pathlib import Path
-
 from peabox_voice_studio.config import MODELS_DIR, OUTPUTS_DIR, PROJECTS_DIR
-
-
 def system_diagnostics() -> list[dict]:
     python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     compatible = (sys.version_info.major, sys.version_info.minor) in {(3, 10), (3, 11), (3, 12)}
@@ -18,8 +15,6 @@ def system_diagnostics() -> list[dict]:
         {"Check": "Kokoro voices", "Status": "Ready" if (MODELS_DIR / "voices-v1.0.bin").exists() else "Downloads on first use", "Detail": str(MODELS_DIR / "voices-v1.0.bin")},
     ]
     return rows
-
-
 def _directory_status(path: Path) -> str:
     try:
         path.mkdir(parents=True, exist_ok=True)
@@ -29,8 +24,6 @@ def _directory_status(path: Path) -> str:
         return "Ready"
     except OSError:
         return "Not writable"
-
-
 def transcription_readiness(filename: str) -> dict:
     extension = Path(filename or "").suffix.lower()
     compressed = extension in {".mp3", ".m4a", ".ogg", ".mp4", ".mov", ".mkv", ".webm"}

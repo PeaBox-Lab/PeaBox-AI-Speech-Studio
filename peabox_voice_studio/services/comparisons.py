@@ -1,9 +1,6 @@
 from pathlib import Path
 from uuid import uuid4
-
 from peabox_voice_studio.models import Project, utc_now
-
-
 def create_comparison_record(project: Project, text: str, variants: list[dict], outputs: list[Path], metrics: list[dict]) -> dict:
     if len(variants) != 2 or len(outputs) != 2 or len(metrics) != 2:
         raise ValueError("A/B comparisons require exactly two variants")
@@ -21,8 +18,6 @@ def create_comparison_record(project: Project, text: str, variants: list[dict], 
     history.insert(0, record)
     del history[20:]
     return record
-
-
 def set_comparison_preference(project: Project, comparison_id: str, preferred: str, notes: str = "") -> bool:
     if preferred not in {"A", "B", "Tie", ""}:
         raise ValueError("Preferred result must be A, B, Tie, or blank")
@@ -32,8 +27,6 @@ def set_comparison_preference(project: Project, comparison_id: str, preferred: s
             record["notes"] = notes[:1000]
             return True
     return False
-
-
 def delete_comparison(project: Project, comparison_id: str) -> bool:
     history = project.settings.setdefault("comparison_history", [])
     before = len(history)

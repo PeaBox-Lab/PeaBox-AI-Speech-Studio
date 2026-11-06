@@ -6,20 +6,15 @@ import wave
 import zipfile
 from array import array
 from pathlib import Path
-
 from peabox_voice_studio.models import Project
 from peabox_voice_studio.services.bundles import export_timeline_bundle, import_timeline_bundle
 from peabox_voice_studio.services.timeline import add_clip
-
-
 def make_wav(samples=None, rate=8000):
     samples = samples or [0, 1000, -1000, 0]
     buffer = io.BytesIO()
     with wave.open(buffer, "wb") as writer:
         writer.setnchannels(1); writer.setsampwidth(2); writer.setframerate(rate); writer.writeframes(array("h", samples).tobytes())
     return buffer.getvalue()
-
-
 class BundleTests(unittest.TestCase):
     def test_export_import_roundtrip(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -34,7 +29,6 @@ class BundleTests(unittest.TestCase):
             self.assertTrue(Path(imported_clip["file"]).exists())
             self.assertEqual(imported_clip["file_name"], Path(imported_clip["file"]).name)
             self.assertIn("bundle import", imported.name)
-
     def test_collision_safe_asset_import(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder); wav = root / "voice.wav"; wav.write_bytes(make_wav())
@@ -46,7 +40,6 @@ class BundleTests(unittest.TestCase):
             second_path = Path(second.settings["audio_clips"][0]["file"])
             self.assertNotEqual(first_path, second_path)
             self.assertTrue(second_path.exists())
-
     def test_missing_source_stays_unlinked(self):
         project = Project("Missing")
         project.settings["audio_clips"] = [{"id": "x", "title": "Missing", "file": "missing.wav", "file_name": "missing.wav", "enabled": True}]
@@ -54,7 +47,6 @@ class BundleTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             imported = import_timeline_bundle(raw, Path(folder))
             self.assertEqual(imported.settings["audio_clips"][0]["file"], "")
-
     def test_rejects_zip_slip(self):
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w") as archive:
@@ -63,7 +55,6 @@ class BundleTests(unittest.TestCase):
             archive.writestr("../evil.wav", make_wav())
         with tempfile.TemporaryDirectory() as folder:
             with self.assertRaises(ValueError): import_timeline_bundle(buffer.getvalue(), Path(folder))
-
     def test_rejects_non_wav_referenced_asset(self):
         project = Project("X")
         project.settings["audio_clips"] = [{"id": "x", "bundle_asset": "audio/a.txt", "file": "", "title": "X"}]
@@ -74,10 +65,7 @@ class BundleTests(unittest.TestCase):
             archive.writestr("audio/a.txt", "not audio")
         with tempfile.TemporaryDirectory() as folder:
             with self.assertRaises(ValueError): import_timeline_bundle(buffer.getvalue(), Path(folder))
-
-
 if __name__ == "__main__": unittest.main()
-
 class BundleTransactionTests(unittest.TestCase):
     def test_failed_commit_rolls_back_assets(self):
         from unittest.mock import patch

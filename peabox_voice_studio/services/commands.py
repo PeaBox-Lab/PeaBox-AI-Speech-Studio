@@ -1,5 +1,4 @@
 from typing import Any
-
 COMMANDS = [
     {"id": "open-dashboard", "label": "Open Executive Dashboard", "page": "Dashboard", "group": "Overview", "keywords": "overview status kpi readiness home"},
     {"id": "manage-projects", "label": "Open Project Workspace", "page": "Projects", "group": "Overview", "keywords": "project create open import export favorite recent"},
@@ -19,8 +18,6 @@ COMMANDS = [
     {"id": "activity", "label": "Open Activity & History", "page": "Render History", "group": "Administration", "keywords": "history audit renders jobs transcripts exports"},
     {"id": "help", "label": "Open Roadmap & Help", "page": "Roadmap & Help", "group": "Support", "keywords": "help roadmap guide documentation next"},
 ]
-
-
 def search_commands(query: str, project_active: bool = False) -> list[dict[str, Any]]:
     query = query.strip().lower()
     results = []
@@ -34,19 +31,13 @@ def search_commands(query: str, project_active: bool = False) -> list[dict[str, 
         item["available"] = project_active or not item["requires_project"]
         results.append(item)
     return results
-
-
 def record_command(preferences: dict, command_id: str, limit: int = 10) -> dict:
     recent = [item for item in preferences.get("recent_command_ids", []) if item != command_id]
     preferences["recent_command_ids"] = ([command_id] + recent)[:limit]
     return preferences
-
-
 def resolve_commands(command_ids: list[str]) -> list[dict]:
     mapping = {command["id"]: command for command in COMMANDS}
     return [mapping[command_id] for command_id in command_ids if command_id in mapping]
-
-
 def onboarding_status(project: Any = None, providers_ready: int = 1) -> dict:
     steps = [
         {"id": "project", "label": "Create or open a project", "complete": project is not None, "page": "Projects"},

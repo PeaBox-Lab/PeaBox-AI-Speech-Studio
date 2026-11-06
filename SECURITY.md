@@ -1,5 +1,4 @@
 # Security and Data-Safety Notes
-
 - Cloud credentials remain in Streamlit session state and are excluded from projects and bundles.
 - Unknown upstream exceptions are not shown verbatim to users.
 - Timeline bundles reject traversal paths, symbolic links, encryption, non-WAV assets, excessive file counts, and oversized payloads.

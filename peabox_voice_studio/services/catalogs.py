@@ -1,6 +1,4 @@
 from typing import Iterable
-
-
 def filter_voices(voices: list[dict], query: str = "", language: str = "All", gender: str = "All") -> list[dict]:
     query = query.strip().lower()
     result = []
@@ -14,8 +12,6 @@ def filter_voices(voices: list[dict], query: str = "", language: str = "All", ge
             continue
         result.append(voice)
     return result
-
-
 def catalog_facets(voices: Iterable[dict]) -> dict:
     voices = list(voices)
     return {
@@ -23,8 +19,6 @@ def catalog_facets(voices: Iterable[dict]) -> dict:
         "genders": sorted({voice.get("gender", "") for voice in voices if voice.get("gender")}),
         "providers": sorted({voice.get("provider", "") for voice in voices if voice.get("provider")}),
     }
-
-
 def capability_rows(configured_providers: set[str], catalog_counts: dict[str, int]) -> list[dict]:
     capabilities = {
         "Kokoro local": ("Local WAV", "Language, voice, speed", "No credentials"),

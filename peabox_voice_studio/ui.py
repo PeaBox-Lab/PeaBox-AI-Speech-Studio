@@ -1,8 +1,6 @@
 from html import escape
 from typing import Any
-
 import streamlit as st
-
 NAVIGATION = {
     "Overview": [
         ("Executive Dashboard", "Dashboard", "▦"),
@@ -23,6 +21,7 @@ NAVIGATION = {
         ("Transcription Studio", "Transcription", "▤"),
     ],
     "Administration": [
+        ("Operations Center", "Operations", "▥"),
         ("Governance Center", "Governance", "◆"),
         ("Approval Queue", "Approvals", "✓"),
         ("Provider Setup", "Provider Setup", "⚙"),
@@ -33,7 +32,6 @@ NAVIGATION = {
         ("Roadmap & Help", "Roadmap & Help", "?"),
     ],
 }
-
 PAGE_META = {
     "Dashboard": ("Executive Dashboard", "Portfolio status, production readiness, and recommended next actions.", "Overview"),
     "Projects": ("Project Workspace", "Create, open, import, export, and maintain portable production projects.", "Overview"),
@@ -47,6 +45,7 @@ PAGE_META = {
     "Quality Studio": ("Quality Studio", "Manage pronunciation rules, pause controls, and processed-text previews.", "Audio & Quality"),
     "Audio Quality Lab": ("Audio Quality Lab", "Analyze WAV files, create normalized or trimmed copies, and compare voices.", "Audio & Quality"),
     "Transcription": ("Transcription Studio", "Transcribe, edit, validate, save, and export timestamped media text.", "Audio & Quality"),
+    "Operations": ("Operations Center", "Repository health, backups, storage inventory, and operational events.", "Administration"),
     "Governance": ("Governance Center", "Manage ownership, workflow state, review comments, decisions, and project risk.", "Administration"),
     "Approvals": ("Approval Queue", "Request, decide, and review local approval attestations and workflow gates.", "Administration"),
     "Provider Setup": ("Provider Setup", "Configure session-only cloud credentials and discover provider voices.", "Administration"),
@@ -54,8 +53,6 @@ PAGE_META = {
     "Render History": ("Activity & History", "Review project renders, timeline exports, jobs, comparisons, and saved transcripts.", "Administration"),
     "Roadmap & Help": ("Roadmap & Help", "Review delivered capabilities, planned architecture, and operating guidance.", "Support"),
 }
-
-
 def inject_corporate_theme(preferences: dict | None = None) -> None:
     preferences = preferences or {}
     compact = bool(preferences.get("compact_navigation", False))
@@ -189,22 +186,16 @@ __MOTION_CSS__
 """
     theme_css = theme_css.replace("__DENSITY_CSS__", density_css).replace("__MOTION_CSS__", motion_css)
     st.markdown(theme_css, unsafe_allow_html=True)
-
-
 def page_entry(page: str) -> tuple[str, str, str, str]:
     for group, entries in NAVIGATION.items():
         for label, internal, icon in entries:
             if internal == page:
                 return group, label, internal, icon
     raise ValueError(f"Unknown page: {page}")
-
-
 def navigate_to(page: str) -> None:
     group, label, _, icon = page_entry(page)
     st.session_state.nav_group = group
     st.session_state[f"nav_page_{group}"] = f"{icon}  {label}"
-
-
 def sidebar_navigation(version: str, project: Any = None, preferences: dict | None = None) -> str:
     st.sidebar.markdown('<div style="font-size:1.12rem;font-weight:750;margin:.2rem 0 .1rem">PeaBox Voice Studio</div>', unsafe_allow_html=True)
     st.sidebar.caption(f"Enterprise workspace · v{version}")
@@ -237,8 +228,6 @@ def sidebar_navigation(version: str, project: Any = None, preferences: dict | No
         st.sidebar.markdown('<span class="pb-status neutral">NO ACTIVE PROJECT</span>', unsafe_allow_html=True)
         st.sidebar.caption("Open or create a project from Overview.")
     return page
-
-
 def page_header(page: str, version: str, project: Any = None) -> None:
     title, subtitle, group = PAGE_META.get(page, (page, "", "Workspace"))
     context = f" · {escape(project.name)}" if project else ""
@@ -247,20 +236,12 @@ def page_header(page: str, version: str, project: Any = None) -> None:
         f'<div class="pb-title">{escape(title)}</div><div class="pb-subtitle">{escape(subtitle)}</div></div>',
         unsafe_allow_html=True,
     )
-
-
 def section(title: str, note: str = "") -> None:
     st.markdown(f'<div class="pb-section"><div class="pb-section-title">{escape(title)}</div><div class="pb-section-note">{escape(note)}</div></div>', unsafe_allow_html=True)
-
-
 def kpi_card(label: str, value: str, note: str = "") -> None:
     st.markdown(f'<div class="pb-card"><div class="pb-card-label">{escape(label)}</div><div class="pb-card-value">{escape(str(value))}</div><div class="pb-card-note">{escape(note)}</div></div>', unsafe_allow_html=True)
-
-
 def callout(text: str) -> None:
     st.markdown(f'<div class="pb-callout">{escape(text)}</div>', unsafe_allow_html=True)
-
-
 def empty_state(title: str, text: str, action_label: str = "", target_page: str = "") -> None:
     st.markdown(
         f'<div class="pb-empty"><div class="pb-empty-title">{escape(title)}</div>'
@@ -270,12 +251,8 @@ def empty_state(title: str, text: str, action_label: str = "", target_page: str 
     if action_label and target_page and st.button(action_label, key=f"empty_{target_page}"):
         navigate_to(target_page)
         st.rerun()
-
-
 def status_badge(text: str, tone: str = "neutral") -> str:
     tone = tone if tone in {"good", "warn", "bad", "neutral"} else "neutral"
     return f'<span class="pb-status {tone}">{escape(text)}</span>'
-
-
 def workflow_step(number: int, title: str, note: str) -> None:
     st.markdown(f'<div class="pb-step"><strong>{number}. {escape(title)}</strong><br><span style="color:#667085;font-size:.84rem">{escape(note)}</span></div>', unsafe_allow_html=True)
