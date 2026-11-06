@@ -1,3 +1,11 @@
+# v0.10.5 Help Update
+
+- **Quota exceeded:** free managed storage or increase the category limit.
+- **Unexpected reserved space:** release stale reservations in Capacity.
+- **Models blocked:** increase Downloaded models capacity before first Kokoro use.
+- **Backup blocked:** free recovery space or increase Backups and recovery capacity.
+- **Project save:** authoritative project JSON is not governed by these quotas.
+
 # v0.10.4 Help Update
 
 - **Daemon already active:** use `--status`; do not start a second process.

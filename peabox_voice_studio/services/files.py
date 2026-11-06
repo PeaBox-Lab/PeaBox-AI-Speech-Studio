@@ -11,6 +11,8 @@ def safe_filename(value: str, fallback: str = "audio", limit: int = 80) -> str:
     clean = re.sub(r"[^A-Za-z0-9_.-]+", "_", (value or "").strip()).strip("._")[:limit]
     return clean or fallback
 def atomic_write_bytes(path: Path, content: bytes) -> Path:
+    from peabox_voice_studio.services.storage_policy import ensure_capacity
+    ensure_capacity(path, len(content))
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temp_name = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
     try:

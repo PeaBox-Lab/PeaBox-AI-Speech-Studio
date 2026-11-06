@@ -19,3 +19,7 @@ data/quarantine/
 data/support/
 
 data/worker/
+
+data/storage_policy.json
+data/storage_reservations.json
+data/storage_policy.lock

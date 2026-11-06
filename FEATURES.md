@@ -1,3 +1,8 @@
+# v0.10.5 Feature Additions
+
+## Storage Capacity Policies
+Monitor and control generated outputs, models, recovery artifacts, and worker state with warning thresholds, hard limits, and capacity reservations.
+
 # v0.10.4 Feature Additions
 
 ## Managed Local Worker

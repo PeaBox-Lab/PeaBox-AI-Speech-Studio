@@ -4,6 +4,7 @@ from peabox_voice_studio.context import AppContext
 from peabox_voice_studio.facades.governance import portfolio_governance
 from peabox_voice_studio.services.maintenance import apply_retention,complete,create,load,retention_preview,save,status
 from peabox_voice_studio.services.recovery import backup_database,inventory,snapshot,validate_database
+from peabox_voice_studio.services.storage_policy import active_reservations,load_policy,policy_status,release_reservation,reserve,save_policy
 from peabox_voice_studio.ui import empty_state,kpi_card,section
 def render(ctx:AppContext)->None:
  projects=ctx.store.list();rows=portfolio_governance(projects);files=inventory();plans=load();section('Portfolio operations','Portfolio governance, local recovery, maintenance evidence, and retention previews.')
@@ -13,7 +14,7 @@ def render(ctx:AppContext)->None:
  with cols[2]:kpi_card('Pending approvals',str(sum(x['pending_approvals'] for x in rows)),'Awaiting decisions')
  with cols[3]:kpi_card('Unassigned',str(sum(x['owner']=='Unassigned' for x in rows)),'Projects without owner')
  with cols[4]:kpi_card('Storage',f'{len(files)} files',f"{sum(x['bytes'] for x in files)/1048576:.1f} MB")
- tabs=st.tabs(['Portfolio','Recovery','Maintenance'])
+ tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity'])
  with tabs[0]:
   if rows:st.dataframe(rows,use_container_width=True,hide_index=True)
   else:empty_state('No projects','Create a project to begin portfolio monitoring.','Open Project Workspace','Projects')
@@ -32,3 +33,23 @@ def render(ctx:AppContext)->None:
   if preview['candidates']:st.dataframe(preview['candidates'],use_container_width=True,hide_index=True)
   confirm=st.checkbox('Permanently remove every file in this preview',disabled=not preview['candidates'])
   if st.button('Apply retention preview',disabled=not confirm):apply_retention(preview);st.rerun()
+ with tabs[3]:
+  _render_capacity_tab()
+
+# Capacity policy is rendered as the fourth Operations tab.
+def _render_capacity_tab():
+ policy=load_policy();st.caption('Quotas apply to generated outputs, downloaded models, recovery artifacts, and worker state. Project JSON is excluded.')
+ enabled=st.checkbox('Enable local storage quotas',value=policy['enabled']);warning=st.slider('Warning threshold percent',50,95,int(policy['warning_percent']))
+ labels={'outputs':'Generated outputs','models':'Downloaded models','recovery':'Backups and recovery','worker':'Worker queue and events'};values={}
+ cols=st.columns(4)
+ for i,(key,label) in enumerate(labels.items()):values[key]=int(cols[i].number_input(label+' limit (MB)',min_value=1,max_value=102400,value=max(1,int(policy['categories'][key]/1048576))))*1048576
+ if st.button('Save storage policy'):save_policy({'enabled':enabled,'warning_percent':warning,'categories':values});st.rerun()
+ states=policy_status();st.dataframe([{'Category':x['category'],'Used MB':round(x['used']/1048576,2),'Reserved MB':round(x['reserved']/1048576,2),'Limit MB':round(x['limit']/1048576,2),'Percent':x['percent'],'Warning':x['warning'],'Blocked':x['blocked']} for x in states],use_container_width=True,hide_index=True)
+ reservations=active_reservations()
+ if reservations:
+  selected=st.selectbox('Active reservation',reservations,format_func=lambda x:f"{x['category']} · {x['bytes']/1048576:.2f} MB · {x['purpose']}")
+  if st.button('Release selected reservation'):release_reservation(selected['id']);st.rerun()
+ category=st.selectbox('Test reservation category',list(labels));amount=st.number_input('Reservation size (MB)',min_value=1,max_value=10240,value=10);purpose=st.text_input('Reservation purpose',value='Planned local operation')
+ if st.button('Create capacity reservation'):
+  try:reserve(category,int(amount)*1048576,purpose);st.success('Capacity reserved. Release it when the planned operation is cancelled or complete.');st.rerun()
+  except OSError as exc:st.error(str(exc))

@@ -30,5 +30,7 @@ def generate(text: str, voice: str, language: str, speed: float, output_name: st
     _download(model, MODEL_URL); _download(voices, VOICES_URL)
     samples, rate = _load_engine(str(model), str(voices)).create(text, voice=voice, speed=speed, lang=language)
     output = collision_safe_path(OUTPUTS_DIR, f"{safe_filename(output_name)}.wav")
+    from peabox_voice_studio.services.storage_policy import ensure_capacity
+    ensure_capacity(output, int(getattr(samples, "nbytes", len(samples) * 4)) + 4096)
     sf.write(output, samples, rate)
     return output

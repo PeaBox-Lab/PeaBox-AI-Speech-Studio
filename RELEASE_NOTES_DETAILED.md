@@ -1,3 +1,26 @@
+# PeaBox Voice Studio v0.10.5 Detailed Release Notes
+
+## Managed categories
+Policies separately cover generated outputs, downloaded model files, recovery artifacts such as backups/quarantine/support, and worker queue/event/state files. Project JSON is intentionally excluded so project metadata remains writable and recoverable even when generated storage is full.
+
+## Warnings and hard limits
+Each category reports files, bytes used, bytes reserved, limit, remaining capacity, usage percent, warning state, and blocked state. The warning threshold is configurable. A hard limit blocks the managed write before a temporary or final file is committed.
+
+## Write enforcement
+Atomic managed writes invoke quota preflight automatically. Kokoro’s direct WAV writer estimates the sample payload before writing. Database backups and quarantine moves preflight the destination category. Existing-file replacement charges only the growth delta.
+
+## Capacity reservations
+A reservation records category, bytes, purpose, identity, and timestamp. Reservations reduce reported remaining capacity and prevent a second operation from overbooking the same local quota. They can be explicitly released from Operations Center.
+
+## Capacity interface
+Operations Center provides policy enablement, warning threshold, per-category limits in MB, live category status, active reservations, release controls, and test reservation creation.
+
+## Compatibility
+Existing project JSON, workers, queues, recovery data, maintenance plans, governance, providers, timelines, and transcription remain compatible. Quotas default to generous local limits and may be disabled.
+
+## Verification
+178 tests cover policy normalization, category mapping, usage, warning and blocked state, overwrite deltas, disabled mode, reservation accounting, overbooking rejection, preflight invocation, all-category status, and UI controls.
+
 # PeaBox Voice Studio v0.10.4 Detailed Release Notes
 
 ## Managed daemon

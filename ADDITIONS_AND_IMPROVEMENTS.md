@@ -1,3 +1,25 @@
+# v0.10.5 Additions and Improvements
+
+## Quota categories
+- Generated outputs
+- Downloaded models
+- Backups, quarantine, and support artifacts
+- Worker queue, events, and daemon state
+
+## Controls
+- Enable or disable quotas
+- Warning threshold
+- Per-category MB limits
+- Live used, reserved, remaining, and percent values
+- Capacity reservations and release
+
+## Enforcement
+- Atomic write preflight
+- Kokoro WAV preflight
+- Backup preflight
+- Quarantine preflight
+- Overwrite growth calculation
+
 # v0.10.4 Additions and Improvements
 
 ## Daemon lifecycle

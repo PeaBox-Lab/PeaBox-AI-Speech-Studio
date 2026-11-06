@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.10.5 — Storage Quotas & Capacity Policies
+- Added local quota categories for outputs, models, recovery, and worker state.
+- Added configurable limits and warning threshold.
+- Added pre-write enforcement to managed atomic writes and Kokoro output generation.
+- Added backup and quarantine capacity checks.
+- Added overwrite-aware required-byte calculations.
+- Added durable capacity reservations and release controls.
+- Added Capacity tab to Operations Center.
+- Kept project JSON outside quota enforcement.
+- Validation: 178 tests passed.
+
+# Changelog
+
 ## v0.10.4 — Managed Worker Daemon
 - Added long-running `--daemon` worker mode.
 - Added durable daemon state, heartbeat, PID, worker identity, processed count, and last error.

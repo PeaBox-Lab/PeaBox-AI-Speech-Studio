@@ -1,3 +1,9 @@
+# v0.10.5 User Guide Update
+
+Open **Portfolio Operations → Capacity** to configure quotas. Set category limits in MB and a warning threshold, then save. The table shows current use and reservations. Use reservations before a planned large local operation, and release them when cancelled or complete.
+
+Project JSON is excluded. If a generated write is blocked, free space through retention/quarantine controls or raise the relevant category limit.
+
 # v0.10.4 User Guide Update
 
 ## Start the daemon

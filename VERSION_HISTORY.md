@@ -1,5 +1,10 @@
 # Version History
 
+## v0.10.5
+Added configurable local storage quotas, capacity warnings, managed-write enforcement, concurrent reservations, Operations Center capacity controls, and 178-test validation.
+
+# Version History
+
 ## v0.10.4
 Added a managed foreground worker daemon with single-process ownership, durable status and heartbeat, pause/resume, drain, shutdown, stale takeover, UI controls, and 165-test validation.
 

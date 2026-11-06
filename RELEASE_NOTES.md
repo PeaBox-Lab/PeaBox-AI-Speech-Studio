@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.10.5 Release Notes
+
+v0.10.5 delivers the roadmap’s local storage quota milestone. The application can warn before capacity pressure, block managed writes before they exceed configured limits, and reserve capacity for concurrent planned operations without restricting authoritative project JSON.
+
 # PeaBox Voice Studio v0.10.4 Release Notes
 
 v0.10.4 advances the local worker foundation into a managed daemon. One process can continuously drain Kokoro jobs while exposing durable status, heartbeat, pause/resume, drain, shutdown, and stale-takeover controls.

@@ -1,5 +1,21 @@
 # Roadmap
 
+## Delivered in v0.10.5
+- Local storage quota categories
+- Warning and hard-limit policies
+- Managed write preflight
+- Concurrent capacity reservations
+- Operations Center Capacity tab
+- Project JSON exclusion
+
+## Recommended next release
+- Object-storage abstraction over local managed categories
+- Cloud-provider sandbox integration tests
+- Browser-driven screenshot regression suite
+- Optional operating-system service installation with explicit consent
+
+# Roadmap
+
 ## Delivered in v0.10.4
 - Long-running local worker daemon
 - Single-daemon ownership and stale takeover
