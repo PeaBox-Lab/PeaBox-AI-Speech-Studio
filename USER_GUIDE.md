@@ -1,3 +1,7 @@
+# v0.11.0 User Guide Update
+
+Open **Portfolio Operations → Profiles**. Create a Draft, submit it using **Advance profile**, and approve it with a different actor label. Advance the Approved profile again to make it Active. Only the Active profile can be probed. Clone an existing profile to propose changes without editing the approved version.
+
 # v0.10.9 User Guide Update
 
 Open **Provider Setup → Offline provider sandbox** and select **Run offline provider contract suite**. Review each provider’s result, normalized voice count, fixture size, and issues. A passing result validates application payload construction only; configure a live session profile separately for real discovery or synthesis.

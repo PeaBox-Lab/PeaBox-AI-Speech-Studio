@@ -1,3 +1,11 @@
+# v0.11.0 Help Update
+
+- **Approval rejected:** reviewer label must differ from creator.
+- **Cannot edit:** clone the Approved/Active profile, or request changes before editing.
+- **Previous Active changed to Approved:** only one profile per backend can be Active.
+- **Cannot delete:** only Draft profiles can be deleted.
+- **Actor labels:** local labels, not authenticated identities.
+
 # v0.10.9 Help Update
 
 - **Sandbox passed, live failed:** check credentials, region, permissions, quota, billing, network, and provider status.

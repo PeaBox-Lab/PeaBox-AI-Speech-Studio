@@ -6,6 +6,7 @@ from peabox_voice_studio.services.object_storage import audit_manifest, copy_obj
 from peabox_voice_studio.services.maintenance import apply_retention,complete,create,load,retention_preview,save,status
 from peabox_voice_studio.services.recovery import backup_database,inventory,snapshot,validate_database
 from peabox_voice_studio.services.backend_resilience import CircuitBreaker, ResilientBackend, RetryPolicy, resilience_report
+from peabox_voice_studio.services.resilience_profiles import active_profile, audit_log as resilience_audit, clone_profile, create_profile, delete_draft, instantiate, list_profiles, profile_diff, transition, update_profile
 from peabox_voice_studio.services.storage_backends import MemoryBackend, contract_report, migration_preview as backend_migration_preview, migrate as migrate_backend, registry as backend_registry
 from peabox_voice_studio.services.storage_policy import active_reservations,load_policy,policy_status,release_reservation,reserve,save_policy
 from peabox_voice_studio.ui import empty_state,kpi_card,section
@@ -17,7 +18,7 @@ def render(ctx:AppContext)->None:
  with cols[2]:kpi_card('Pending approvals',str(sum(x['pending_approvals'] for x in rows)),'Awaiting decisions')
  with cols[3]:kpi_card('Unassigned',str(sum(x['owner']=='Unassigned' for x in rows)),'Projects without owner')
  with cols[4]:kpi_card('Storage',f'{len(files)} files',f"{sum(x['bytes'] for x in files)/1048576:.1f} MB")
- tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects','Backends','Resilience'])
+ tabs=st.tabs(['Portfolio','Recovery','Maintenance','Capacity','Objects','Backends','Resilience','Profiles'])
  with tabs[0]:
   if rows:st.dataframe(rows,use_container_width=True,hide_index=True)
   else:empty_state('No projects','Create a project to begin portfolio monitoring.','Open Project Workspace','Projects')
@@ -44,6 +45,8 @@ def render(ctx:AppContext)->None:
   _render_storage_backends_tab()
  with tabs[6]:
   _render_backend_resilience_tab()
+ with tabs[7]:
+  _render_resilience_profiles_tab()
 
 # Capacity policy is rendered as the fourth Operations tab.
 def _render_capacity_tab():
@@ -115,3 +118,45 @@ def _render_backend_resilience_tab():
  report=st.session_state.get('backend_resilience_report')
  if report:st.dataframe([{'Backend':x['backend'],'Healthy':x['healthy'],'Circuit':x.get('circuit',{}).get('state','n/a'),'Calls':x.get('metrics',{}).get('calls',0),'Retries':x.get('metrics',{}).get('retries',0),'Timeouts':x.get('metrics',{}).get('timeouts',0),'Last error':x.get('metrics',{}).get('last_error','')} for x in report],use_container_width=True,hide_index=True)
  st.info('The local backend is fast and durable. These policies establish the contract required before any future remote backend is approved.')
+
+def _render_resilience_profiles_tab():
+ st.caption('Profiles persist resilience settings without credentials. Activation requires an approved profile and uses local actor labels, not authenticated identities.')
+ actor=st.text_input('Profile actor label',value=st.session_state.get('resilience_actor','Local User'));st.session_state['resilience_actor']=actor
+ profiles=list_profiles();name=st.text_input('New profile name',value='Local backend standard');backend=st.selectbox('Profile backend',['local','memory']);description=st.text_area('Profile description',height=70)
+ c1,c2,c3=st.columns(3);attempts=c1.number_input('Profile retry attempts',1,10,3);timeout=c2.number_input('Profile timeout seconds',0.1,3600.0,5.0);threshold=c3.number_input('Profile circuit threshold',1,100,3)
+ d1,d2,d3=st.columns(3);delay=d1.number_input('Profile retry delay',0.0,60.0,0.05);backoff=d2.number_input('Profile backoff',1.0,10.0,2.0);recovery=d3.number_input('Profile recovery seconds',1,86400,30)
+ settings={'attempts':attempts,'delay_seconds':delay,'backoff':backoff,'timeout_seconds':timeout,'failure_threshold':threshold,'recovery_seconds':recovery}
+ if st.button('Create Draft resilience profile'):
+  try:create_profile(name,backend,settings,actor,description);st.rerun()
+  except Exception as exc:st.error(str(exc))
+ if profiles:
+  selected=st.selectbox('Saved resilience profile',profiles,format_func=lambda x:f"{x['name']} · {x['backend']} · {x['status']}")
+  st.json({'Status':selected['status'],'Backend':selected['backend'],'Creator':selected['created_by'],'Reviewer':selected.get('reviewer') or 'None','Settings':selected['settings']})
+  note=st.text_input('Review or transition note');actions=st.columns(6)
+  transitions={'Draft':'In Review','In Review':'Approved','Changes Requested':'In Review','Approved':'Active','Active':'Approved','Archived':'Draft'}
+  target=transitions.get(selected['status'])
+  if actions[0].button('Advance profile',disabled=not target):
+   try:transition(selected['id'],target,actor,note);st.rerun()
+   except Exception as exc:st.error(str(exc))
+  if actions[1].button('Request changes',disabled=selected['status']!='In Review'):
+   try:transition(selected['id'],'Changes Requested',actor,note);st.rerun()
+   except Exception as exc:st.error(str(exc))
+  if actions[2].button('Archive profile',disabled=selected['status']=='Archived'):
+   try:transition(selected['id'],'Archived',actor,note);st.rerun()
+   except Exception as exc:st.error(str(exc))
+  if actions[3].button('Clone profile'):
+   try:clone_profile(selected['id'],f"{selected['name']} copy",actor);st.rerun()
+   except Exception as exc:st.error(str(exc))
+  if actions[4].button('Delete Draft',disabled=selected['status']!='Draft'):
+   try:delete_draft(selected['id'],actor);st.rerun()
+   except Exception as exc:st.error(str(exc))
+  active=active_profile(selected['backend'])
+  if actions[5].button('Probe Active profile',disabled=not active):
+   try:
+    wrapped=instantiate(active,backend_registry.create(active['backend']));st.session_state['active_profile_probe']=wrapped.health()
+   except Exception as exc:st.error(str(exc))
+  if active and active['id']!=selected['id']:st.dataframe(profile_diff(selected,active),use_container_width=True,hide_index=True)
+  if st.session_state.get('active_profile_probe'):st.json(st.session_state['active_profile_probe'])
+ audit=resilience_audit()
+ if audit:
+  with st.expander('Resilience profile audit history'):st.dataframe(list(reversed(audit[-100:])),use_container_width=True,hide_index=True)

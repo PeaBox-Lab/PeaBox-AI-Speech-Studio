@@ -28,3 +28,6 @@ data/object_manifest.json
 data/object_storage.lock
 
 # Storage backend selection remains runtime-only in v0.10.7.
+
+data/resilience_profiles.json
+data/resilience_profiles.lock

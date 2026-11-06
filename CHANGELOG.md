@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.11.0 — Governed Resilience Profiles
+- Added durable secret-free resilience profiles.
+- Added Draft, review, changes, approval, activation, deactivation, and archive lifecycle.
+- Enforced reviewer separation from creator.
+- Enforced one Active profile per backend.
+- Limited edits to Draft and Changes Requested.
+- Added clone, compare, delete-Draft, audit, and Active health probe.
+- Added Profiles tab to Operations Center.
+- Validation: 247 tests passed.
+
+# Changelog
+
 ## v0.10.9 — Cloud Provider Sandbox
 - Added deterministic offline sandboxes for Azure Speech, Polly standard/neural, and Google Cloud TTS.
 - Added normalized voice discovery fixtures.

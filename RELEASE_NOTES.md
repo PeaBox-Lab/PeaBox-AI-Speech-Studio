@@ -1,3 +1,7 @@
+# PeaBox Voice Studio v0.11.0 Release Notes
+
+v0.11.0 adds durable governance to backend resilience configuration. Retry, timeout, and circuit policies can now move through a local draft-review-approval-activation lifecycle before they are used to wrap a backend.
+
 # PeaBox Voice Studio v0.10.9 Release Notes
 
 v0.10.9 delivers the roadmap’s cloud-provider sandbox milestone. Azure, Polly, and Google application contracts can now be tested deterministically without network access, real credentials, provider charges, or external service dependencies.

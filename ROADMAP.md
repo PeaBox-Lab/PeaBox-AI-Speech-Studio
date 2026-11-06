@@ -1,5 +1,20 @@
 # Roadmap
 
+## Delivered in v0.11.0
+- Durable resilience profiles
+- Draft/review/approval/activation lifecycle
+- Reviewer separation
+- Single-active enforcement
+- Clone, compare, audit, and runtime probe
+
+## Recommended next release
+- Browser-driven screenshot regression suite
+- Live provider integration harness with explicit test credentials and cost guardrails
+- Optional remote backend with explicit credentials, approval, and rollback
+- Authenticated identity integration for governance actions
+
+# Roadmap
+
 ## Delivered in v0.10.9
 - Azure offline sandbox
 - Polly standard and neural offline sandboxes

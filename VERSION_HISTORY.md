@@ -1,5 +1,10 @@
 # Version History
 
+## v0.11.0
+Added durable, secret-free, reviewed resilience profiles with controlled lifecycle, reviewer separation, single-active enforcement, audit history, runtime instantiation, and 247-test validation.
+
+# Version History
+
 ## v0.10.9
 Added deterministic offline Azure, Polly, and Google sandboxes, provider contract validation, failure injection, sanitized evidence, UI controls, and 232-test verification.
 

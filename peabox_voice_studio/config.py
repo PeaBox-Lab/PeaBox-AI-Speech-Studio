@@ -1,6 +1,6 @@
 from pathlib import Path
 APP_NAME = "PeaBox Voice Studio"
-VERSION = "0.10.9"
+VERSION = "0.11.0"
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 PROJECTS_DIR = DATA_DIR / "projects"
@@ -36,3 +36,6 @@ STORAGE_POLICY_LOCK_PATH = DATA_DIR / "storage_policy.lock"
 
 OBJECT_MANIFEST_PATH = DATA_DIR / "object_manifest.json"
 OBJECT_STORAGE_LOCK_PATH = DATA_DIR / "object_storage.lock"
+
+RESILIENCE_PROFILES_PATH = DATA_DIR / "resilience_profiles.json"
+RESILIENCE_PROFILES_LOCK_PATH = DATA_DIR / "resilience_profiles.lock"

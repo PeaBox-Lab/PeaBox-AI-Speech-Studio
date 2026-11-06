@@ -1,3 +1,8 @@
+# v0.11.0 Feature Additions
+
+## Governed Resilience Profiles
+Persist retry, timeout, and circuit policies; review and approve them; activate one per backend; compare changes; and retain complete local history before runtime use.
+
 # v0.10.9 Feature Additions
 
 ## Offline Cloud Provider Sandbox

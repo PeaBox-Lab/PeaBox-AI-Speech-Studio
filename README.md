@@ -1,23 +1,22 @@
-# PeaBox Voice Studio v0.10.9
-A local-first corporate voice-production workspace with modular screens, bounded workflows, governance, recovery, workers, quotas, object storage, resilient backends, and offline cloud-provider contract testing.
+# PeaBox Voice Studio v0.11.0
+A local-first corporate voice-production workspace with modular screens, governed workflows, provider sandboxes, managed workers, storage backends, backend resilience, and durable reviewed resilience profiles.
 
-## v0.10.9 Cloud Provider Sandbox
-- Deterministic offline Azure Speech adapter
-- Deterministic offline Amazon Polly standard and neural adapters
-- Deterministic offline Google Cloud TTS adapter
-- Voice discovery normalization contract tests
-- Provider-specific SSML and speed mapping validation
-- Pause-marker compilation and XML escaping checks
-- Deterministic MP3-like audio fixtures
-- Discovery and synthesis failure injection
-- Sanitized call evidence that records profile fields but not values
-- Provider Setup contract suite with clear live-service limitations
-- No network access or real credentials required
+## v0.11.0 Governed Resilience Profiles
+- Durable retry, timeout, and circuit settings without credentials
+- Draft, In Review, Changes Requested, Approved, Active, and Archived states
+- Controlled transition rules
+- Reviewer must differ from profile creator for approval
+- One Active profile per backend
+- New activation automatically returns the previous Active profile to Approved
+- Draft/changes-only editing
+- Clone, compare, archive, reactivate, and Draft deletion
+- Append-only local profile audit history
+- Active profile instantiation and health probing
+- Operations Center Profiles tab
 
 ## Validation
-- 232 automated tests passed
-- Azure, Polly, and Google payload and catalog contracts verified
-- Zero-network module loading validated
+- 247 automated tests passed
+- Validation bounds, transitions, reviewer separation, activation, cloning, deletion, diffs, audit, and instantiation verified
 - All Python sources compile successfully
 - Every archive entry is verified against its source hash
 
@@ -25,7 +24,7 @@ A local-first corporate voice-production workspace with modular screens, bounded
 1. Install 64-bit Python 3.10, 3.11, or 3.12.
 2. Extract the ZIP into a new folder.
 3. Run `start_windows.bat`.
-4. Confirm the launcher and sidebar display v0.10.9.
+4. Confirm the launcher and sidebar display v0.11.0.
 5. Keep the `data`, `outputs`, and `models` folders writable.
 ## Validation
 ```bash

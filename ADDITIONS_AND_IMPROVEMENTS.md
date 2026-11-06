@@ -1,3 +1,23 @@
+# v0.11.0 Additions and Improvements
+
+## Profile governance
+- Draft creation
+- Review submission
+- Changes Requested
+- Approval
+- Activation
+- Deactivation
+- Archive and reactivation
+
+## Controls
+- Creator/reviewer separation
+- Single Active profile per backend
+- Draft-only deletion
+- Draft/changes-only editing
+- Clone and compare
+- Audit history
+- Active profile health probe
+
 # v0.10.9 Additions and Improvements
 
 ## Offline sandboxes

@@ -1,3 +1,26 @@
+# PeaBox Voice Studio v0.11.0 Detailed Release Notes
+
+## Durable profile contents
+Profiles persist backend name, retry attempts, delay, backoff, operation timeout, circuit failure threshold, recovery duration, description, creator, reviewer, review note, timestamps, status, and history. Credentials, endpoints, and object content are excluded.
+
+## Lifecycle
+Draft profiles can be edited or submitted for review. Review can approve or request changes. Changes Requested can return to Draft or review. Approved profiles may be activated. Active profiles may return to Approved or be archived. Archived profiles may return to Draft.
+
+## Separation and activation
+The approving reviewer label must differ from the creator label. Activating a profile automatically deactivates another Active profile for the same backend by returning it to Approved. This preserves one effective profile per backend.
+
+## Change control
+Only Draft and Changes Requested profiles can be edited. Profile updates retain before/after settings. Profiles can be cloned to a new Draft and compared against the current Active profile. Only Draft profiles can be deleted.
+
+## Audit
+Create, update, transition, activation replacement, and deletion actions append local audit records containing timestamp, actor label, action, profile identity, and transition details. Labels remain local and unauthenticated.
+
+## Runtime use
+Only an Active profile can instantiate a resilient backend. The profile is validated again and converted into RetryPolicy, CircuitBreaker, timeout, and ResilientBackend objects. The UI can run a health probe using the Active profile.
+
+## Verification
+247 tests cover bounds, persistence, edit restrictions, reviewer separation, transition rules, single-active enforcement, changes round trip, cloning, deletion, diffs, audit, Active requirements, instantiation, and UI controls.
+
 # PeaBox Voice Studio v0.10.9 Detailed Release Notes
 
 ## Azure sandbox
