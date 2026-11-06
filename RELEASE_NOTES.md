@@ -1,6 +1,6 @@
-# PeaBox Voice Studio v0.09.0 Release Notes
+# PeaBox Voice Studio v0.09.1 Release Notes
 
-v0.09.0 turns the application shell into a modular screen platform. High-level workspace screens now render through a registry and shared context rather than living directly in the main script. The new Operations Center consolidates project health, repair previews, repository maintenance, local maintenance plans, and operational events. JSON project files remain the source of truth; SQLite is a disposable, rebuildable index.
+v0.09.1 completes the screen-architecture transition begun in v0.09.0. Every navigation destination now has an independent renderer module, while the main application only initializes shared state and dispatches the selected screen. This lowers regression risk, makes page ownership explicit, and creates a stable base for browser tests and future provider integrations.
 
 # PeaBox Voice Studio v0.07.4 Release Notes
 This release implements the highest-priority findings from the v0.07.3 audit. Generated outputs no longer silently replace files with the same name. Timeline readiness now checks the stored audio content hash, not only file existence and script-block state.

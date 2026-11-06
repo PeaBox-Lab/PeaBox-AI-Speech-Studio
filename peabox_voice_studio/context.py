@@ -7,7 +7,9 @@ class AppContext:
     store: Any
     project: Any
     preferences: dict
+    profiles: dict
+    voice_catalogs: dict
     configured_providers: Callable[[], set[str]]
-    open_project: Callable[[str], None]
     save_project: Callable[[Any], None]
+    open_project: Callable[[str], None]
     set_active_project: Callable[[Any], None]

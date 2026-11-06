@@ -1,13 +1,11 @@
-import json
-from pathlib import Path
-import streamlit as st
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.ui import callout, empty_state, kpi_card, navigate_to, section, workflow_step
-from peabox_voice_studio.services.commands import record_command, resolve_commands, search_commands
-from peabox_voice_studio.services.preferences import save_preferences
+from peabox_voice_studio.screens.dependencies import *
 
 def render(ctx: AppContext) -> None:
-    project=ctx.project; ui_preferences=ctx.preferences
+    store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences
+    profiles=ctx.profiles; voice_catalogs=ctx.voice_catalogs
+    configured_providers=ctx.configured_providers; save_project=ctx.save_project
+    open_project=ctx.open_project; set_active_project=ctx.set_active_project
     section("Search workspace commands", "Commands navigate to safe screens and never execute destructive project actions.")
     command_query = st.text_input("Search screens and workflows", placeholder="Try: transcript, batch, provider, approval, timeline")
     command_results = search_commands(command_query, project is not None)

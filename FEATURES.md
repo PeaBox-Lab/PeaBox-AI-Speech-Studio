@@ -1,10 +1,10 @@
-# v0.09.0 Feature Additions
+# v0.09.1 Feature Additions
 
-## Modular application shell
-Workspace screens can be developed and tested as independent renderer modules with a stable shared context.
+## Fully modular workspace
+Every workspace destination is isolated in its own screen module and resolved through one central registry.
 
 ## Operations Center
-Monitor project health, preview safe repairs, rebuild the metadata index, complete maintenance plans, and review operational events from one screen.
+Review project health, preview and confirm safe repairs, rebuild the secondary project index, manage local maintenance plans, and inspect operational events.
 
 # Features Guide
 ## Workspace productivity

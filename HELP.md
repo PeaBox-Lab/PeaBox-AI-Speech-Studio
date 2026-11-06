@@ -1,7 +1,10 @@
-# v0.09.0 Help Update
+# v0.09.1 Help Update
 
-## Operations and recovery
-If the project index is missing or inconsistent, open **Operations Center → Repository** and rebuild it from the project JSON files. If a project health report finds repairable metadata issues, review the preview and confirm the repair plan. Audio assets are not recreated by metadata repair.
+## Repository recovery
+The SQLite project list is secondary. If it is missing or inconsistent, use **Operations Center → Repository → Rebuild project index**. The rebuild reads project JSON and does not replace it.
+
+## Project repairs
+Health repairs affect only explicitly previewed metadata problems. Missing audio cannot be recreated automatically; relink those assets in Timeline Studio.
 
 # Help Articles
 ## A timeline clip says the audio changed

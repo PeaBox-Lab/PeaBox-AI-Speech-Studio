@@ -1,26 +1,28 @@
 import sqlite3
-from pathlib import Path
 from peabox_voice_studio.config import DATABASE_PATH
-from peabox_voice_studio.models import utc_now
+
 def init(path=DATABASE_PATH):
- p=Path(path);p.parent.mkdir(parents=True,exist_ok=True)
- with sqlite3.connect(p) as c:c.execute('CREATE TABLE IF NOT EXISTS projects(id TEXT PRIMARY KEY,name TEXT,updated_at TEXT,status TEXT,issues INTEGER,project_path TEXT,indexed_at TEXT)')
+    path.parent.mkdir(parents=True,exist_ok=True);c=sqlite3.connect(path);c.row_factory=sqlite3.Row
+    c.execute('create table if not exists projects(id text primary key,name text,description text,updated_at text,path text,issues integer default 0)');c.commit();return c
 def upsert(project,project_path,issues=0,path=DATABASE_PATH):
- init(path);status=project.settings.get('governance',{}).get('status','Draft')
- with sqlite3.connect(path) as c:c.execute('INSERT INTO projects VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,updated_at=excluded.updated_at,status=excluded.status,issues=excluded.issues,project_path=excluded.project_path,indexed_at=excluded.indexed_at',(project.id,project.name,project.updated_at,status,issues,str(project_path),utc_now()))
-def list_projects(path=DATABASE_PATH):
- init(path)
- with sqlite3.connect(path) as c:c.row_factory=sqlite3.Row;return [dict(x) for x in c.execute('SELECT * FROM projects ORDER BY updated_at DESC')]
-def rebuild(items,path=DATABASE_PATH):
- init(path)
- with sqlite3.connect(path) as c:c.execute('DELETE FROM projects')
- for p,pp,i in items:upsert(p,pp,i,path)
- return len(items)
-def health(path=DATABASE_PATH):
- init(path)
- with sqlite3.connect(path) as c:integrity=c.execute('PRAGMA integrity_check').fetchone()[0];count=c.execute('SELECT COUNT(*) FROM projects').fetchone()[0]
- return {'ready':integrity=='ok','integrity':integrity,'projects':count,'bytes':Path(path).stat().st_size}
+    c=init(path)
+    try:c.execute('insert into projects values(?,?,?,?,?,?) on conflict(id) do update set name=excluded.name,description=excluded.description,updated_at=excluded.updated_at,path=excluded.path,issues=excluded.issues',(project.id,project.name,project.description,project.updated_at,str(project_path),issues));c.commit()
+    finally:c.close()
 def remove(project_id,path=DATABASE_PATH):
- c=init(path)
- try:c.execute('delete from projects where id=?',(project_id,));c.commit()
- finally:c.close()
+    c=init(path)
+    try:c.execute('delete from projects where id=?',(project_id,));c.commit()
+    finally:c.close()
+def list_projects(path=DATABASE_PATH):
+    c=init(path)
+    try:return [dict(x) for x in c.execute('select * from projects order by updated_at desc')]
+    finally:c.close()
+def rebuild(items,path=DATABASE_PATH):
+    c=init(path)
+    try:
+        c.execute('delete from projects')
+        c.executemany('insert into projects values(?,?,?,?,?,?)',[(p.id,p.name,p.description,p.updated_at,str(pp),issues) for p,pp,issues in items]);c.commit()
+    finally:c.close()
+def health(path=DATABASE_PATH):
+    try:
+        c=init(path);count=c.execute('select count(*) from projects').fetchone()[0];c.close();return {'ready':True,'projects':count,'path':str(path)}
+    except Exception as exc:return {'ready':False,'projects':0,'error':type(exc).__name__}

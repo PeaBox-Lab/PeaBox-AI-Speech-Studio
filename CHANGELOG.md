@@ -1,13 +1,13 @@
 # Changelog
 
-## v0.09.0 — Modular Screen Architecture
-- Introduced `AppContext`, a central screen registry, and dedicated screen modules.
-- Extracted Dashboard, Command Center, Preferences, Operations, and Help from the application bootstrap.
-- Added Operations Center project health, confirmed safe repairs, repository rebuild, maintenance plans, and operational events.
-- Restored the rebuildable SQLite metadata index while keeping project JSON authoritative.
-- Added architecture tests and updated UI tests for modular ownership.
-- Reduced the bootstrap below the architecture line-count guard while preserving all prior workflows.
-- Validation: 157 tests passed.
+## v0.09.1 — Full Screen Modularization
+- Moved every navigation page into `peabox_voice_studio/screens/`.
+- Reduced `app.py` to initialization, context construction, navigation, and registry dispatch.
+- Expanded `AppContext` for provider profiles, voice catalogs, projects, preferences, and project lifecycle callbacks.
+- Added an Operations Center for health, safe repairs, repository rebuilds, maintenance plans, and event evidence.
+- Integrated project save/delete activity with the rebuildable metadata index and operations log.
+- Added registry uniqueness, complete navigation coverage, bootstrap-size, module-boundary, smoke, repository, repair, maintenance, and event tests.
+- Validation: 165 tests passed.
 
 # Changelog
 ## v0.07.4 — 2026-11-05

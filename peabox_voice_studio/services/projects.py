@@ -32,10 +32,8 @@ class ProjectStore:
             try:
                 from peabox_voice_studio.services.repository import upsert
                 from peabox_voice_studio.services.operations import record
-                upsert(project, path)
-                record("project.saved", project_id=project.id, details={"name": project.name})
-            except Exception:
-                pass
+                upsert(project,path);record("project.saved",project_id=project.id,details={"name":project.name})
+            except Exception:pass
         return project
     def load(self, project_id: str) -> Project:
         path = self._path(project_id)
@@ -56,9 +54,8 @@ class ProjectStore:
             try:
                 from peabox_voice_studio.services.repository import remove
                 from peabox_voice_studio.services.operations import record
-                remove(project_id); record("project.deleted", project_id=project_id)
-            except Exception:
-                pass
+                remove(project_id);record("project.deleted",project_id=project_id)
+            except Exception:pass
     def import_project(self, raw: bytes | str, preserve_identity: bool = False) -> Project:
         text = raw.decode("utf-8-sig") if isinstance(raw, bytes) else raw
         payload = json.loads(text)

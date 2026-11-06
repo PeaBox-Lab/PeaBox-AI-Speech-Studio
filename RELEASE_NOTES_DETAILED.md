@@ -1,16 +1,19 @@
-# PeaBox Voice Studio v0.09.0 Detailed Release Notes
+# PeaBox Voice Studio v0.09.1 Detailed Release Notes
 
-## Architecture
-`AppContext` defines the stable dependencies available to modular screens. `SCREEN_RENDERERS` maps navigation identities to callable renderers. The bootstrap initializes services, resolves navigation, and dispatches registered screens while existing production screens continue to operate unchanged.
+## Complete screen extraction
+All 19 user-facing navigation pages now live in dedicated modules: dashboard, projects, command center, preferences, operations, governance, approvals, diagnostics, provider setup, voice library, quality, audio lab, timeline, script blocks, batch production, speech generation, transcription, history, and help.
 
-## Modular screens
-Executive Dashboard, Command Center, Interface Preferences, Operations Center, and Roadmap & Help now live in dedicated modules. This isolates feature ownership, makes screen-level testing practical, and prevents further growth of the monolithic bootstrap.
+## Application contract
+`AppContext` supplies project state, preferences, provider profiles, discovered voice catalogs, configured-provider resolution, and project lifecycle callbacks. `SCREEN_RENDERERS` is the single dispatch map and rejects unknown destinations. Screen modules never import the application bootstrap.
 
-## Operations Center
-The Operations Center reports project health, previews deterministic safe repairs, requires confirmation before mutation, rebuilds the secondary SQLite index, records local maintenance-plan completions, and displays structured operational events.
+## Operations and recovery
+The Operations Center provides project health reports, preview-only repair plans, confirmation-gated repairs, a rebuildable SQLite project index, local maintenance plans, and structured event history. Project JSON remains the source of truth.
 
-## Compatibility and validation
-Project JSON remains authoritative and portable. Existing schema migration, file locks, collision-safe outputs, timeline integrity checks, transactional bundle imports, bounded audio mixing, governance, provider, transcription, and quality workflows remain available. 157 automated tests passed.
+## Compatibility
+The release retains project schema migration, collision-safe output naming, project file locks, asset hashes, transactional bundle import, bounded timeline mixing, cached models, sanitized errors, governance, approvals, multi-provider speech, editable transcription, quality processing, and portable timeline bundles.
+
+## Verification
+165 tests cover cumulative functionality, full registry coverage, renderer contracts, module boundaries, page smoke execution, operations services, project health, repair behavior, maintenance plans, and repository rebuilding.
 
 # Detailed Release Notes — v0.07.4
 ## Data integrity

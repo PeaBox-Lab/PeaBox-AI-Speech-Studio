@@ -1,16 +1,18 @@
 # Roadmap
 
-## Delivered in v0.09.0
-- Shared application context
-- Screen registry and renderer contract
-- Modular Dashboard, Command Center, Preferences, Operations, and Help screens
-- Operations Center with health, repairs, repository maintenance, plans, and events
+## Delivered in v0.09.1
+- Dedicated module for all 19 navigation pages
+- Complete registry dispatch
+- Expanded application context
+- Operations and repository recovery foundation
+- Page smoke and module-boundary test coverage
 
-## Next architecture milestones
-- Extract remaining production, audio, transcription, governance, and project screens
-- Add browser-driven navigation tests
-- Add provider sandbox integration tests
-- Add schema migration fixtures across historical releases
+## Recommended next release
+- Browser-driven navigation and visual regression suite
+- Screen-specific service facades to replace the shared dependency surface
+- Historical project migration fixture matrix
+- Cloud-provider sandbox integration tests
+- Backup, restore, storage inventory, and support-bundle UI consolidation
 
 # Evidence-Based Product Roadmap
 ## Roadmap basis

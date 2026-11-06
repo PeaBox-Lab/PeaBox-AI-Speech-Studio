@@ -1,26 +1,22 @@
-import ast
-import unittest
+import ast,unittest
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[1];S=ROOT/'peabox_voice_studio/screens'
+EXPECTED={'Dashboard','Projects','Command Center','Preferences','Operations','Governance','Approvals','System Check','Provider Setup','Voice Library','Quality Studio','Audio Quality Lab','Timeline Studio','Script Blocks','Batch Production','Create Speech','Transcription','Render History','Roadmap & Help'}
 class ScreenArchitectureTests(unittest.TestCase):
-    def test_registry_has_unique_modular_screens(self):
-        source=(ROOT/'peabox_voice_studio/screens/registry.py').read_text()
-        tree=ast.parse(source)
-        registry=next(n.value for n in ast.walk(tree) if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='SCREEN_RENDERERS' for t in n.targets))
-        keys=[k.value for k in registry.keys]
-        self.assertEqual(len(keys),len(set(keys)))
-        self.assertEqual(set(keys),{'Dashboard','Command Center','Preferences','Operations','Roadmap & Help'})
-    def test_every_screen_exposes_renderer(self):
-        for name in ('dashboard','command_center','preferences','operations','help'):
-            tree=ast.parse((ROOT/f'peabox_voice_studio/screens/{name}.py').read_text())
-            functions={n.name for n in tree.body if isinstance(n,ast.FunctionDef)}
-            self.assertIn('render',functions)
-    def test_bootstrap_dispatches_registry(self):
-        source=(ROOT/'app.py').read_text()
-        self.assertIn('if page in SCREEN_RENDERERS:',source)
-        self.assertIn('render_screen(page, app_context)',source)
-        self.assertLess(len(source.splitlines()),900)
-    def test_context_has_required_services(self):
-        annotations=__import__('peabox_voice_studio.context',fromlist=['AppContext']).AppContext.__annotations__
-        self.assertTrue({'version','store','project','preferences','configured_providers','open_project','save_project','set_active_project'}<=set(annotations))
+ def test_registry_has_every_page_once(self):
+  tree=ast.parse((S/'registry.py').read_text());node=next(n.value for n in ast.walk(tree) if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='SCREEN_RENDERERS' for t in n.targets));keys=[k.value for k in node.keys];self.assertEqual(set(keys),EXPECTED);self.assertEqual(len(keys),len(set(keys)))
+ def test_every_screen_exposes_render(self):
+  registry=(S/'registry.py').read_text()
+  modules={v.split('.')[0] for v in [ast.unparse(x) for n in ast.walk(ast.parse(registry)) if isinstance(n,ast.Dict) for x in n.values]}
+  for module in modules:
+   tree=ast.parse((S/f'{module}.py').read_text());self.assertIn('render',{n.name for n in tree.body if isinstance(n,ast.FunctionDef)})
+ def test_context_contract_is_complete(self):
+  from peabox_voice_studio.context import AppContext
+  required={'version','store','project','preferences','profiles','voice_catalogs','configured_providers','save_project','open_project','set_active_project'};self.assertTrue(required<=set(AppContext.__annotations__))
+ def test_bootstrap_stays_small(self):self.assertLess(len((ROOT/'app.py').read_text().splitlines()),60)
+ def test_screens_do_not_import_application(self):
+  for path in S.glob('*.py'):
+   tree=ast.parse(path.read_text())
+   imports=[n for n in ast.walk(tree) if isinstance(n,(ast.Import,ast.ImportFrom))]
+   self.assertFalse(any((isinstance(n,ast.Import) and any(x.name=='app' for x in n.names)) or (isinstance(n,ast.ImportFrom) and n.module=='app') for n in imports))
 if __name__=='__main__':unittest.main()

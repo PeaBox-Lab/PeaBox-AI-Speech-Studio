@@ -1,16 +1,11 @@
-import json
-from pathlib import Path
-import streamlit as st
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.ui import callout, empty_state, kpi_card, navigate_to, section, workflow_step
-from peabox_voice_studio.services.commands import onboarding_status
-from peabox_voice_studio.services.diagnostics import system_diagnostics
-from peabox_voice_studio.services.governance import governance, governance_readiness, governance_summary
-from peabox_voice_studio.services.timeline import list_clips, validate_timeline
-from peabox_voice_studio.services.preferences import resolve_projects, save_preferences
+from peabox_voice_studio.screens.dependencies import *
 
 def render(ctx: AppContext) -> None:
-    store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences; configured_providers=ctx.configured_providers; open_project=ctx.open_project
+    store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences
+    profiles=ctx.profiles; voice_catalogs=ctx.voice_catalogs
+    configured_providers=ctx.configured_providers; save_project=ctx.save_project
+    open_project=ctx.open_project; set_active_project=ctx.set_active_project
     projects = store.list()
     diagnostics = system_diagnostics()
     ready_checks = sum(row["Status"] == "Ready" for row in diagnostics)

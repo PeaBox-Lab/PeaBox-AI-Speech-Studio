@@ -10,7 +10,7 @@ def load():
         data=json.loads(MAINTENANCE_PATH.read_text());return data if isinstance(data,list) else []
     except Exception:return []
 def save(plans):atomic_write_bytes(MAINTENANCE_PATH,json.dumps(plans,ensure_ascii=False,indent=2).encode())
-def create(name,frequency,tasks=None):return {'id':uuid.uuid4().hex,'name':name.strip() or 'Maintenance plan','frequency':frequency,'tasks':tasks or ['Review project health','Review storage and backups','Review operations log'],'enabled':True,'last_completed_at':'','next_due_at':now(),'history':[]}
+def create(name,frequency,tasks=None):return {'id':uuid.uuid4().hex,'name':name.strip() or 'Maintenance plan','frequency':frequency,'tasks':tasks or ['Review project health','Review repository index','Review operational events'],'enabled':True,'last_completed_at':'','next_due_at':now(),'history':[]}
 def status(plan,at=None):
     if not plan.get('enabled',True):return 'Paused'
     due=plan.get('next_due_at','')

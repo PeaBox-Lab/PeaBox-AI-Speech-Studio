@@ -1,12 +1,11 @@
-import json
-from pathlib import Path
-import streamlit as st
 from peabox_voice_studio.context import AppContext
-from peabox_voice_studio.ui import callout, empty_state, kpi_card, navigate_to, section, workflow_step
-from peabox_voice_studio.services.preferences import save_preferences
+from peabox_voice_studio.screens.dependencies import *
 
 def render(ctx: AppContext) -> None:
-    ui_preferences=ctx.preferences
+    store=ctx.store; project=ctx.project; ui_preferences=ctx.preferences
+    profiles=ctx.profiles; voice_catalogs=ctx.voice_catalogs
+    configured_providers=ctx.configured_providers; save_project=ctx.save_project
+    open_project=ctx.open_project; set_active_project=ctx.set_active_project
     section("Personal workspace preferences", "These preferences are stored locally on this device and are not included in project exports.")
     area_options = ["Overview", "Production", "Audio & Quality", "Administration", "Support"]
     default_area = st.selectbox("Default workspace area", area_options, index=area_options.index(ui_preferences.get("default_area", "Overview")) if ui_preferences.get("default_area") in area_options else 0)

@@ -1,13 +1,25 @@
-# v0.09.0 Additions and Improvements
+# v0.09.1 Additions and Improvements
 
-- Modular screen package and shared application context
-- Registry-based navigation dispatch
-- New Operations Center navigation area
-- Project health and repair workflow
+## Architecture
+- Dedicated module for every navigation page
+- 31-line application bootstrap
+- Expanded shared application context
+- Single complete screen registry
+- Enforced one-page/one-renderer mapping
+
+## Operations
+- Project health summary and issue details
+- Preview-only safe repair plans
+- Explicit repair confirmation
 - Rebuildable project metadata index
-- Local maintenance plans and completion history
+- Local maintenance plans and completion evidence
 - Structured operations event viewer
-- Architecture and bootstrap regression guards
+
+## Quality
+- Full page smoke coverage
+- Module-boundary checks
+- Repository and operations service tests
+- 165 passing automated tests
 
 # v0.07.4 Additions and Improvements
 ## Integrity

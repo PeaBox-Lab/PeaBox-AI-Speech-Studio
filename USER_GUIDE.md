@@ -1,7 +1,10 @@
-# v0.09.0 User Guide Update
+# v0.09.1 User Guide Update
 
 ## Operations Center
-Open **Overview → Operations Center** to review project health, repository status, maintenance plans, and operational events. Repairs are previewed first and require explicit confirmation. Rebuilding the project index does not replace or modify project JSON files.
+Open **Overview → Operations Center** to inspect project health, rebuild the metadata index, complete local maintenance plans, and review events. Repairs always appear as a preview and require explicit confirmation.
+
+## Navigation behavior
+All screens retain their existing names and workflows. The modular architecture changes internal ownership without changing project files or expected user actions.
 
 # User Guide
 ## Preserve output history

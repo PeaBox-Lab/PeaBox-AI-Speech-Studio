@@ -1,7 +1,7 @@
 # Version History
 
-## v0.09.0
-Modular screen architecture, shared application context, registry dispatch, Operations Center, project health and safe repairs, rebuildable repository index, maintenance plans, and architecture-quality tests.
+## v0.09.1
+Completed registry-driven modularization for all 19 navigation pages, reduced the bootstrap to initialization and dispatch, expanded the application context, restored operations and recovery workflows, and added 165-test validation.
 
 # Cumulative Version History
 - **v0.02.01** — Modular project workspace foundation
@@ -22,3 +22,12 @@ Modular screen architecture, shared application context, registry dispatch, Oper
 - **v0.07.2** — Quick actions, favorites, recents, and interface preferences
 - **v0.07.3** — Workspace Command Center, onboarding, and actionable empty states
 - **v0.07.4** — Reliability, integrity, migration, and runtime hardening
+================================================================================
+EXPORT SUMMARY
+================================================================================
+Files discovered: 85
+Text/source files exported: 85
+Binary files listed: 0
+Oversized files skipped: 0
+Failed files: 0
+Excluded directories: 1
